@@ -1,6 +1,6 @@
 @import url("lwarp.css") ;
 
-div.sidetoccontainer{
+div.sidetoccontainer__{
    position: fixed;
    z-index: 1;
    /* font-size: 1.5em; */
@@ -9,7 +9,7 @@ div.sidetoccontainer{
    width: 15%;
    /* bottom: 0; */
    /* font-size: 90%; */
-   /*display: ;		*/
+   display: none;		/**/
 }
 
 div.bodycontainer{
@@ -18,7 +18,7 @@ div.bodycontainer{
 }
 
 section.textbody{
-    margin: 3em 16% 0ex 1%;
+    margin: 3em 16% 0ex 16%;
 }
 
 blockquote p{
