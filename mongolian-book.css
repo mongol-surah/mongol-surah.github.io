@@ -18,7 +18,7 @@ div.bodycontainer{
 }
 
 section.textbody{
-    margin: 3em 16% 0ex 16%;
+    margin: 3em 8% 0ex 8%;
 }
 
 blockquote p{
@@ -27,7 +27,7 @@ blockquote p{
 
 nav {
     font-family: "DejaVu Sans", "Bitstream Vera Sans",
-        Geneva, Verdana, sans-serif ;
+        Geneva, Verdana, sans-serif, "FangSong", ;
     margin-bottom: 4ex ;
     font-size: 1.5em;
 }
@@ -36,11 +36,13 @@ div.sidetoctitle{
     display: none;
 }
 
+
 nav.sidetoc p a.toccurrent{
     color: Blue;
 }
 
 nav.topnavigation{
+	padding: 0.5ex 0em 0.5ex 0em ;
     display: block;
     width: 100%;
     position: fixed;
@@ -62,6 +64,17 @@ a.topnavcontents{
     padding-left:1ex;
 }
 
+div.book, h1, h2, h3, h4, h5, h6, span.paragraph, span.subparagraph
+{
+    font-family: "Linux Libertine O", "Hoefler Text", "Garamond",
+        "Bembo", "Janson", "TeX Gyre Pagella", "Palatino",
+        "Liberation Serif", "Nimbus Roman No 9 L",  "FreeSerif", Times,
+        "Times New Roman", "SimHei", serif;
+    font-style: normal ;
+    font-weight: bold ;
+    text-align: left ;
+}
+
 /* trick to ensure link targets are not obscured by header */
 h3::before{
     display: block; 
@@ -70,6 +83,7 @@ h3::before{
     height: 42px; 
     visibility: hidden; 
     pointer-events: none;
+	font-family: "DejaVu Sans";
 }
 
 h4::before{
@@ -109,6 +123,11 @@ div.titlepage span.textcolor{
 
 div.minipage p{
     text-align: left;
+}
+
+footer{
+	text-align: center;
+	
 }
 
 
