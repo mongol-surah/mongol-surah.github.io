@@ -21,6 +21,16 @@ section.textbody{
     margin: 3em 8% 0ex 8%;
 }
 
+section.textbody > h1 {
+    text-align: left;
+	font-size: 22pt;
+	display: none;
+}
+
+div.titlepage > h1 {
+	text-align: center;
+}
+
 blockquote p{
     font-size: 100%
 }
