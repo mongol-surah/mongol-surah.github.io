@@ -1,0 +1,107 @@
+@font-face {
+  font-family: 'Menk-Hawang-Tig';
+  src: url('/files/web-resources/MHW8103.ttf')
+}
+
+@font-face {
+  font-family: 'Menk-Qimed-Tig';
+  src: url('/files/web-resources/Menk-Qimed-Tig-MQD8101.ttf')
+}
+
+@font-face {
+  font-family: 'Menk-QingMing-Tig';
+  src: url('/files/web-resources/Menk-QingMing-Tig-MQI8101.ttf')
+}
+
+@font-face {
+  font-family: 'Menk-Lhundb-Tig';
+  src: url('/files/web-resources/MenkLhundbTig.ttf')
+}
+
+@font-face {
+  font-family: 'MongBaiti';
+  src: url('/files/web-resources/monbaiti.ttf')
+}
+
+@font-face {
+  font-family:'Menksoft2012';
+  src: url('/files/web-resources/Menksoft2012.woff') format('woff');
+}
+
+.mongol-text {
+  margin: 10px;
+  writing-mode: vertical-lr;
+  text-orientation: sideways;
+  line-height: 140%;
+  font-family: Menk-Hawang-Tig;
+  font-size: 120%;
+  padding: 0px;
+}
+
+.mongol-box {
+  
+  box-sizing: content-box;
+  background-color: #E6F2FF;
+  margin: 0px;
+  overflow-x: scroll;
+}
+
+.mongol-border {
+  padding: 0;
+  max-width: 100%;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  border: 10px solid transparent;
+  border-image: url(/files/web-resources/uul3.svg) 25% round;
+}
+
+audio {
+	display: block;
+	margin-bottom: 20px;
+	margin-top: 20px;
+	width: 100%;
+}
+
+html body {
+	background: #FAF7F4;
+}
+
+.menu a {
+	background: #FAF7F4;
+	border-style: outset;
+	border-color: rgb(238,238,238);
+	
+}
+
+.title { 
+  font-size: 15pt; 
+  font-weight: normal;
+}
+
+.article-meta {
+	background: inherit;
+}
+
+hr {
+	background-color: silver;
+	height: 1px;
+	/* color: #304070; */
+}
+
+h2 {
+	padding: 0px;
+	border-style: outset;
+	border-width: 3px;
+	border-color: rgb(238,238,238);
+	background-image: linear-gradient(to bottom, #f8f8ff, #c0c0c6);
+}
+
+footer {
+    font-size: .85em ;
+    line-height: 1.2 ;
+    margin-top: 100px ;
+    border-top: 1px solid silver ;
+    /* padding: 2ex 1em 2ex 1em ; */
+    clear: both ;
+    text-align: center ;
+}

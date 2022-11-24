@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>学习蒙古语 on </title>
+    <link>http://mongol-surah.github.io/</link>
+    <description>Recent content in 学习蒙古语 on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 25 May 2022 10:07:40 +0000</lastBuildDate><atom:link href="http://mongol-surah.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Mongolian grammar terms 2: Inflexions</title>
+      <link>http://mongol-surah.github.io/post/monoglian-grammar-terms-2/</link>
+      <pubDate>Wed, 25 May 2022 10:07:40 +0000</pubDate>
+      
+      <guid>http://mongol-surah.github.io/post/monoglian-grammar-terms-2/</guid>
+      <description>Inflexions 词形变化 Src: J. Gaunt. 采自J. Gaunt的书。
+   Inflexions / 缀加成分 Explantion 解释     1. -аа reflexive (added to nouns): means possession or intimacy 名词的反身后缀, 表示拥有或者亲密的关系   2. аа emphatic (.. to verbs): show emphasis) 加在动词后边，以示强调   3. -аа present continuos tense; little used; mostly used for байх 现在进行时；不常用；多用在байх   4. -аа causative form of certain verbs 一些动词的使动态   5. -aaгүй past tense negative of 3.</description>
+    </item>
+    
+    <item>
+      <title>Mongolian grammar terms 1</title>
+      <link>http://mongol-surah.github.io/post/monoglian-grammar-terms-1/</link>
+      <pubDate>Fri, 06 May 2022 10:07:40 -0400</pubDate>
+      
+      <guid>http://mongol-surah.github.io/post/monoglian-grammar-terms-1/</guid>
+      <description>Nouns&amp;rsquo; cases; 名词的格    Cases (Тийн ялгал, т. я. in short)/格 Explantion 解释     1. тарах тийн ялгал. ablative case 从比格   2. заах т. я. accusative case (=objective case) 宾格   3. нэрлэх т. я. nominative case 主格   4. өгөх орших т. я. dative-locative case 向位格(给在格)   5. үйлдэх т. я. instrumental case 工具格(凭借格,用让格)   6. хамтрах т. я.</description>
+    </item>
+    
+    <item>
+      <title>关于本站</title>
+      <link>http://mongol-surah.github.io/about/</link>
+      <pubDate>Thu, 14 May 2020 23:21:40 -0400</pubDate>
+      
+      <guid>http://mongol-surah.github.io/about/</guid>
+      <description>这里的空气静悄悄 </description>
+    </item>
+    
+    <item>
+      <title>其他学习资源</title>
+      <link>http://mongol-surah.github.io/links/</link>
+      <pubDate>Thu, 14 May 2020 23:21:40 -0400</pubDate>
+      
+      <guid>http://mongol-surah.github.io/links/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
