@@ -12,6 +12,7 @@
 *lwarp*.txt
 *.pdf
 *-images.txt
+*mathjax.txt
 
 ## Core latex/pdflatex auxiliary files:
 *.aux

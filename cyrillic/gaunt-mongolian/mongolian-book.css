@@ -18,7 +18,7 @@ div.bodycontainer{
 }
 
 section.textbody{
-    margin: 3em 8% 0ex 8%;
+    margin: 0em 8% 0ex 8%;
 }
 
 section.textbody > h1 {
@@ -52,10 +52,10 @@ nav.sidetoc p a.toccurrent{
 }
 
 nav.topnavigation{
-	padding: 0.5ex 0em 0.5ex 0em ;
+	padding: 0.5ex 0em 1ex 0em ;
     display: block;
     width: 100%;
-    position: fixed;
+    position: inherit;
     z-index: 1;
     top: 0;
     background: #FAF7F4;
@@ -63,8 +63,10 @@ nav.topnavigation{
 }
 
 a.topnavlink{
-    float: right;
-    padding-left: 0ex;
+    /* float: left; */
+    left: 10;
+    font-weight: bold;
+    padding-left: .4em;
     padding-right: 3ex;
 }
 
