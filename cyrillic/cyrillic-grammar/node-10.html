@@ -1,0 +1,5640 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—动词的类别 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-146"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... section 动词的类别......
+-->
+<h4 id="autosec-147"><span class="sectionnumber">2.4&#x2003;</span>动词的类别</h4>
+<a id="cyrillic-grammar-autopage-147"></a>
+<a id="cyrillic-grammar-autofile-10"></a>
+
+<!-...... subsection 实义动词......
+-->
+<h5 id="autosec-148"><span class="sectionnumber">2.4.1&#x2003;</span>实义动词</h5>
+<a id="cyrillic-grammar-autopage-148"></a>
+
+<!-...... subparagraph 1．实义动词的分类......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-149"><span class="sectionnumber">2.4.1.0.0.1&#x2003;</span>1．实义动词的分类</span>
+<a id="cyrillic-grammar-autopage-149"></a>
+实义动词从过程方面表示行为、状态，一般从语法角度分为及物动词与不及物动词。及物动词后面必须跟随一个宾语，意义才能完整起来。如：би үзнэ 我看，чи уу 你喝，不联系上下文或语言环境，人们不能理解到底看什么、喝什
+么，如果说成 би ном үзнэ 我看书，чи цай уу 你喝茶，意义就能完整起来。与此相比，不及物动词后面就不必有宾语。如：би унтана 我要睡，чи яв 你走吧，这里动词本身的意义已经完整了，再不必提出“睡什么”&#x202f;“走什么”
+的问题。
+</p>
+<p>
+蒙古语中有些动词可以兼有不及物与及物的两重性质。如：чи яв 你走 — чи зам яв 你走路，би харайна 我跳 — би дээс харайна 我跳绳
+</p>
+<p>
+蒙古语中有些动词需要两个宾语，一个是直接宾语，一个是间接宾语。有时候间接宾语也可以有两个。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ахад хоол хүргэнэ.（间接—直接—动词)
+</p>
+<p>
+给哥哥送饭
+</p>
+<p>
+Чамд нэг ном өгье. 给你一本书
+</p>
+<p>
+Ахаас жимс авчээ. 和哥哥要了水果
+</p>
+<p>
+Чамаас ном зээлье. 和你借书
+</p>
+<p>
+Энэ хэргийг Баатараар Гуад хэлүүлье.
+</p>
+<p>
+把这件事让巴特尔告诉给高娃. (直接—间接—间接—动词)
+</p>
+<p>
+Энэ бичгийг Гуагаар Баатарт хүргүүлье.
+</p>
+<p>
+把这本书让高娃送给巴特尔
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+根据上述情况，可把蒙古语实义动词分为：
+</p>
+<p>
+
+<a href="./media/image16.png" target="_blank" ><img
+src="./media/image16.png"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+<p>
+但在一般情况下只分不及物与及物即可。具有两重性的可看作是一种个别现象。
+</p>
+<p>
+蒙古语中及物与不及物动词互相间没有形态上的分别，主要是看它的意义以及句法上看它们要求不要求宾语 (初学者可从字典上查看)。但是在派生的动词上往往从它的附加成分可以看出它们是及物或不及物动词的。
+</p>
+<p>
+（1）构成及物动词的附加成分有：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+га гэ , аа ээ —халаах 加热 (使热)，бүтээх 完成，ихдээх 放大，босоох 竖起
+</p>
+<p>
+уул үүл —урсуулах 让流，үхүүлэх 让死，
+</p>
+<p>
+лга лгэ —суулгах 让坐，хийлгэх 让做
+</p>
+<p>
+дах дэх —сүүлдэх 揪尾巴，
+</p>
+<p>
+шаах шээх —сайшаах 称赞，буруушаах 非难
+</p>
+<p>
+члах члэх —дүүчлэх 悌，дотночлох 亲热
+</p>
+<p>
+чих —хэмхчих 粉碎，хагачих 打破
+</p>
+<p>
+лах лэх —хугалах 折断，таслах 切断
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(2) 构成不及物动词的附加成分有：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+лдах лдэх —цохилдох 撕打, барилдах 摔跤
+</p>
+<p>
+гдах гдэх —бичигдэх 被写，танигдах 被认识
+</p>
+<p>
+дах (дэх) с —ихдэх 过大，охордох 过短，багас 过小
+</p>
+<p>
+тах тэх —мөстөх 结冰，иштэх 长茎, 长杆
+</p>
+<p>
+жих —насжих 年岁大，баяжих 致富
+</p>
+<p>
+рах рэх —хөхрөх 发蓝，үгүйрэх 变穷，хугарах 折断，тасрах 断
+</p>
+<p>
+рхах рхэх —сайрах 自负自夸，өшөөрхөх 记仇
+</p>
+<p>
+жрах жрэх —ангижрах 分离，муужрах 变弱
+</p>
+<p>
+шрах шрэх —хөгшрөх 变老，тайвшрах 和平, 麻痹
+</p>
+<p>
+цах цэх —дулаацах 温一温，сэрүүцэх 乘凉
+</p>
+<p>
+гих —шаагих 下暴雨，бургих 涌出
+</p>
+<p>
+гинах гинэх —хангинах 嘹亮, 铿锵，дангинах 发铮铮响声
+</p>
+<p>
+чигнах чигнэх —паржигнах 啪啦啪啦响，түрчигнэх 发辚辚响
+</p>
+<p>
+ийх йх—сэртийх 竖起，хонхийх 变消瘦，сэрвийх 翘起
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<b>2．实义动词的语法特点 </b>
+</p>
+<p>
+实义动词的词法特点主要表现在：
+</p>
+<p>
+(1) 有式的范畴，式下边还有人称范畴和时间范畴。
+</p>
+<p>
+(2) 有形动词范畴，形动词还有时间、体等区别。
+</p>
+<p>
+(3) 有副动词范畴，副动词还有连接方式的不同。
+</p>
+<p>
+(4) 有态和体的范畴，态和体都有多种形式。
+</p>
+<p>
+实义动词的句法特点主要表现在：
+</p>
+<p>
+（1）实义动词能支配各格名词以及其它静词。动词的这种支配性是它的主要特点之一。形动词尽管有静词的特点，但它能支配各格名词，所以它属于动词。而 эхлэлт 开始，хөгжилт 发展，хөдөлгөөн 运动，чармайлга 努力，уялдал 结
+合等词之所以被认为是由动词派生的名词，主要是因为它们丧失了支配各格名词的能力。
+</p>
+<p>
+（2）动词能为大部分形容词所修饰，能为副词所修饰，它们都构成该动词的状语。其中能为副词所修饰是动词的主要特点之一。
+</p>
+<p>
+（3）动词的主要句法功能是充当述语，根据它形态变化的不同，以及它所处位置的不同，又有不同情况。式动词充当句子结尾的述语，在它后边只能附加一些语气词。副动词是充当状语或副句述语的形式，一般不能以它结尾。形动
+词则既可以充当主句的述语，又可以充当副句的述语，也就是说既可以构成结束形式，又可以构成非结束形式。
+</p>
+<p>
+动词的形动词形式是个非常重要的形式，由于它兼有动词性和静词性，所以它能充当各种句子成分 (详见形动词部分)。
+</p>
+
+<!-...... subsection 虚义动词......
+-->
+<h5 id="autosec-150"><span class="sectionnumber">2.4.2&#x2003;</span>虚义动词</h5>
+<a id="cyrillic-grammar-autopage-150"></a>
+
+<!-...... subsubsection 代动词......
+-->
+<h6 id="autosec-151"><span class="sectionnumber">2.4.2.1&#x2003;</span>代动词</h6>
+<a id="cyrillic-grammar-autopage-151"></a>
+
+<p>
+代动词可以代替实义动词，可以代替具有行为意义的事件。它在语法特征方面和实义动词一样。一般以某一形式代替同样的形式。如以代动词的副动词、形动词、式动词代替实义动词的副动词、形动词、式动词等。代动词有下列两类。
+</p>
+<p>
+（1）指示代动词：有 ингэх 这样做，чингэх 那样做，口语中还有 мэнгэх 就这样做，мэнчигэх 就那样做的形式。<sup>8</sup>
+</p>
+<p>
+代动词的 ингээд , чингээд (тэгээд) 等形式有时当做联接词来使用。
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-152"></a>
+<p>
+<sup>8</sup>&nbsp; 可能是 мөн ингэх , мөн чингэх
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энэ хэдэн зүйлийн эмийг хамтаар чанаж болно уу? Чингэж болохгүй. 这几种药可以一起煮吗？不能那样做
+</p>
+<p>
+Чиний чингэж хэлсэн чинь таарахгүй болжээ.
+</p>
+<p>
+你那样说就不对了
+</p>
+<p>
+Энэ үсгийг ингэж бичсэн нь зөв үү?
+</p>
+<p>
+把这个字写成这样对吗？
+</p>
+<p>
+Би номын дэлгүүрт очжээ,чингээд (тэгээд) энэ хэдэн дэвтэр номыг авчээ.
+</p>
+<p>
+我到了书店，买了这几本书
+</p>
+<p>
+Би тэднэрийг эрж олсонгүй ингээд хоосон харьж ирэв. 我没有找到他们, 这样, 空空地回来了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）疑问代动词：有 яах 怎么做，ийх 怎么做，хэрхэх 怎么做。其中 хэрхэх 这个形式主要在书面语中出现，而且出现频率不大。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+疑问代动词有时可以表达感叹的意义。
+</p>
+<p>
+Үүнийг яаж иддэг вэ? Үүнийг чанаж иддэг.
+</p>
+<p>
+这个怎么吃？这是煮着吃的。
+</p>
+<p>
+Яаж ийж байгаад энэ хэргийг бүтээе.
+</p>
+<p>
+想尽办法办成这件事
+</p>
+<p>
+Яагаад цагтаа ирсэнгүй вэ? 怎么没有按时来呢?
+</p>
+<p>
+Үйл үгийг дотор нь хэрхэн ангилах вэ?
+</p>
+<p>
+怎样为动词分类呢？(ангилах 分类区别划分)
+</p>
+<p>
+Яасан сайхан зураг бэ ! 多么好看的画呀！
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 概称动词......
+-->
+<h6 id="autosec-153"><span class="sectionnumber">2.4.2.2&#x2003;</span>概称动词</h6>
+<a id="cyrillic-grammar-autopage-153"></a>
+
+<p>
+动词也和名词一样具有概称形式。动词概称形式的作用也在于使某一具体动词的意义变得范围大一些笼统一些。如说 шүүрдэж ийх 就是以 шүүрдэх 打扫为主，包括有关动作 (如：擦, 收拾, 倒尘土等)。
+</p>
+<p>
+动词概称形式一般用 ийгээд 表示。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн харааж ийгээд байж байсан.
+</p>
+<p>
+那个人在哪儿骂街来着
+</p>
+<p>
+Хэлж ийж байгаад явуулчихжээ.
+</p>
+<p>
+经过说服等打发走了
+</p>
+<p>
+Чи гэрээ шүүрдэж ийчих.
+</p>
+<p>
+你把房间打扫打扫吧!
+</p>
+<p>
+Чи гэрээ шүүрдэж ийгээд бэлтгэж бай.
+</p>
+<p>
+你把房间打扫打扫，做好准备吧！
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 关联动词 (联系动词) ��� ......
+-->
+<h6 id="autosec-154"><span class="sectionnumber">2.4.2.3&#x2003;</span>关联动词 (联系动词) гэх</h6>
+<a id="cyrillic-grammar-autopage-154"></a>
+
+<p>
+关联动词是一种特殊的虚义动词。汉语里没有相应的词，英语、俄语里也没有相应的词。它不同于英语里的连系动词倒是很像日语里的助词。
+</p>
+<p>
+蒙古语的关联动词就是一个 « гэх»，它有与实义动词相同的形态变化，但它的语法功能却很复杂。下边分别列举出它的主要语法意义和功能。
+</p>
+<p>
+(1) <b>гэх 的主要功能是联系思维和言语的内容 </b>。也就是说，它能把表示思维和言语的具体内容的语词或句子联系到 (连接到) 表示 “思维” 和 “言语” 这样一些词汇意义的概括词上。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн : “би очихгүй” гэж хэлжээ.
+</p>
+<p>
+他说：“我不去”。
+</p>
+<p>
+Тэр хүн : “би очихгүй” гэж боджээ.
+</p>
+<p>
+他想：“我不去”。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+тэр хүн (行为主体), “би очихгүй”(言语或思维的具体内容, гэж 联系动词, хэлжээ (боджээ)（表示言语或思维的概括词）
+。
+</p>
+<p>
+很显然译成中文关联动词就没有了，因此从汉语的角度看，有些不好理解，但从蒙古语来说是必须有的。
+</p>
+<p>
+有时概括词可以省略，这时 гэх 兼任概括词的职能并笼统地表示思维和言语的词汇意义。在平常比较多的是表示 “言语” 的词汇意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+
+</p>
+
+<div class="minipage" style="vertical-align:bottom ; justify-content:flex-start ; width:822pt ; ">
+<a id="cyrillic-grammar-autopage-155"></a>
+<p>
+<span class="uline">Тэр хүн</span>
+</p>
+<p>
+那个人
+</p>
+</div>
+<p>
+:“
+</p>
+
+<div class="minipage" style="vertical-align:bottom ; justify-content:flex-start ; width:822pt ; ">
+<a id="cyrillic-grammar-autopage-156"></a>
+<p>
+<span class="uline">би очихгүй</span>
+</p>
+<p>
+我不去
+</p>
+</div>
+<p>
+”
+</p>
+
+<div class="minipage" style="vertical-align:bottom ; justify-content:flex-start ; width:812pt ; ">
+<a id="cyrillic-grammar-autopage-157"></a>
+<p>
+<span class="uline">гэжээ</span>
+</p>
+<p>
+说了
+</p>
+</div>
+<p>
+.
+</p>
+<p>
+他说：“我不去”。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+以上是最简单最典型的例子，实际语言中情况比较复杂。从它的 “具体内容” 说，有 “思维” 内容，有 “言语” 内容，有介乎中间的表示主观企图和客观原因的，从它的 “概括词” 说，有表示言语方面的 хэлэх 说, илтгэх 讲明, 汇报, 表达,
+хашхирах 喊叫<sup>9</sup>，бархирах 叫喊，шивнэх 耳语, 窃窃私语; 嘟嘟囔囔，хараах 骂，зөвлөх 商量, 讨论 ерөөх, магтах, сайшаах 祝愿, 赞扬，зөвшөөрөх 同意，буруушаах 非难，асуух, лавлах 问，сонсох 听，дуулах 唱，найдах
+委托，үнэлэх 评价，……有表示思维方面的 бодох, санах 想，хүсэх, эрмэлзэх 希望，зовох 发愁，айх 怕，болгоомжлох 谨慎, хичээх 谨慎, 勤奋, 尽力，баярлах 高兴，уурлах 生气，ойлгох, үзэх, ухаарах 理解, 觉悟，мэдэх 知道，мэдрэх
+觉醒, 觉悟; 感觉 санаанд орох 想起，мартах 忘记，андуурах 误解，сонирхох 感兴趣，……等等。
+</p>
+<p>
+从它们的表达方式来说，有直接引用式的，有间接引用式的。直接引用是引用原意原话，丝毫不加改变。间接引用是经过转达者的口吻转述的，因此，人称、语气方面有一定的改变，如：
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-158"></a>
+<p>
+<sup>9</sup>&nbsp; 等于 хашгирах（喊叫）。
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн : “би заавал тогтсон цагтаа ирнэ” гэж батлав.
+</p>
+<p>
+他保证说：“我一定在规定的时间回来”。
+</p>
+<p>
+Тэр хүн тогтсон цагтаа ирэхээ батлав.
+</p>
+<p>
+他保证在规定时间回来。
+</p>
+<p>
+Тэр хүн надаас ”та хаа явах вэ” гэж асуужээ.
+</p>
+<p>
+他问我：“您到哪里去？”
+</p>
+<p>
+Тэр хүн надаас миний хаа явахыг асуужээ.
+</p>
+<p>
+他问我到哪里去。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+«гэх» 在起联系作用的时候，它的一个突出特点是能使原来的言语和思维保持原来面目 (尤其直接引用式)，原来的一个词、一个词组，或者一个句子甚至几个句子都可以原样成为它的联系的对象，而与句子结构相适应的各种变化，则
+都由 гэх 本身的变化来承担。因此 гэх 有如同实义动词的一系列变化：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гэж гээд гэвэл гэтэл гэсээр гэвч гэмэгц …
+</p>
+<p>
+гэх гэсэн гэдэг гэгч гээч гэмээр…
+</p>
+<p>
+гээ гэе гэгтүн гэцгээе …
+</p>
+<p>
+гэнэ гэв гэлээ гэжээ гэцгээв ……
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+由于这样，通常情况下不可能成为句子成分的语句，如果使用关联动词 гэх , 都可以联系起来，充当各种句子成分。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ард түмний төлөө үйлчилнэ гэдэг чинь гүн утгатай үг шүү.
+</p>
+<p>
+为人民服务，这是具有深刻意义的话。(主语）
+</p>
+<p>
+Ард түмний төлөө үйлчилнэ гэдгийг хэзээд мартахгүй.
+</p>
+<p>
+永远不忘为人民服务。(宾语)
+</p>
+<p>
+Ард түмний төлөө үйлчилнэ гэж чармайж байна.
+</p>
+<p>
+为了为人民服务而努力。(状语）
+</p>
+<p>
+Ард түмний төлөө үйлчилнэ гэсэн үг бол гүн утгатай юм.
+</p>
+<p>
+为人民服务这句话具有深刻意义。(定语)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+由于上述情况，гэх 的使用范围逐渐扩展，它的兼任概括词的一些形式则在长期使用过程中逐渐定型化，分别构成了单独的语法形式 (见下述几项)。
+</p>
+<p>
+关联动词 гэх 联系言语和思维的内容的用例：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ээж юу гэж хэлсэн бэ？母亲怎么说的？
+</p>
+<p>
+“юу гэж байна вэ? ирнэ гэнэ үү？” гэж ээж асуув.
+</p>
+<p>
+母亲问：“怎么样？他来吗？”
+</p>
+<p>
+Та хоёулааг иржээ гэж сонсоод их баярлав.
+</p>
+<p>
+听说你们二位来了很高兴。
+</p>
+<p>
+Дүүрэн суулга дамнаж хөе хая гэсээр хүмүүсийн дундуур гарна.
+</p>
+<p>
+挑了满桶水嗬伊哈伊地喊着从人群中穿过去。
+</p>
+<p>
+Би одоо явъя гэж бодож байна. 我现在想走。
+</p>
+<p>
+Юунд багшийн хичээлийг сайн сонссонгүй вэ гэж би их гэмшив.
+</p>
+<p>
+为什么没有好好听老师的课呢！我很是后悔。
+</p>
+<p>
+Худаг малтахад төвөгтэй гэж татгалзаж байна уу?
+</p>
+<p>
+以为挖井有困难 (麻烦) 而在犹豫吗？
+</p>
+<p>
+Би бол эндэх байдлыг ойлгоё гэж ирсэн юм.
+</p>
+<p>
+我是为了了解这里的情况而来的。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）гэх 的联系思维和言语内容的功能在句末往往演变为某种语气词的作用。
+</p>
+<p>
+1）表示转述语气、反问语气、怀疑语气。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Эрт урьдын цагт өвгөн эмгэн хоёр байж гэнэ.
+</p>
+<p>
+很早很早以前说有个老头老太婆。
+</p>
+<p>
+Бүгдээрээ цөм явчихж гэнэ лээ. 说是大家都走了
+</p>
+<p>
+Гадаа бороо орж байна гэнэ. 说是外边在下雨
+</p>
+<p>
+Тийм холоос зориглож ирээд хоосон буцах гэж үү？
+</p>
+<p>
+决心从那么远赶来而空手回去吗？
+</p>
+<p>
+Тэр чинь болох гэж үү？那能行吗？
+</p>
+<p>
+Арай тийм гэж үү？许是那样？
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）表示不耐烦、责备、及惊叹语气。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Мэдэхгүй гэх л ! яагаад дахин дахин асуугаад байх юм.
+</p>
+<p>
+不知道呢！(为什么老问)
+</p>
+<p>
+Чамайг бүү хэл гэх л ！яагаад бас хэлээд байх юм.
+</p>
+<p>
+让你别说呢！(为什么老说)
+</p>
+<p>
+Хүн чамайг наашаа ир гэх л яагаад ирэхгүй юм.
+</p>
+<p>
+让你往这边来呢！(为什么不来)
+</p>
+<p>
+【不知道是 гэх л 还是 гэхлээ、гэхлээр 哪个对?】
+</p>
+<p>
+Ингэж ажил гаргана гэдэг чинь. 真是找麻烦！
+</p>
+<p>
+Энэ хаврын хавсрага гэж ээ.(хавсрага 刺骨寒风)
+</p>
+<p>
+今年春天的灾情真厉害! (хавсрах 刮刺骨寒风)
+</p>
+<p>
+Тэр морины гүйхийн хурдан гэж ээ.
+</p>
+<p>
+那匹马跑得真快!
+</p>
+<p>
+Тэр хүүхний уран гэдэг нь (хэрэг ээ).
+</p>
+<p>
+那个女孩真巧!
+</p>
+<p>
+Тэр хүүхний хэл амны нь хурц гэдэг нь.
+</p>
+<p>
+那个女孩真能说!
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）表示强调的口气。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ай, ийм хэрэг гэж хаа байх юм.
+</p>
+<p>
+唉, 哪里还有这样的事！
+</p>
+<p>
+Чам шиг мэргэн сэцэн хүн үүнийг мэдэхгүй гэж байна уу даа
+</p>
+<p>
+你这样聪明的人，怎么会连这个也不知道呢。
+</p>
+<p>
+Бороо зүсрэж харанхуй гэдэг жигтэйхэн байв.
+</p>
+<p>
+连绵不断地下雨，天空黑暗得出奇
+</p>
+<p>
+Тэр хэдэн хүүхэн нямбай гэгчээр эмийг сүрчиж явна.
+</p>
+<p>
+几个女孩仔细地喷洒着药水。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4）表示让步的口气。以 ч гэсэн ; гээд ; ч гээд ; л ч гэсэн ; л гээд 等形式表达。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Шинжлэх ухааны юм бол хэзээ ч гэсэн бүр бусдын шүүмжлэхээс айдаггүй.
+</p>
+<p>
+科学的东西任何时候也不怕别人批评。
+</p>
+<p>
+Надад сайн нь гээд, муу нь гээд, аль нь ч гээд үгүй.
+</p>
+<p>
+我这里好的坏的哪个都没有。
+</p>
+<p>
+Миний үзэхээр энэ үед тэр бэлчээрт хэн гээд тогтож чадахгүй.
+</p>
+<p>
+我看这时候谁都不能在那个牧场放牧。
+</p>
+<p>
+Би очлоо ч гэсэн тэр асуудлыг шийдвэрлэж чадахгүй.
+</p>
+<p>
+就是我去，那个问题也不能解决。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+5）另外，还有一个 гэм, 是
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гэх 的一个残存的变化形式，不常用。表达 “可不是吗”，“是那样吗”，“那样为好” 的语气。
+</p>
+<p>
+Тийм гэж үү, яг тийм гэм.
+</p>
+<p>
+莫非那样？就是那样。
+</p>
+<p>
+Надад үгүй гэм дээ (юм чинь ),би юугаа өгөх юм.
+</p>
+<p>
+我没有, 我给啥呀
+</p>
+<p>
+Хоёулаа явъя гэм. 我俩去为好。
+</p>
+<p>
+Хүүе модыг барь гэм. 喂, 拿个木棍为好。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）гэх 可以辅助某一类词或某些语法形式表示一定的语法意义，并表达其语法变化。
+</p>
+<p>
+1）辅助摹拟词、感情词，表达它们的语法变化。有的形式在长期使用过程中已经结合成为一个词了。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бороо шивэр шивэр гэж орж байна.
+</p>
+<p>
+雨在淅淅沥沥地下。
+</p>
+<p>
+Түс гэтэл унаад ёо гэж бархирав.
+</p>
+<p>
+扑通掉下去喊了一声哎哟。
+</p>
+<p>
+Ха ха гэж инээнэ. 哈哈地大笑。
+</p>
+<p>
+Нохой ган ган(г) гэж хуцна. 狗汪汪地叫。
+</p>
+<p>
+Тэр хүн доголос доголос гэсээр ирлээ.
+</p>
+<p>
+那个人一瘸一拐地来了。
+</p>
+<p>
+Цусны судал нь луг луг гэж цохилж байна.
+</p>
+<p>
+血管怦怦地搏动 ( цусны судал 血管)
+</p>
+<p>
+Чим чим гэж өвдөж байна. 一刺一刺地痛。
+</p>
+<p>
+Тэр чинь ч гэсэн хүн юм. 那个人不错
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）接在 -х на(нэ) я е 形式之后，构成一种分析形式的语法变化。表示 “想要”&#x202f;“正要” 的意义 (情态意义) 的同时，表示它们的语法变化。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чи хэзээ ирье гэвэл хэзээ ир.
+</p>
+<p>
+你什么时候想来, 就什么时候来。
+</p>
+<p>
+Хэлье гэх л хэлүүлэхгүй. (我) 想说 (他) 不让说。
+</p>
+<p>
+Хэлье гэхэд мэдэхгүй. 想说但不知道。
+</p>
+<p>
+Одоо явна (явах) гэж байна. 现在正要走。
+</p>
+<p>
+Одоо удалгүй цаг болно гэж байна.
+</p>
+<p>
+现在快到时间了
+</p>
+<p>
+Нар гараа гарая гэж байна. 太阳就要出来了。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）接在-в, лаа лээ 形式之后，以 -в гэсээр , -в гэтэл , -лаа(лээ) гэсээр 的形式表示立即副动词的意义，构成分析形式的制约连接副动词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Үзэв гэсээр таничихжээ. 一看就认出来了。
+</p>
+<p>
+Хэлэв гэтэл мэдчихжээ. 一说就知道了。
+</p>
+<p>
+Очлоо гэсээр олоод авах юм. 一去就能得到。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4）гэх 接在疑问代词 юу 之后，构成副词性疑问代词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чи өчигдөр юу гэж (юу гээд ) ирсэнгүй юм？
+</p>
+<p>
+你昨天为什么没有来？
+</p>
+<p>
+Тэр юу гэж чингэж хэлэх юм？他为什么那么说?
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）гэх 的一些形态变化，逐渐形成了单独的虚词，如：гэвч 但是，гэтэл 可是，гэтэл …гэ 又…又…，гэхдээ 然而等形式都形成了一种连接词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Өчигдөр орой манай сургуульд үдэшлэг байсан гэвч би өөр учиртай болоод очиж чадсангүй
+</p>
+<p>
+昨晚学校有晚会，但我因为有其它事没有能够去
+</p>
+<p>
+Би үүний тухай танд хэлж байсан шүү гэтэл та миний хэлсэн зүйлийг үгээр авсангүй.
+</p>
+<p>
+关于这件事我和你谈过多次, 但你没把我说的话当作一回事
+</p>
+<p>
+Тэр хүн байсаар л үүнийг авна гэтэл түүнийг авна гээд хүнийг ер амруулахгүй.
+</p>
+<p>
+那个人在的话, 又是要这个, 又是要那个, 始终不让人安宁
+</p>
+<p>
+Энэ ажлыг хурдан хийж дуусгах хэрэгтэй болжээ，гэхдээ хааш яаш хийж болохгүй шүү.
+</p>
+<p>
+这个工作需要很快做完，但不能做得马马虎虎。<sup>10</sup><a id="cyrillic-grammar-autopage-159"></a>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-160"></a>
+<p>
+<sup>10</sup>&nbsp;(хааш яаш 马马虎虎)
+</p>
+
+</div>
+</div>
+
+<!-...... subsubsection 助动词......
+-->
+<h6 id="autosec-161"><span class="sectionnumber">2.4.2.4&#x2003;</span>助动词</h6>
+<a id="cyrillic-grammar-autopage-161"></a>
+
+<p>
+蒙古语中有一部分动词，有时失去自己的独立意义，辅助别的词附加各种语法意义，或表示其语法变化，这时我们称它们为助动词 (这些动词当做实义动词用的情况，我们不在这里研究)。
+</p>
+<p>
+作为辅助动词来用的助动词，里边也有不同的情况，<span class="uline">大致可以分为两类</span>：
+</p>
+<p>
+一类是辅助实义动词的，它们连接在动词的单纯连接副动词后边，它们的作用主要是附加体、情态、趋向等语法意义，并表示整个动词的形态变化。
+</p>
+<p>
+另一类是辅助静词和形动词的，它们连接在静词和形动词后边，它们的主要作用是给有关词赋予动词性变化及各个变化形式的语法意义。有的形式 (如 болох) 同时附加一些情态意义。辅助静词和形动词的助动词是一种辅助它们构成
+述语的助动词 (相当于其它语言中的系词)。
+</p>
+
+<!-...... paragraph 辅助实义动词的助动词......
+-->
+
+<p>
+<span class="paragraph" id="autosec-162"><span class="sectionnumber">2.4.2.4.1&#x2003;</span>辅助实义动词的助动词</span>
+<a id="cyrillic-grammar-autopage-162"></a>
+辅助实义动词的助动词主要有：表示体的意义的 байх эхлэх барах дуусах суух явах ирэх очих орох орхих хоцрох гарах гаргах 等，表示情态意义的 болох чадах ялах дийлэх ядах гарах мэдэх олох үзэх 等，表示趋向意义的 авах өгөх 等
+(具体意义见下边有关各项)。
+</p>
+<p>
+1）байх 这个动词作为实义动词用时有“存在”&#x202f;“具有”或“作罢”&#x202f;“停止”等意义。做为助动词用时，这些意义都被冲淡或消失，而主要表示别的实义动词的“体”的语法意义，随着接加于单纯连接副动词何种形
+式，“体”的意义也有所不同。
+</p>
+<p>
+一般说，-ж(ч) + байх 的形式表示动词的进行体，进行体表示动作在各时间 (现在、将来、过去) 正在进行。-аад (ээд) +байх 的形式表示完成体或坚持的重复体。完成体表示动作在各该时间已经完成和发生，但它的结果仍然存在或行为
+还在持续。坚持体和重复体表示动作的坚持进行和重复进行。-саар (сээр) + байх 的形式则表示延续体，延续体表示早已发生的动作在各该时间还在延续着。
+</p>
+<p>
+如以 хэлэх (说）为例：进行体：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн өчигдөр тэр тухай хэлж байжээ.
+</p>
+<p>
+他昨天在谈论那件事。
+</p>
+<p>
+Тэр хүн өнөөдөр мөн тэр тухай хэлж байна.
+</p>
+<p>
+他今天还在谈论那件事。
+</p>
+<p>
+Тэр хүн маргаашийн энэ үед бас лав хэлж байх юм.
+</p>
+<p>
+他明天的这个时候也一定在谈的。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+完成体：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр үед би тэр хүнд хэлээд байжээ.
+</p>
+<p>
+那时候我已经和他谈了。
+</p>
+<p>
+Би тэр хүнд хэлээд байна.
+</p>
+<p>
+我对他谈 (说) 了。
+</p>
+<p>
+Маргаашийн энэ үед тэр хүнд лав хэлээд байна.
+</p>
+<p>
+明天的这个时候一定对他谈 (说)。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+坚持体和重复体：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+тэр хүн чингэж хэлээд л байжээ.
+</p>
+<p>
+他过去老是那样说。
+</p>
+<p>
+Тэр хүн чингэж хэлээд л байна.
+</p>
+<p>
+他 (现在) 老是那样说。
+</p>
+<p>
+Тэр хүн хожим лав чингэж хэлээд л байх биз.
+</p>
+<p>
+他将来一定会老是那样说。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+延续体：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Маныг очиход тэр хүн хэлсээр байжээ.
+</p>
+<p>
+我们去的时候他在说。
+</p>
+<p>
+Тэр хүн одоо мөн хэлсээр байна.
+</p>
+<p>
+他现在还在说。
+</p>
+<p>
+Одоо нэг цагийн хойно тэр хүн лав бас хэлсээр байх юм.
+</p>
+<p>
+过一小时后他一定还在继续说。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+从上例可以看出，体的意义是由 «-ж(ч) + бай-»«-аад ээд + бай-»«-саар сээр + бай-» 等部分表示的，至于 бай 的后缀-ж(ч),-жээ(чээ),-на нэ ,-х юм…等变化则属于整个动词的变化。
+</p>
+<p>
+上边说的几个体的区别只是从大体上看的，在实际语言中体的意义还有细微差别。如同样进行体，зогсож байна 站着，сууж байна 坐着，是静态的继续，босч байна 正在起来，чанаж байна 正在煮，是动态的进展，ирэж л байна 常来，
+очиж л байна 常去，则表示重复某种行为，ирцгээж байна 人们在来，очцгоож байна 人们在去，则表示多数人的连续行为等等。
+</p>
+<p>
+完成体和重复体 (及坚持体) 虽然形式基本一样，但差别比较显著，因此分立为两项 (再细分重复体和坚持体也有些不同)。
+</p>
+<p>
+完成体：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Та түүнтэй уулзана уу, тэр хүн одоо ирээд байна.
+</p>
+<p>
+您见他吗？他现在已经来了。
+</p>
+<p>
+Би өчигдөр оройтоод хүрэхэд бүгдээр цөм ор орондоо суугаад байжээ.
+</p>
+<p>
+我昨天去的晚了一些, 那时大家都坐到各自的座位上了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+重复体 (和坚持体)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бүү ир гэж байхад тэр хүн ирээд байна.
+</p>
+<p>
+不让他来，他还是常来。
+</p>
+<p>
+Бүү захидал бич гэж хэлж өгсөн байтал тэр бас бичээд байна.
+</p>
+<p>
+告诉他不要写信了, 但还是继续写信。
+</p>
+<p>
+Тэр өдөр бүгдээр босч зогссонд тэр хүн орондоо суугаад байжээ.
+</p>
+<p>
+那天大家站起来了，他还在座位上坐着。
+</p>
+<p>
+Тэнгэр харанхуй болчихоод байхад тэр хүн бас бичээд байна.
+</p>
+<p>
+天已经黑了，但他还是继续写。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）эхлэх 这个动词用在包含行为意义的名词后时，具有实义动词性质，如：ажил эхлэх (开始工作）хурал эхлэх (会议开始）等。如果用在实义动词单纯连接副动词后，则具有“开始体”的语法意义，如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Өгүүлэлээ бичих тухай хэдий өдөр бодоод одоо сая бичиж эхэлжээ.
+</p>
+<p>
+关于文章的写法考虑了多少天，现在才开始写。
+</p>
+<p>
+Ажлын үүргээ хэрхэн биелүүлэх тухай бодж эхлэв.
+</p>
+<p>
+开始考虑如何完成工作任务。
+</p>
+<p>
+Энэ толь бичгийг найруулж эхэлснээс аваад одоо болтол арван жил болж байна.
+</p>
+<p>
+这部字典从开始编写到现在已有十年。
+</p>
+<p>
+Бичээд эхлэсэн боловч хагас бас болоодүй.
+</p>
+<p>
+已经开始写了，但还不到一半。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+«-ж(ч) + эхлэх» 有时可以说成 «эхэлж +…-х»，说法有些不同，基本意义相同。
+</p>
+<p>
+3）барах , дуусах 这两个动词用在包含行为意义的名词后时，具有实义动词的性质。如：хэргээ баргах(事情办完)，хурал дуусах (开完会) 等。如果用在实义动词副动形式后边，则具有“结束体”的语法意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+уутаа оёод барлаа би. 我把口袋缝完了。
+</p>
+<p>
+Гэрийн гаднаа цэвэрлэж баржээ.
+</p>
+<p>
+把房屋外面打扫完了
+</p>
+<p>
+Хашаагаа энэ өдөр барьж дуусна уу？
+</p>
+<p>
+围墙今天能完成吗?
+</p>
+<p>
+Уншиж дууссан номоо надад өгнө үү?
+</p>
+<p>
+看完的书给我吗?
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4）суух 这个动词做为实义动词用时表示“坐”&#x202f;“住”&#x202f;“落”等等。如果用在实义动词副动形式后边充当助动词，则具有“继续体”的语法意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бас л маныг хараж сууж байна шид.
+</p>
+<p>
+还是等待我们呢呗。
+</p>
+<p>
+Чингэвэл бид хүлээгээд суувал барлаа.
+</p>
+<p>
+那样我们等现成就行了。
+</p>
+<p>
+Ийм өвс муутай бэлчээрийг үзэж суугаад үхэр хонио үхүүлнэ үү？
+</p>
+<p>
+守候这样不好的牧场，要让牛羊死掉吗？
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+5）явах 这个动词做为实义动词用时，表示“走”，如果用做助动词，则具有“继续体”的意义 (重复进行或照常进行)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Үр хүүхэд минь ард олны төлөө ажиллаж явна.
+</p>
+<p>
+孩子们在为人民服务
+</p>
+<p>
+Би тогтсон цагтаа сэрсэнгүй унтаад явуулчихжээ.
+</p>
+<p>
+我在规定时间没有醒，睡过站了。
+</p>
+<p>
+Олны хуримд орж явсан юм. 参加过众人的宴会
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+6）очих 这个动词做为实义动词用时，表示“去”。如果用作助动词，则具有“渐变体”的意义 (逐渐接近，从远距离到近距离)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хоёр талаас эхэлсэн боловч дундаа нийлээд оччихжээ.
+</p>
+<p>
+虽然从两边开始，但中间合起来了
+</p>
+<p>
+Чиний хэлж байх чинь таарч очлоо. 你说的对头了
+</p>
+<p>
+Чингэмэн сая ёсонд нийцэж очно.
+</p>
+<p>
+那样才合乎道理。(чингэмэнжин)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+7）ирэх 这个动词做为实义动词用时表示“来”。如果用在实义动词副动形式后边，充当助动词，则具有“渐变体”的语法意义 (从远到近，由小到大的渐变)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Аав чинь нодниноос аваад ярьж ирснийг чи ямар мэдэхгүй юм уу?
+</p>
+<p>
+你父亲从去年以来就说，这你还不知道?
+</p>
+<p>
+Бид удаан жил дотноор явалцаж иржээ.
+</p>
+<p>
+我们有多年的亲密交往。
+</p>
+<p>
+Ажил бол улам илүү нэмэгдэж ирэх юм.
+</p>
+<p>
+工作会愈来愈加重。
+</p>
+<p>
+Монгол хэлийг сураад монголчуудтай нэвтрэлцэх болоод иржээ.
+</p>
+<p>
+学习蒙古语，逐渐能和蒙古人交谈了
+</p>
+<p>
+但不是实义动词副动形式后边的 ирэх 都是助动词，下例中的 ирэх 就不是助动词。
+</p>
+<p>
+Би чамайг эрж ирсэн юм. 我来找你
+</p>
+<p>
+Хэн чамайг хүргэж ирсэн юм? 谁送你来的？
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+8）орох 这个动词做为实义动词用时，表示“进入”。如果用作助动词则具有“转变体”的意义 (由一种状态进入另一种状态)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн хэлсээр байгаад хараагаад ороод иржээ.
+</p>
+<p>
+那个人说着说着骂起来了。
+</p>
+<p>
+Чи харин намайг буруушаагаад орлоо.
+</p>
+<p>
+你却非难起我来了。
+</p>
+<p>
+Уур нь тайлагдаад инээмсэглээд ороод иржээ.
+</p>
+<p>
+气消了，脸面上浮起笑色来了。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+9）орхих хоцрох 这两个动词做为实义动词用时，表示“抛弃”&#x202f;“存留”&#x202f;“落后”等。如果用作助动词，则表示“完成体”的意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хэдэн тохой зузаан элс гэнэт нурч ирээд Харбарсыг булж орхижээ.
+</p>
+<p>
+几尺厚的沙子突然塌下来埋住哈尔巴拉了
+</p>
+<p>
+Юу болсон ч түүнийг гарч ирэхээс өмнө зайлж орхиё.
+</p>
+<p>
+无论如何在他出来以前我得躲开。
+
+</p>
+<p>
+Хүлээсээр байгаад унтж хоцорчээ.
+</p>
+<p>
+等着等着睡着了。
+</p>
+<p>
+Өө ! Чамд нэг юм өгөхөө мартж хоцорчээ.
+</p>
+<p>
+哦！我忘了给你一件东西。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+10）гарах，гаргах 这个动词做为实义动词用时，表示“出来”&#x202f;“使之出来”&#x202f;“作出”。如果用作助动词，则具有“完成体”的意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Намайг энэ өдөртөө хашаагаа сүлжэж гарга гээд шаардаад байна.
+</p>
+<p>
+要求我今天把围圈编织好。
+</p>
+<p>
+Хурдан хурдан хийгээд гаргасан чинь бүдүүлэг болчихжээ.
+</p>
+<p>
+快做的结果粗糙了。
+</p>
+<p>
+Энэ худгийг түргэн малтаж гаргах нь их цухуйлаа.
+</p>
+<p>
+这个井需要很快挖出来.(цухуйх 露出探头出现显露)
+</p>
+<p>
+Гэрт дахиад инээдэм шуугиан болж гарав.
+</p>
+<p>
+屋子里又起了一阵喧嚣声。
+</p>
+<p>
+Тэр өдөр би тэсгэлгүй энэ тэнгэрийг чинь харааж гарлаа.
+</p>
+<p>
+那天我忍无可忍, 把这个老天骂了一阵。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+11）болох 这个动词做为实义动词用时表示“同意”&#x202f;“赞成”以及“解决”&#x202f;“可以”&#x202f;“够”等意。把它用在别的实义动词的单纯连接副动词 (-ж ч ) 后时 (用在别的副动词后则构成独立动词)，则具有“同意
+该动作”&#x202f;“该动作有实现的可能”等情态意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чи одоо явж болно. 你现在可以走
+</p>
+<p>
+Түүнийг цочоо сэргэж үл болно.
+</p>
+<p>
+不能惊醒他。(цочих =сочих 受惊吃惊惊恐)
+</p>
+<p>
+Малаа үхүүлэхгүй байж болно.
+</p>
+<p>
+可以不使牲畜受损失。
+</p>
+<p>
+Чингээд яаж болох юм！那怎么能行！
+</p>
+<p>
+Та нар гэрт ороод ярилцаж болдоггүй юм уу?
+</p>
+<p>
+你们进屋谈不行吗？
+</p>
+<p>
+Уг нь явж болох байсан юм. 本来是可以走的
+</p>
+<p>
+Үзэж болбол үзэе. 可以看的话看看
+</p>
+<p>
+Энэ жимсийг идэж болох болтол бас нилээд байна.
+</p>
+<p>
+这个水果离吃还有一段时间。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+12）мэдэх 这个动词做为实义动词用时表示“知道”&#x202f;“掌握”，作为助动词用时表示“也许”&#x202f;“可能”的情态意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр ч танихгүй болж мэднэ. (байх магадгүй ).
+</p>
+<p>
+他可能不认识
+</p>
+<p>
+Манай ажилд дутагдал байж мэднэ (байх магадгүй).
+</p>
+<p>
+我们工作可能有缺点
+</p>
+<p>
+Тэр хүн манай айлаар дайрч мэднэ (дайрах магадгүй).
+</p>
+<p>
+他可能路过我们的村子.
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+上述例子中 -ж мэднэ = -х магадгүй
+</p>
+<p>
+13）олох 这个动词做为实义动词用时表示“获得”&#x202f;“得到”。做为助动词用时，表示“可以实现”某个动作，一般把 олох 放在实义动词之前。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Нэг өдөр яваад таних хүн олж учрасангүй.
+</p>
+<p>
+走了一天没有遇到熟人
+</p>
+<p>
+Би хэдий анхаараад олж үзсэнгүй.
+</p>
+<p>
+我怎么注意也没发现。
+</p>
+<p>
+Өөрийн дутагдлаа үзэж олох хэрэгтэй.
+</p>
+<p>
+要看到自己的缺点。(дутагдал 缺点)
+</p>
+<p>
+Тийм хэрэг гарсныг би бодж олохгүй байна.
+</p>
+<p>
+我想不起曾经发生过那样的事。
+</p>
+<p>
+Санаж олсон зүйл байвал цаг тухай хэлж байгаарай.
+</p>
+<p>
+有什么想到的请随时告诉一下。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+-ж олох 有时不表示助动词，如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Агуу их ялалтыг тэмцэж олохоор чармайх.
+</p>
+<p>
+为争得伟大胜利而努力。
+</p>
+<p>
+Миний эрж олсон нь энэ хэдхэн.
+</p>
+<p>
+我找到的只有这几个。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+14）чадах 主要是做为助动词用，表示动作的“能”和“会”。ялах , дийлэх 除了表示“战胜”(实义动词) 以外，还可以表示与 чадах 相近的意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энэ ажлыг би биелүүлж чадна. 这件事我能完成
+</p>
+<p>
+Бага хүүхэд амар сууж чадахгүй.
+</p>
+<p>
+小孩子们闲呆不住。
+</p>
+<p>
+Энэ зохиолыг та орчуулж чадна уу？
+</p>
+<p>
+这个著作你能翻译吗？
+</p>
+<p>
+Бид чамайг сайн харгалзаж чадсангүй.
+</p>
+<p>
+我们未能好好照顾你。
+</p>
+<p>
+Чи үүнийг үүрч ялна уу？你能背动这个吗？
+</p>
+<p>
+Өдий дарьаар энэ хадыг дэлбэчиж ялна уу？
+</p>
+<p>
+这些炸药能把山峰炸掉吗？
+</p>
+<p>
+Хэн ч түүнийг хорьж дийлэхгүй. 谁也阻挡不了他
+</p>
+<p>
+Би тэрийг чинь ууж дийлэхгүй. 我喝不了那个。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+15）ядах 这个动词，做为实义动词表示“疲乏”，作为助动词则表示与 чадах 相反的意义，可译为“不能”&#x202f;“不会”
+。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чи чинь бас юу хэлэх гээд хэлж ядаад байна вэ？
+</p>
+<p>
+你想说什么而又说不出来呢？
+</p>
+<p>
+Нууя гээд нуух газраа олж ядан байтал …
+</p>
+<p>
+想躲而又找不到躲的地方的时候…
+</p>
+<p>
+Дугуйлангийн даргад хэлж ядах юмгүй шүү.
+</p>
+<p>
+没有对组长不能说的事情。(дугуйлан(г) 小组)
+</p>
+<p>
+Сайн муу үгийг ч ядаж ойлгохгүй.
+</p>
+<p>
+连好坏话都分不出来。
+</p>
+<p>
+Ёс бусаар чалчсаныг нь сонсоод тэсч ядав.
+</p>
+<p>
+听到胡言乱语真忍不了。
+</p>
+<p>
+Би тэр үгийг хэлж ядна. 那种话我说不出口。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+16）гарах 这个动词，做为实义动词表示“出”&#x202f;“上”，做为助动词则表示“会”。
+</p>
+<p>
+Би мэдэхээр мэднэ, гэвч хэлж гарахгүй.
+</p>
+<p>
+我知道是知道，但说不出来。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энэ сэдэвийг би бодж гарахгүй.
+</p>
+<p>
+这个题我算不出来
+</p>
+<p>
+Үүний бурууг та үзэж гарав уу?
+</p>
+<p>
+它的错误您看出来了没有？
+</p>
+<p>
+Энэ ямар хэлний ном бэ？та уншиж гарна уу？
+</p>
+<p>
+这是用什么文字写的书？您能读吗？
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+17）үзэх 这个动词做为实义动词用时表示“看”或“想”。做为助动词用时则表示“试一试”&#x202f;“看一看”。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Урьдаар нэг туршиж үзвэл ямар вэ？
+</p>
+<p>
+先试一试如何?
+</p>
+<p>
+Би түүнээс нэг асууж үзье. 我和他问一问。
+</p>
+<p>
+Чи дугуйлангийн даргад нэг хэлж үз дээ.
+</p>
+<p>
+你向组长说一说看。
+</p>
+<p>
+Би очоод нэг эрж үзье. 我去找一找看。
+</p>
+<p>
+Би нилээд хүнтэй ярилцаж үзлээ.
+</p>
+<p>
+我和好多人谈过。
+</p>
+<p>
+Та энэ тухай бодж үзэв үү?
+</p>
+<p>
+关于这点您考虑过没有？
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+18）авах 这个动词做为实义动词用时表示“要”，做为助动词用时则表示“向自己方面”&#x202f;“为自己完成”的意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хурдан тэмдэглэж ав. 快记下来。
+</p>
+<p>
+Түүнийг барьж авъя. 把他抓住。
+</p>
+<p>
+Нэг бага хэлээд авсан чинь хэрэг болжээ.
+</p>
+<p>
+说了一下便成了大事。
+</p>
+<p>
+Эндэх ажлын байдлыг та сайхан ойлгож ав даа.
+</p>
+<p>
+您好好了解一下这里的工作情况。
+</p>
+<p>
+Тэр хүн үзэмэгцээ сураад авчээ. 他一看就学会了
+</p>
+<p>
+Тэр амьтныг нэг буудаад авсан чинь харайж харайгаад ойчоод өгчээ.
+</p>
+<p>
+把那东西打了一枪, 结果它跳了几下就倒下去了.
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+19）өгөх 这个动词做为实义动词用时表示“给”，做为助动词用时则表示“向对方”&#x202f;“为对方完成”的意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Гонцог хонь хариулж өгөхөөр явсан.
+</p>
+<p>
+官其格赶羊去了
+</p>
+<p>
+Яагаад өдий удтал үүдээ нээж өгөхгүй вэ？
+</p>
+<p>
+为什么这么长时间不给开门？
+</p>
+<p>
+Чи энэ хүнд замыг сайн заагаад өг.
+</p>
+<p>
+你给这个人好好指路。
+</p>
+<p>
+Хургыг чинь би хөхүүлж өгье. 羊羔我给喂吧
+</p>
+<p>
+Би та нарт хэдэн хүн нэмж өгье.
+</p>
+<p>
+我给你们增加几个人。
+</p>
+<p>
+Авна гэсэн хүнийг чинь явуулж өгье.
+</p>
+<p>
+所要的人我给派去。
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... paragraph 辅助形动词和静词的助动词......
+-->
+
+<p>
+<span class="paragraph" id="autosec-164"><span class="sectionnumber">2.4.2.4.2&#x2003;</span>辅助形动词和静词的助动词</span>
+<a id="cyrillic-grammar-autopage-164"></a>
+
+</p>
+<p>
+辅助形动词和静词的助动词主要有 байх 和 болох ，以及它们的扩展式和简略式。它们给形动词和静词赋予动词的各种变化及其语法意义，辅助它们完成充当述语的条件。
+</p>
+
+<!-...... subparagraph （1）辅助形动词的 ���� ......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-165"><span class="sectionnumber">2.4.2.4.2.1&#x2003;</span>（1）辅助形动词的 байх</span>
+<a id="cyrillic-grammar-autopage-165"></a>
+
+</p>
+<p>
+蒙古语形动词本身可以有时间、体等的变化，接加的助动词也可以有时间、祈使式、形动词、副动词等等的变化，因此它们的结合情况相当复杂，表示的各种语法意义也很繁多，为了把这些错综复杂的关系看得清楚起见，我们从实义
+动词形动词词尾当中挑出几个主要的 (即 -сан сэн, -х ,-даг -дэг, -маар -мээр) 形式，并把助动词的多种变化归纳为几个主要的类别 (现在时, 过去时, 将来时, 祈使式, 副动词)，以图解的方式表示它们的接加关系，并按图解中的数字分别加
+以叙述。
+</p>
+<p>
+1）-сан (сэн) + байна：在这类组合里，前边的成分表示相对时间，后边的成分表示绝对时间。绝对时间是以说话的时间为标准，说话当时为绝对现在时，说话时间以前为绝对过去时，以后为绝对未来时。相对时间则不以说话时间为
+标准，而以别的某一时间 (在句子里往往用别的词表明这种时间) 为标准。-сан + байна 的 сан 表示相对过去时，байна 表示绝对现在时，合起来表示一种现在过去时。
+</p>
+<p>
+蒙古语里现在过去时和一般过去时区别不太大。现在过去时 сан байна 可以简略为 сан(сэн)，也可换成 жээ(чээ), 但与现在完成时-аад(-ээд) +байна 有所不同。-аад(ээд) байна 表示动作已经完成了，但影响结果还在，而 сан байна 没有这
+种意义。
+</p>
+<p>
+[-сан (сэн) байна] байх，除形动词的意义和用法方面的不同外，在表达时间方面是一样的。-сан(сэн) байна 在书面语里常用，而在口语里常见的形式是-сан(сэн) юм байна 中间加个 юм 后增加如下的情态意义，说话的人在动作进行时
+并不了解情况，是事后根据一些事实或经过别人告诉才知道的。
+</p>
+<p>
+-сан байна, -сан байх ,-сан юм байна 的用例：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн өнөөхөн ингэж хэлсэн байна.
+</p>
+<p>
+那个人最近这样说的。
+</p>
+<p>
+Тэр хүн манайд ирсэн байна.
+</p>
+<p>
+那个人到我们家来过
+</p>
+<p>
+Энэ аргыг манай нөхөд бас сураад авчихсан байна.
+</p>
+<p>
+这个办法我们的同志们也学会了。
+</p>
+<p>
+Гадар талыг хазсан байвал нөгөө нь хазсан байх ёстой.
+</p>
+<p>
+如果咬了外边, 那么应该是另外一个咬的
+</p>
+<p>
+Сайн суралцахын төлөө тэд бас чадалынгаа хирээр чармайсан байх юм.
+</p>
+<p>
+为了学得好，他们也是尽量努力了。
+</p>
+<p>
+Бид хоёрын ярьлцасан зүйлийг тэд сонссон байх магад.
+</p>
+<p>
+我们俩谈的事他们可能听见了
+</p>
+<p>
+Энд хүн орж ирсэн юм байна.
+</p>
+<p>
+这里有人进来过 (从迹象看)
+</p>
+<p>
+Тэд тогтсон хугацаанаасаа өмнө ирсэн юм байна.
+</p>
+<p>
+他们比规定时间来得早 (可能从别人那里听说)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）-сан (сэн) байжээ : 前边的 сан сэн 表示相对时间，后边的 байжээ 表示绝对时间，合起来表示一种过去的过去时。过去的过去时表示，该动作在过去的某个时间已经成为过去时，在这种句子里往往用别的词来表示这某个时间。如：
+Намайг очиход тэр хүн явсан байжээ （我去的时候那个人已经走了。
+）这里 намайг очиход (我去的时候) 是一种在过去发生的动作，байжээ 的过去时说明这个。тэр хүн явсан (那个人走了) 的过去时 явсан 又是“我去的时候”的过去时，
+因此叫过去的过去时。
+</p>
+<p>
+过去的过去时和过去完成时 (-аад байжээ) 有些不同。过去完成时表示动作在过去的某个时间虽已完成，但影响、结果当时还在，过去的过去时没有这种意义。
+</p>
+<p>
+-сан (сэн) байжээ 的形动词形式是 -сан (сэн) байсан , 它既可以代替 -сан байжээ , 又有形动词的意义和作用 (但这个形式用的很少)
+</p>
+<p>
+-сан (сэн) юм байжээ 的形式口语里用的较多，在意义方面，因为在中间有个 юм 所以也有如下情态意义：说话的人在动作进行当时并不了解情况，事情过后判断出来或间接了解到的。
+</p>
+<p>
+-сан(сэн) байжээ (байж байлаа); -сан(сэн) байсан ; -сан(сэн) юм байжээ 的用例：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр асуудлыг өнгөрсөнд өөр маягаар тайлбарласан байжээ.
+</p>
+<p>
+那个问题过去曾有过别的解释
+</p>
+<p>
+Хоёр өдөр яваад БуянДаваанд хүрэхэд тэд хэдийн дэвшсэн байжээ.
+</p>
+<p>
+走了两天到巴彦达瓦时他们早就搬走了
+</p>
+<p>
+Цогмандалын хээр хүрэнгийн тоосонд нь ч хавьтаж чадсангүй байж билээ.
+</p>
+<p>
+连把朝克满都拉的枣红色马扬起的尘土也没追上。
+</p>
+<p>
+Хөгшин өнөө хоёр байлдагчийг хартал хэзээний гадагш гараад явсан байлаа.
+</p>
+<p>
+老人看那两位战士时，他们早已出去了。
+</p>
+<p>
+Үүд цонхоо таг битүүлж оньсолсон байжээ.
+</p>
+<p>
+门窗都锁得很严。
+</p>
+<p>
+Маныг очиход тэр нэгэнт явчихсан байсан юм.
+</p>
+<p>
+我们去时他已经走了
+</p>
+<p>
+Тэр хүн явчихсан юм байжээ, би хэрэггүй оччихлоо. 那个人已经走了, 我多余去了 (那个人走时不知道, 后来去找时才知道)
+</p>
+<p>
+Тэр асуудлыг онолын бичиг дээр хэдийн тодорхойлчихсон юм байжээ , бид мэдсэнгүйгээр маргалдаж байснаас биш.
+</p>
+<p>
+那个问题在理论著作上早就解决了，我们不知道，还在那里争论。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）-сан байхаа 在这种组合里-сан (сэн) 表示过去时，байхаа 只起一个估计或揣测语气词的作用，这个 байхаа 是由 байх уу 演变而来的，所以也有人写 байх аа 。байлгүй 也表示推断的意义，但意义比较肯定，有“一定是那样”
+&#x202f;“肯定是那样”的意义。байж мэднэ 则表示没有把握的估计，意为“可能是那样”。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Нэг үр (亩) тарианаас хоёр дан илүү байхаа.
+</p>
+<p>
+一亩地可能打了两石多。
+</p>
+<p>
+Аав саяхан ирсэн юм чинь лав өлссөн байхаа.
+</p>
+<p>
+爸爸刚来一定很饿了。
+</p>
+<p>
+Тэр хүн хэзээний мэдсэн байлгүй.
+</p>
+<p>
+那个人一定早就知道了。
+</p>
+<p>
+Тэр хүн энэ үед лав явчихсан байлгүй дээ.
+</p>
+<p>
+那个人这时一定走了。
+</p>
+<p>
+Тэр хүн энэ үед явчихсан байж мэднэ.
+</p>
+<p>
+那个人这时可能走了。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4)-сан(сэн) байтал, -сан(сэн) байвч, -сан(сэн) байвал ：在这类组合里，前边的-сан(сэн) 表示过去时，后边的副动词形式则给过去时附加副动词的意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Эдүгээ эгч дүү жил удаж сая учрасан байтал юунд ийм дув дуугүй вэ？
+</p>
+<p>
+现在姐妹离别多年才见面, 为什么这样默默无言呢?
+</p>
+<p>
+Та нар бүр мэдчихсэн байталаа надаар яриулж юу хийх юм бэ?
+</p>
+<p>
+你们既然都知道了，还让我说什么呢？
+</p>
+<p>
+Хэн ч уриалсангүй байтал олноороо цөм цуглаж ирэв.
+</p>
+<p>
+谁也没有号召，大家都来集合了。
+</p>
+<p>
+Ажилчны бүх тоо хасагдсан байвч барилгын ажилчны тоо нэмэгджээ.
+</p>
+<p>
+工人总数虽然减少了, 但基建工人数增加了
+</p>
+<p>
+Манай гаргасан тогтоолд доорхи кадрын зөв санал багтсан байвал тэд яриангүй хүрээлэх юм.
+</p>
+<p>
+我们作出的决定如果包括了下边干部的正确意见，那么他们一定会拥护的.
+</p>
+<p>
+Баруун мөр нь хүнд шархтсан юм байж шархаа боосон цамцны зурвас нь цус нэвтэрчээ.
+</p>
+<p>
+右肩受了重伤，包扎伤口的衬衣条浸透着鲜血
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+这里-сан байтал (既然那样，虽然那样) 与一般的 тал, тэл 有些不同。
+</p>
+<p>
+5）-х байна : 前边的成分表示相对的现在将来时，后边的成分表示绝对现在时。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> бороо орох байна.
+</p>
+<p>
+要下雨呀。(将来＋现在）
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> бороо орохгүй байна.
+</p>
+<p>
+不下雨呢。(将来＋现在)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+例 <span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 表示从现在看的将来时 (现在将来时）。但是这类形式往往包含某种情态意义。例 <span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 中言外之意有下起雨来怎么办的顾虑。例 <span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 也表示现在将来时，是一种否定的现在将来时，这个例子也包含某种情态意义，本来应该下雨，但现在还不下，与估计有出入，有些失望的情绪。如果在这类句子中，加一个 юм 则表示原来不知道，现在才知道。如以上述
+二例为例：那就是 <span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 原来不知道，现在知道要下雨呀。<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> 原来我还以为要下雨呢，现在知道这个雨是下不成了。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бороо орох юм байна.
+</p>
+<p>
+是要下雨的呀。
+</p>
+<p>
+Бороо орохгүй юм байна.
+</p>
+<p>
+雨是下不成了。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+«-х байна» 的用例：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хурдан явцгаая оройтох байна.
+</p>
+<p>
+(大家) 快走吧, 要晚了。
+</p>
+<p>
+Хашаагаа хаа мал чинь гараад явах байна.
+</p>
+<p>
+把圈关上，牲畜会出去的。
+</p>
+<p>
+Аа даа , чамтайгаа ингэж учрах юм байна.
+</p>
+<p>
+啊，没有想到这样遇见你。
+</p>
+<p>
+Та бас аянд явах юм байна би мэдсэнгүй.
+</p>
+<p>
+您也出去旅行呀，我还不知道。
+</p>
+<p>
+Чи учир явдлыг үзэж гарахгүй байна.
+</p>
+<p>
+你看不出问题的所在。
+</p>
+<p>
+Энэ чинь нэг ч өвдөхгүй байна.
+</p>
+<p>
+这一点也不痛呀
+</p>
+<p>
+Энэ бороо чинь их орохгүй юм байна даа.
+</p>
+<p>
+这个雨好像不会大下。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+6）-х байжээ : 前边的成分表示相对的现在将来时，后边的成分表示绝对过去时。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+1. Тэр хүн очих байжээ.
+</p>
+<p>
+他本来是应该去的 (将来＋过去）
+</p>
+<p>
+2. Тэр хүн очихгүй байжээ.
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+他本来应该不去（将来＋过去）
+</p>
+<p>
+例 <span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 表示过去将来时，是一种过去的未实现动作，与此同时，往往还包含某种对动作的未实现表示遗憾的情态意义。如果这个动作是言者本身的动作，那么就包含一种后悔的心情。
+</p>
+<p>
+例 <span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> 表示否定的过去将来时，这里也往往包含某种情态意义，这个动作与自己的期望不符合或动作的结果使人失望，用在自己则有后悔的心情。
+</p>
+<p>
+如果在这类句子中，加一个 юм 可以增加一种原来不知道，后来一看是如此的意义。
+</p>
+<p>
+«-х байжээ» 的用例：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Та тэр хүнд саналаа шууд шууд хэлэх байжээ.
+</p>
+<p>
+你本应对他直接说出你自己的意见
+</p>
+<p>
+Би тэр ажилд нэн идэвхтэй оролцох байжээ.
+</p>
+<p>
+我本应更积极地参加那个工作
+</p>
+<p>
+Тэр багшид арвин ном байх юм байжээ.
+</p>
+<p>
+原来那个老师有很多书
+</p>
+<p>
+Цонхоор нь өчүүхэн ч гэрэл харагдахгүй байв.
+</p>
+<p>
+从窗户一点光亮也透不出来
+</p>
+<p>
+Төмөр гинжийн гангиналцах дуу удтал тасрахгүй.
+</p>
+<p>
+铁链的响声经久不断。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+上述 5）6）项的 -х байна , -х байжээ 往往包含某种情态意义 (或者说往往有不同程度的某种情态意义)。与此同时也存在着意义相近但没有情态意义的形式。下面例举几种以供使用时的参考：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> өвдөх байна 会痛的
+</p>
+<p>
+өвдөх юм байна 原来痛
+</p>
+<p>
+өвдөхгүй байна 不痛呢
+</p>
+<p>
+өвдөхгүй юм байна 原来不痛 (现在)
+</p>
+<p>
+өвдөх юм байжээ 原来痛的 (过去)
+</p>
+<p>
+өвдөхгүй юм байжээ 原来不痛 (过去)
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> өвдөнө 痛
+</p>
+<p>
+өвдөж байна 痛呢
+</p>
+<p>
+өвдөхгүй 不痛
+</p>
+<p>
+өвдөж үгүй 没有痛 (现在)
+</p>
+
+<p>
+өвджээ 痛了
+</p>
+<p>
+өвдөж байжээ 痛来着
+</p>
+<p>
+өвдсөн үгүй 没有痛（过去)
+</p>
+<p>
+өвдсөнгүй байжээ 没有痛过
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+这些形式 <span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 为带有情态意义的，<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> 为没有情态意义的。译文是大致意思，不可能准确译出，只供参考。
+</p>
+<p>
+7）-х байх (аа) : 在这种组合里，-х 表示将来时，байх (аа) 只起一种语气词作用，表示估计、揣测。байлгүй 则表示比较肯定的推断。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр мөддөө ирэх байхаа. 他一会儿可能来。
+</p>
+<p>
+Энэ учрыг тэр хүн мэдэх байхаа.
+</p>
+<p>
+这个事情那个人可能知道。
+</p>
+<p>
+Чи хүлээж бай тэр хүн ирэх байлгүй дээ.
+</p>
+<p>
+你等一等，他会来的。
+</p>
+<p>
+Энэ учрыг түүнээс асуу тэр чамд хэлж өгөх байлгүй.
+</p>
+<p>
+这个事情问他，他会告给你的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+8）-х 后接加副动词：表示现在的-х 后可接加 байтал , байж , байсаар 等副动词，但多数在前边带有否定词。表示前后两个动词的关系不是顺接的。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бид түүний төлөө зовохгүй байж яаж чадах вэ？
+</p>
+<p>
+我们怎么能不为他操心呢？
+</p>
+<p>
+Өөр хүн цөм зүдрэхгүй байтал би яагаад зүдрэх вэ？
+</p>
+<p>
+别人都不累，我怎么会累呢？
+</p>
+<p>
+Амжилт нь гол болох байтал алдаа нь гол болно гэвэл бүр ч буруу болно.
+</p>
+<p>
+把成绩主要说成错误主要，那就完全不对了。
+</p>
+<p>
+Би түүний сэтгэлийг олж мэдэхгүй байсаар түүнийг гомдоов.
+</p>
+<p>
+我不体会他的心理，以至使他伤心了。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+9）10）-даг (дэг) байна ，даг (дэг) байжээ ：这类组合里 даг дэг 表示经常进行体，байна 表示现在时，байжээ 表示过去时。所以，даг (дэг) байна 是现在经常进行体，даг (дэг) байжээ 是过去经常进行体。有时中间加 юм 表示后来知道。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Дахин дахин уг сүрэг уруугаа гүйлцэн ирдэг байна.
+</p>
+<p>
+再三地跑向原来的畜群
+</p>
+<p>
+Гэвч зарим ургамал заавал түүний дээр ургадаг байна.
+</p>
+<p>
+但是有些植物专在它上边生长。
+</p>
+<p>
+Хүн чинь их айн цочиж сэтгэл санаа зовбол ингээд солиорчихдог байна шүү.
+</p>
+<p>
+人如果极端受惊苦恼就会这样神经错乱的呀。
+</p>
+<p>
+Эд голдуу орой сурч боловсордог байжээ.
+</p>
+<p>
+这些人主要在晚上学习
+</p>
+<p>
+Тэр хүн өдөр өдөр эмнэлгэд очдог юм байжээ.
+</p>
+<p>
+原来他每天到医院去。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+11）12）даг дэг 后接加祈使式 (实际为推测语气词) 和副动词的情况比较少
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн мэддэг байлгүй. 那个人一定知道
+</p>
+<p>
+Хэрвээ тэднэр газар тарианы өөрчлөлтийг зөвшөөрдөг байвал манай ажилд бас тустай юм.
+</p>
+<p>
+如果他们赞成土地改革, 那对我们工作是有利的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+13）持续体形动词 аа ээ оо өө 的接加关系与上述形动词有些不同。它或者以 -аагүй ээгүй ; -аадүй ээдүй 的否定形式出现，或者以 хэлж байгаа ; хииж байгаа ; сурч яваа 的复合形式出现，单独以 аа ээ 的形式出现很少。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би бодж үзээгүй байна. 我还没有考虑过。
+</p>
+<p>
+Бид тэр үед танилцаагүй байжээ.
+</p>
+<p>
+我们那时候还不认识。
+</p>
+<p>
+Гэгээ орох үед бороо зогсоогүй байв.
+</p>
+<p>
+天亮的时候雨还没有停下来。
+</p>
+<p>
+Бас сайн бэлчээр эрж явж байгаа биз дээ?
+</p>
+<p>
+又是找好草场去了吧？
+</p>
+<p>
+Маныг эрт ирчихлээ гэж гомдож байгаа байхаа.
+</p>
+<p>
+对我们的早来可能有些埋怨吧。
+</p>
+<p>
+Миний бүр биеийн яс хэмхэрч байгаа мэт ширхирэв.
+</p>
+<p>
+我全身的骨头要碎似的。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+14）-маар(мээр) байна ; -маар(мээр) байжээ : 在这类组合中 маар(мээр) 表示可能性，байна, байжээ 表示现在时、过去时。因而-маар байна 表示现在时可能性；-маар байжээ 表示过去时可能性。(这些可能性后来有的可能实现，有的不
+一定实现）
+。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэнгэрийн байдлыг үзэхэд бороо ормоор байна.
+</p>
+<p>
+看天的样子要下雨呀。
+</p>
+<p>
+Нарийн өндөр мод их салхинд үлээгдээд хуга очмоор байна.
+</p>
+<p>
+细高的树被大风吹得几乎要折断。
+</p>
+<p>
+Тэд хэдүүл үг булаалдаад хэрэлдмээр байна.
+</p>
+<p>
+他们几个人吵嘴吵得几乎要打架 (булаалдах 互相争吵)
+</p>
+<p>
+Ноднины үерт хэрэм унамаар байжээ.
+</p>
+<p>
+去年的洪水里墙几乎要倒下来。
+</p>
+<p>
+Унамаар байсан хэрэмийг тулж тавьжээ.
+</p>
+<p>
+把要倒的墙支住了。
+</p>
+<p>
+-маар мээр 后接加副动词的情况有时也遇到。
+</p>
+<p>
+Хэрэг явдал нь болмоор байтал өөр учир гарчихжээ.
+</p>
+<p>
+正当事情要成功的时候出了别的事情。
+</p>
+<p>
+Унамаар байвал тулж тавь.
+</p>
+<p>
+如有要倒的样子, 支住它
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph （2）辅助形动词的 ����� ......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-167"><span class="sectionnumber">2.4.2.4.2.2&#x2003;</span>（2）辅助形动词的 болох</span>
+<a id="cyrillic-grammar-autopage-167"></a>
+
+</p>
+<p>
+和助动词 байх 一样，按下列图解看看它们的接加关系。
+</p>
+<p>
+
+<a href="./media/maar-baina.jpg" target="_blank" ><img
+src="./media/maar-baina.jpg"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+<p>
+1）2）-сан(сэн) болно , -сан(сэн) болжээ : 过去时 сан (сэн) 后接加 болно , болжээ 的形式比较少。只是偶尔遇到 сан(сэн) болно。сан (сэн) болно 表示一种过去时，与 сан (сэн) байна ，сан (сэн) юм 相近，所以平常不多用。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн туслагчаа юу ч хийхгүй гэж шүүмжлэн заннаж байсан болно.
+</p>
+<p>
+他曾批评他的助手什么事也不做。
+</p>
+<p>
+Түүний гарыг нь барихад үнэхээр сэтгэл хөдлөгдсөн болно.
+</p>
+<p>
+握他的手的时候，他非常感动。由于很好努力的结果, 获得了很大的成绩
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+如果 сан(сэн) болжээ , сан(сэн) болно 中间有 нь, чинь, ч …ч, аас ээс , 则 болох 不是助动词，而是独立动词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чиний чингэж хэлсэн нь болжээ.
+</p>
+<p>
+你那样说是对的
+</p>
+<p>
+Би түүнийг гуйсан чинь болохгүй.
+</p>
+<p>
+我求过他，但不行。
+</p>
+<p>
+Намрын хураалт өнгөрөөд зассан ч болно.
+</p>
+<p>
+秋收过后修理也可以。
+</p>
+<p>
+Сайн чармайснаас болж их амжилтыг олов.
+</p>
+<p>
+由于很好努力的结果, 获得了很大的成绩
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+如果-сан(сэн) болжээ 中间有 шиг 就如同接加在形容词下边的助动词一样，表示“具有该性质”的意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чингэж хэлсэн нь чамайг дааруулсан шиг болжээ.
+</p>
+<p>
+那样说似乎有些敲打你了。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3) -сан(сэн) бололтой , сан(сэн) болов уу : сан(сэн) 后接加 бололтой ,болов уу 能给它附加估计、反问、疑问等意义，这里 бололтой, болов уу 起一种语气词作用。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн мэдсэн бололтой. 他似乎知道了
+</p>
+<p>
+Тэр нөхөрөө гэж санасан бололтой.
+</p>
+<p>
+他似乎当作了自己的朋友。
+</p>
+<p>
+Би чамд чингэж хэлсэн болов уу?
+</p>
+<p>
+我对你那样说过吗？
+</p>
+<p>
+Бүгдээр цөм очсон болов уу даа
+</p>
+<p>
+许是大家都去了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4) -сан(сэн) боловч, сан(сэн) болохоор , сан(сэн) бол : сан(сэн) 后接加的副动词形式 боловч, болохоор, бол , 能给它附加让步副动词、原因副动词、假定副动词的意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чингэж бичсэн боловч биелэгдсэнгүй.
+</p>
+<p>
+虽然那样写了，但未实现。
+</p>
+<p>
+Санаандаа бодсон боловч хэлсэнгүй.
+</p>
+<p>
+虽然心里想了, 但没有说。
+</p>
+<p>
+Урьсан боловч ирсэнгүй. 虽然请了, 但没有来
+</p>
+<p>
+Урьсан болохоор иржээ. 因为请了所以来了
+</p>
+<p>
+Хоёр сум туссан болохоор газар ойчив.
+</p>
+<p>
+由于受了两颗子弹, 所以倒在地下 (тусах 击中)
+</p>
+<p>
+Мэдээ сэхээгүй байсан болохоор юу ч мэдсэнгүй.
+</p>
+<p>
+由于没知觉，所以什么也没有知道
+</p>
+<p>
+Эртхэн авчирсан бол таарч юм.
+</p>
+<p>
+早拿来的话才对
+</p>
+<p>
+Чи миний бие болсон бол надаас илүү бачимдах юм.
+</p>
+<p>
+如果你是我的话，你会更着急
+</p>
+<p>
+此外-сан(сэн) бол 有时不表示假定副动词的意义，它在句末，在语气词 даа дээ 的帮助下表示疑问、遗憾的意义。
+</p>
+<p>
+Тэр хаа очсон бол даа？他到哪里去了？
+</p>
+<p>
+Хэзээ явсан бол даа？什么时候走了？
+</p>
+<p>
+Би бас явсан бол аа. 我也走就好了。
+</p>
+<p>
+Бид бүгдээр очсон бол даа. 我们大家都去好了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+5）-х болно 这个组合的两个形式都是现在将来时，结合起来的形式表示将来时，同时多半都有推测、推断的情态意义。偶尔可见 -х болох 的形式。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Дотоодын дайн гарах аюул бүх улсын ард түмнийг сүрдүүлэх болно.
+</p>
+<p>
+发生内战的危机将威胁全国人民。
+</p>
+<p>
+Ямар нэгэн төрийн бодлогыг санаатайгаар хэрэгжүүлж байх биш бол сохор балайгаар хэрэгжүүлж байх болно.
+</p>
+<p>
+不是自觉地，就是盲目地执行某种政策。
+</p>
+<p>
+Нутгийн нилээд олон кадр одоо нутаг уснаасаа салж өмнө фронтод очих болно.
+</p>
+<p>
+许多地方干部将要离开自己的乡土开赴前线
+</p>
+<p>
+Цогтын дотор нь зовж толгой нь эргэж газар дэлхий хөрвөж байх шиг болно.
+</p>
+<p>
+朝克图心烦头昏，似乎天地在旋转一样。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+6）-х болжээ : 现在将来时接加 болох 的过去时，表示 &lt;1&gt; 现在的动作是从过去某个时候开始的；&lt;2&gt; 将要进行某种动作；动作的时间已经迫近。与此同时往往伴随决心进行，必然进行的情态意义。-х болсон 的时间及
+情态意义与-х болжээ 一样，-х болсон 则有形动词的功能。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр өдрөөс эхэлсэн би сэтгэл шийдэж суралцах болжээ.
+</p>
+<p>
+从那天开始我专心于学习了。
+</p>
+<p>
+Тэр одоо аргагүй зөвшөөрөх болжээ.
+</p>
+<p>
+他现在不得不承认了。
+</p>
+<p>
+Ганцог аа, хонь гарах боллоо. 官其格, 该放羊了
+</p>
+<p>
+Хүмүүс бие биесээ харилцан туслалцах болсон нь хавтай байна хө.
+</p>
+<p>
+人们变得能互相帮助，这很好呀！
+</p>
+<p>
+Түүнээс хойш олноороо түүнийг улам хайрлан хүндэтгэх болсон гэнэ.
+</p>
+<p>
+从那之后大家对他更加敬爱了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+7）-х 接加 болов уу, болтугай , бололтой , болгожээ 能给形动词-х 添加请求、祝愿、估计、顾虑等情态意义，这些词都有情态词或语气词的作用。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Та намайг хавсрах болов уу. 请你帮助我！
+</p>
+<p>
+Даруйхан хариу захидал ирүүлэх болов уу
+</p>
+<p>
+快些来个回信吧！
+</p>
+<p>
+Ажил үйлс дээр чинь амжилт гарах болтугай.
+</p>
+<p>
+祝你工作有成绩！
+</p>
+<p>
+Тэд бас очих бололтой. 他们也可能去。
+</p>
+<p>
+Тэр хүн нөхрөө гэж санасан бололтой.
+</p>
+<p>
+他以为是自己的朋友呢。
+</p>
+<p>
+Чи үл тэнцэх болгожээ. 怕你不及格
+</p>
+<p>
+Буруудах болгожээ. 恐怕犯错误
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+8）-х 后接加 болж , болоод , боловч , болохоор , болтол , бол , 能给现在将来时 -х 添加并列副动词、先行副动词、让步副动词、目的副动词 (这里表示原因)、界限副动词、假定副动词等意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Өвгөн тэр үгийг сонсоод улам хүлээхгүй болж маргалдаж орж ирэв.
+</p>
+<p>
+老头听到那话以后，越发接受不了以至吵起来了
+</p>
+<p>
+Хэлэх үг олдохгүй болоод дуугүй суув.
+</p>
+<p>
+没有话可说，默默无声了。
+</p>
+<p>
+Чи эмнэлэгт очихгүй боловч майхандаа амсхийх хэрэгтэй.
+</p>
+<p>
+你虽不去医院，也得去帐蓬休息。
+</p>
+<p>
+Чи одоо зөв замаар явах болохоор гэрийн чинь учирийг би бие дээрээ хүлээж авъя.
+</p>
+<p>
+你现在要走正路嘛，家里的事情我承担。
+</p>
+<p>
+Тэр ажлыг хийх болтол энэ ажлыг хийж бай
+</p>
+<p>
+你在做那个工作以前要做这个工作
+</p>
+<p>
+Чи явахгүй бол байг би ч явна.
+</p>
+<p>
+你不走就不走，我是走呀。
+</p>
+<p>
+Чи явбал яв (явах юм бол яв) явахгүй бол байг.
+</p>
+<p>
+你走就走，不走就不走。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+бол 有时没有假定的意义，可以用在句末表示疑问；或者用在主语后充当主语的标志。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Гэрт нь бас юу байх вэ？他家里还有什么呢？
+</p>
+<p>
+Хүүтэйгээ уулзъя гээд хэдий сандарч байх бол？
+</p>
+<p>
+为了和儿子见面，不知他怎样着急？
+</p>
+<p>
+Манай малтаж байх бол яг хавтас шиг чулуу.
+</p>
+<p>
+我们挖的正是像石板似的石头
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+9）10）-даг (дэг) 是经常体，所以-даг (дэг) болно 是表示将来的经常体，同时也包含估计的情态意义。-даг (дэг) болжээ(болсон) 是表示从过去某时以来的经常体。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би хожим монгол хятад хоёр хэлийг цөм чөлөөтэйгөөр хэлж бичиж чаддаг болно даа.
+</p>
+<p>
+我以后能够自由说写蒙汉两种语文
+</p>
+<p>
+Түүнээс аваад аянчин хүн эднийхээр орж аяга цай уун ундалж гардаг болжээ.
+</p>
+<p>
+从那之后，旅行者常到他们家，喝一碗茶再走。
+</p>
+<p>
+Морь нь үг хэлийг ч нилээд мэддэг болсон аж.
+</p>
+<p>
+他的马也懂得不少话了。(аж=ажээ=байжээ )
+</p>
+<p>
+Хожим нь улмаар гоё сайхан цаас хийж чаддаг болсон билээ.
+</p>
+<p>
+以后逐渐能够制造漂亮的纸张了
+</p>
+<p>
+Яаж байгаад явалцдаг болсноо би ч мартчихжээ.
+</p>
+<p>
+我们怎么来往起来的，我也忘记了
+</p>
+<p>
+Тэр хүн чармайн ажилладаг болсон байжээ.
+</p>
+<p>
+他变得勤奋努力了。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+11）-даг (дэг) болов уу , даг (дэг) бололтой : даг (дэг) 后接加 болов уу ,бололтой 能给它添加疑问、推测等意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Дэлхий дээр тийм хүн өөр бас байдаг болов уу?
+</p>
+<p>
+世界上是否还有象那样的人？
+</p>
+<p>
+Эдний хэлэхээр бол энэ морь бас үг мэддэг бололтой.
+</p>
+<p>
+据他们说，好像这马还懂得话。
+</p>
+<p>
+Тэр хүн орос хэл мэддэг болов уу?
+</p>
+<p>
+他是否懂得俄语呢？
+</p>
+<p>
+Англи хэл мэддэг бололтой. 好像懂得英语
+</p>
+</li>
+</ul>
+</div>
+
+</div>
+<p>
+12）-даг (дэг) 后接加 боловч , болохоор , бол , 可给它添加副动词意义。有时 бол 没有副动词意义，用在句末表示疑问，用在主语后充当主语标志。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн өдөр шөнөгүй ажилладаг боловч царайд нь ядраж зүдэрсний шинж ер мэдэгддэггүй билээ.
+</p>
+<p>
+他虽然日夜工作, 但在脸上从来看不到疲倦的迹象
+</p>
+<p>
+Манай зарим нөхөр гол ажлыг атгадаг боловч чанга атгахгүй учраас ажлаа мөн сайн хийж чаддаггүй билээ. 我们的一些同志虽然也抓主要工作，但抓得不紧，因此也是做不好工作。
+</p>
+<p>
+Тэр айлын үхрийг хариулдаг болохоор бид түүнийг үхэрчин хүү гэдэг.
+</p>
+<p>
+因为他放村里的牛，所以我们把他叫做放牛娃
+</p>
+<p>
+Хэрвээ эрж олдог юм бол даруйд нь авчирж өгье.
+</p>
+<p>
+如果找到的话，马上送来。
+</p>
+<p>
+Энэ зургийг хаа наадаг бол тэнд нь хурдан наа.
+</p>
+<p>
+这幅画该粘帖在哪里就快贴上。
+</p>
+<p>
+Өөр газар очиж үзэхэд ямар бол?
+</p>
+<p>
+到别的地方看看如何?
+</p>
+<p>
+Миний нүүхгүй гэдэг бол олны бэлчээрийг шамшия гэсэн бодлого биш юм.
+</p>
+<p>
+我不搬家的意思不是要独占大家的牧场。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+13）аадүй (ээдүй) болохоор, аадүй (ээдүй) бол , аа (ээ) бололтой : 表示现在尚未完成的动作。〖аадүй 与 аагүй 意思一样〗
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бүгдээр цуглаж гүйцээдүй болохоор одоо бага хүлээж байя.
+</p>
+<p>
+大家还没有集合齐，所以再等一会儿。
+</p>
+<p>
+Энэ бичгийг би уншаадүй болохоор агуулгыг нь мэдэхгүй.
+</p>
+<p>
+这本书我还没有读，因此内容不了解。
+</p>
+<p>
+Чи энэ бичгийг уншаадүй (юм) бол хурдан унш.
+</p>
+<p>
+如果还没有读这本书那么快读吧。
+</p>
+<p>
+Чи өөрийн хувиа аваадүй бол үүнээс ав.
+</p>
+<p>
+如果你没有领取自己的份，那么快领取吧。
+</p>
+<p>
+Нэг хэдэн хүн нэг юм хүлээж байгаа бололтой нааш цааш явцгаана.
+</p>
+<p>
+有几个人好象在等待什么东西，正在来回走动。
+</p>
+<p>
+Нүүнэ гэж байгаа болохоор тэндээ очоод унагалбал дээр юм уу. 因为要搬家, 搬到那里下驹才好吧. (унагалах 母马产驹)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+14）маар(мээр) болжээ , маар(мээр) болоод , маар(мээр) болсон ：都表示准备工作已经作好。маар(мээр) 后接加 болох 的情况很多。маар(мээр) болоод 是非结束式。маар(мээр) болсон 可作结束式，也可作非结束式。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэд одоо явмаар болжээ. 他们现在就要走了
+</p>
+<p>
+Тэр хүн очмоор болоод байчихжээ.
+</p>
+<p>
+他就要去了，又不去了。
+</p>
+<p>
+Тэр хүн явмаар болсон хойно сая надад чимээ өгчээ.
+</p>
+<p>
+他快要走了，才通知我
+</p>
+<p>
+Тэр хүн явмаар болсон. 他要走了．
+</p>
+<p>
+Унамаар болсон суварга. 快要倒塌的塔
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph （3）辅助静词的 ���� ......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-169"><span class="sectionnumber">2.4.2.4.2.3&#x2003;</span>（3）辅助静词的 байх</span>
+<a id="cyrillic-grammar-autopage-169"></a>
+
+</p>
+<p>
+用在静词后的 байх 有时是独立的实义动词，有时是具有辅助性质的助动词。当作实义动词用时，байх 有“存在”&#x202f;“占有”的意义。当作助动词用的 байх 处在名词后时，有“是什么”的意义，处在形容词后时有“具有什么
+性质”的意义，而且这些意义都比较模糊。从语法方面说，做为实义动词用的 байх 能充当独立的句子成分，而做为助动词用的 байх 只能辅助别的词共同构成句子成分，所以助动词的语法变化实质上是在辅助别的静词完成它们的语
+法变化，至于各种语法变化的具体意义，随着变化形式的不同而有所不同。
+</p>
+<p>
+1）静词后接加 байх 的陈述式及形动词形式。静词后接加 байх 的时间形式，表示静词的“是什么”&#x202f;“具有什么性质”的同时，能给静词添加时间意义，如：现在时添加“现在它是什么”&#x202f;“现在它具有什么性质”；
+过去时添加“过去它是什么”&#x202f;“过去它具有什么性质”等等。байх 的形动词体的形式，则给添加体的意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр харагдаж байх чинь монгол гэр байна даа.
+</p>
+<p>
+望见的那是蒙古包。
+</p>
+<p>
+Би сандран тосон авч үзэхлээр нэг цахилгаан мэдээ байжээ.
+</p>
+<p>
+我忙接过来一看，是一封电报。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+Гэрийн байдалыг нь ажиглахад тун тохилог сайхан байв. 注意家里情况, 布置很是适合。（ажиглах 注视, 观察; 留意）
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Шугуй доторхи муруй сарий зам нь явахад тун ч бэрхтэй байлаа.
+</p>
+<p>
+林中弯曲的小路，走起来很困难。
+</p>
+<p>
+Намайг салааны дарга байхад тэр байлдагч байв.
+</p>
+<p>
+我当排长的时候他是战士。
+</p>
+<p>
+Тэр хүн үлгэр холбоонд дуртай байдаг юм байна.
+</p>
+<p>
+他喜欢听说书和好来宝
+</p>
+<p>
+Өвгөн анчин энэ хүйтэнд ажиггүй байгаа бололтой.
+</p>
+<p>
+老猎人在这严寒里好像不在乎。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）静词后接加 байх 的祈使式。静词后可接加 байхаа , байж мэднэ , байлгүй 只起一种语气词作用。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би үзвэл Дорж адуугаа хариулбал дээр байхаа.
+</p>
+<p>
+我看道尔吉还是放马较好。
+</p>
+<p>
+Тийм хүнд биш байхаа гайгүй байхаа?
+</p>
+<p>
+不是那么重吧！差不多吧？
+</p>
+<p>
+Төмрөөр хийсэн юм чинь хүнд байлгүй.
+</p>
+<p>
+用铁作的嘛，一定很重。
+</p>
+<p>
+Шинэ арьсан дээл юм чинь дулаан байлгүй.
+</p>
+<p>
+新皮衣嘛，一定很暖和。
+</p>
+<p>
+Тэр харагдаж байх чинь зээр байж мэднэ.
+</p>
+<p>
+那边望见的可能是黄羊。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）静词后接加 байх 的副动词形式，表示静词的“是什么”&#x202f;“具有什么性质”的同时，能给静词添加副动词意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Том хүн байж байгаад хүүхдийн зантай.
+</p>
+<p>
+虽然是大人，却有小孩子的脾气。
+</p>
+<p>
+Бүр нэг гэрийн улс байгаад юу гэж талархах юм.
+</p>
+<p>
+都是一家人嘛，何必道谢。
+</p>
+<p>
+Одоо бас эрт байсаар бишүү? 现在还早吧?
+</p>
+<p>
+Жирийн ард байталаа их зориг самбаатай.
+</p>
+<p>
+虽然是个普通老百姓，但却很有志气。
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph （4）辅助静词的 ����� ......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-170"><span class="sectionnumber">2.4.2.4.2.4&#x2003;</span>（4）辅助静词的 болох</span>
+<a id="cyrillic-grammar-autopage-170"></a>
+
+</p>
+<p>
+用在静词后的 болох, 有时是独立的实义动词，有时是具有辅助性质的助动词。当作实义动词用时，болох 有“成熟”&#x202f;“再说”等意义。当作助动词用时，处在一般名词后时有“是什么”&#x202f;“发展成为什么”的意义；
+处在时间名词后时有“到什么时候”&#x202f;“用多长时间”的意义；处在包含行为意义的名词后时，则表示该行为的实现；处在形容词后时，表示“具备该性质”
+；处在数字后时，表示“达到该数量”
+。这些意义的基本意义是“成为
+什么”
+。基本功能是辅助静词完成句法所要求的各种语法变化，主要是作为述语的变化。
+</p>
+<p>
+1）静词后接加 болох 的时间式。静词后接加 болох 的时间式，能给静动添加时间意义。如：现在时添加“现在它是什么”&#x202f;“现在它具有什么性质”
+；过去时添加“过去完成了什么”&#x202f;“过去它具备了什么性质”；将来
+时添加“将来它成什么”&#x202f;“将来它具备什么性质”等等。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Нэг нь нийтийн хоолны гэр, нөгөө нь олны номын сан болно.
+</p>
+<p>
+一个是集体食堂，另一个是公共阅览室。
+</p>
+<p>
+Нийтийн дугуйлан хөгжиж хоршоо болов.
+</p>
+<p>
+集体小组发展成合作社了。
+</p>
+<p>
+Чиний энэ яаруу сандруу зан чинь сайн хэргийг муу хэрэг болгоход саадгүй шүү.
+</p>
+<p>
+你这个急燥脾气, 很可能把好事变成坏事。
+</p>
+<p>
+Удсан ч үгүй намар болжээ.
+</p>
+<p>
+不久就到了秋天。
+</p>
+<p>
+Цаг хиртэй болсны дараа дахиад намайг дуудлаа.
+</p>
+<p>
+过了一个来小时以后又叫了我。
+</p>
+<p>
+Шинэ өрнөлт удалгүй болох гэж байна.
+</p>
+<p>
+新的高潮很快就要到来。
+</p>
+<p>
+Замдаа нэг бага саад болсон ч магадгүй.
+</p>
+<p>
+道上可能耽误了一些。
+</p>
+<p>
+Чих тавин чагнуул нам жим болсон байв.
+</p>
+<p>
+侧耳听来没有动静了。
+</p>
+<p>
+Одоо арав нэмбэл зуу болно.
+</p>
+<p>
+再加十个就是一百。
+</p>
+<p>
+Энэ тэрэг дахиж ирвэл арван удаа болно.
+</p>
+<p>
+这车再来一次就十回了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+用在名词后的有些 болох , 与名词一起变成了一种复合动词。
+</p>
+<p>
+сайн болох 痊愈；нас болох 到岁数, 去世；санаа болох 挂念; сүйд болох 遭祸；нэг зүг болох 就绪；нэг тийшээ болгох 处理；энэ тэр болох 三长两短；юм болгох 物尽其用
+</p>
+<p>
+2）静词后接加 болох 的祈使式。бололтой 表示估计；болов уу 表示疑问或不肯定；ч болтугай 表示一种让步口气。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Морьт цэргийн холбогч бололтой.
+</p>
+<p>
+可能是骑兵的联络员。
+</p>
+<p>
+Нэг нь нөгөө нэгийнхээ нөхөр нь бололтой.
+</p>
+<p>
+一个可能是另一个的朋友 (爱人)。
+</p>
+<p>
+Мөнх болов уу , Баатар болов уу тэр тухай ярьж байсан юм.
+</p>
+<p>
+是孟克呢, 或是巴特尔呢，谈过那个问题。
+</p>
+<p>
+Хэн ч болтугай үүнийг хөдөлгөж үл болно.
+</p>
+<p>
+无论谁都不能动这个。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）静词后接加 болох 的副动词形式时，能给静词添加副动词意义。有的副动词形式则起一种后置词或连接词作用。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Галын гэрэл нь усыг гал улаан болтол гэрэлтүүлж байлаа.
+</p>
+<p>
+火光把水照得通红。(гэрэлтэх 照耀, 发光)
+</p>
+<p>
+Би хэзээ боловч энэ хэргийг мартахгүй.
+</p>
+<p>
+我任何时候也不忘记这件事情。
+</p>
+<p>
+Энэ ажил хэлэхэд амар боловч хийхэд хүчиртэй.
+</p>
+<p>
+这个工作说着容易做起来难。
+</p>
+<p>
+Энд бэлхэн түлш үгүй болохоор зарим нь аргал түүхээр явлаа.
+</p>
+<p>
+这里没有现成的燃料，所以有的人拣牛粪去了
+</p>
+<p>
+Ажил яаруу болохоор би очиж чадсангүй.
+</p>
+<p>
+因为工作忙，所以我未能去。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+бол 这个词，在形式上，在内容上，也都有了自己的特点。它可以处在静词各格之后，表示一种假设的口气，有时假定口气不明显，就变为提示的意义，起一种强调某词的作用。如果用在主述关系上，而且主语、述语二者是静词性的
+对等的词，那么 бол 就起主语标志的作用。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би бол очно. 我的话去。
+</p>
+<p>
+Маргааш бол очно. 明天的话去。
+</p>
+<p>
+Чи чөлөөтэй бол ир чөлөөгүй бол байчих.
+</p>
+<p>
+你有时间就来，没有时间就算了。
+</p>
+<p>
+Тийм ном Бээжинд бол байх магадгүй.
+</p>
+<p>
+那样的书北京的话可能有。
+</p>
+<p>
+Үнэнээ бол хэлэхгүй яах юм.
+</p>
+<p>
+怎么会不说真实情况呢
+</p>
+<p>
+Тэр хүний амнаас бол ийм үг гармаар юм.
+</p>
+<p>
+从那个人嘴里可能出这样的话。
+</p>
+<p>
+Түүнтэй бол хамт очсон ч болно.
+</p>
+<p>
+如果和他去，一同去也行。
+</p>
+<p>
+在下例中的 бол 就起主语标志的作用。
+</p>
+<p>
+Энэ бол манай нутгийн гаралт. 这是我们的土产
+</p>
+<p>
+Гэвч миний энэ бол онцын байдал шүү.
+</p>
+<p>
+但我这是特殊情况。
+</p>
+<p>
+此外，在有疑问代词的句末，бол 表示一种疑问、怀疑、顾虑的意义。
+</p>
+<p>
+Харин ямар бол даа? 许是什么样呢？
+</p>
+<p>
+Ай, юу бол даа？唉，不知道如何!
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+至于 болод (болон) , 它的书写形式也好，语法意义也好，都与 болох 有了区别，变成了完全的连接词。
+【内蒙古是 болод 和, 与, 同，而字典里只有 болоод】
+</p>
+
+<!-...... subparagraph （5）����, ����� 的扩展式......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-171"><span class="sectionnumber">2.4.2.4.2.5&#x2003;</span>（5）байх, болох 的扩展式</span>
+<a id="cyrillic-grammar-autopage-171"></a>
+
+</p>
+<p>
+我们在前边叙述了实义动词的副动词形式后接加表示体、情态的助动词的情况，也叙述了静词、形动词后接加表示时间、情态的助动词的情况。但是蒙古语动词的变化并不停留在这个限度之内，实义动词后接加的表示体、情态的助
+动词也可以采取形动词的形式。同时形动词后接加的表示时间、情态的助动词也可以有体的变化。这样一来变化形式就复杂化，但变化形式就其类型而言，不外乎原有几种形式的相加或原有几个形式的扩展。因此, 我们把它们称作扩
+展式。下边分别看看扩展式的几个基本类型。
+</p>
+<p>
+1）情态助动词后加时间助动词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Монголоор хэлж чадна. 会说蒙古语。
+</p>
+<p>
+Тэр монголоор хэлж чадах юм байна даа.
+</p>
+<p>
+原来他会说蒙古语。(现在才知道)
+</p>
+<p>
+Тэр монголоор хэлж чадах юм байжээ.
+</p>
+<p>
+原来他是会说蒙古语的.(我当时没有知道)
+</p>
+<p>
+Цээжээр хэлж гарна. 能背诵出来。
+</p>
+<p>
+Тэр цээжээр хэлж гарах юм байна.
+</p>
+<p>
+原来他能背出来。(现在才知道)
+</p>
+<p>
+Тэр цээжээр хэлж гарах юм байжээ.
+</p>
+<p>
+原来他是能背出来的。(我当时不知道)
+</p>
+<p>
+Энэ үхрийг унаж болно. 这个牛可以骑。
+</p>
+<p>
+Энэ үхрийг унаж болох юм байна.
+</p>
+<p>
+原来这个牛可以骑。
+</p>
+<p>
+Энэ үхрийг унаж болох юм байжээ.
+</p>
+<p>
+原来这个牛是可以骑的。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）进行体现在时或过去时加时间助动词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Шинэ асуудалд тулгарч байна.
+</p>
+<p>
+遇到了新问题。
+</p>
+<p>
+Шинэ асуудалд тулгарч байжээ (байсан ).
+</p>
+<p>
+曾遇到过新问题。
+</p>
+<p>
+Шинэ асуудалд тулгарч байх юм байна.
+</p>
+<p>
+原来遇到了新问题。
+</p>
+<p>
+Шинэ асуудалд тулгарч байсан юм байна.
+</p>
+<p>
+原来曾遇到过新问题。
+</p>
+<p>
+Шинэ асуудалд тулгарч байсан юм байжээ.
+</p>
+<p>
+原来曾遇到过新问题。
+</p>
+<p>
+Тэр хавьд олон айл нутаглаж байна.
+</p>
+<p>
+那附近住着很多家。(现在)
+</p>
+<p>
+Тэр хавьд олон айл нутаглаж байжээ (байсан ).
+</p>
+<p>
+那附近曾住过很多人家。(过去)
+</p>
+<p>
+Байдлыг харахад тэр хавьд олон айл нутаглаж байх юм байна.
+</p>
+<p>
+看样子那附近住着很多家 (现在情况, 现在发现)
+</p>
+<p>
+Ор мөрөөс нь үзэхэд тэр хавьд олон айл нутаглаж байсан юм байна.
+</p>
+<p>
+看痕迹那附近曾住过很多家。(过去事情，现在发现)
+</p>
+<p>
+Тэр хавьд олон айл нутаглаж байдаг юм байжээ миний нүд муу учраас тэр үед олж харсангүй.
+</p>
+<p>
+那附近本来住着很多家，我因眼力不好没有看见。(过去事情, 当时发现, 或当时未发现)
+</p>
+<p>
+Тэр хавьд олон айл нутаглаж байсан юм байжээ бид тэр үед ор мөрөөс нь сая олж мэджээ.
+</p>
+<p>
+那附近原来曾住过很多家，我们那时候从迹象才发现。(过去事情，以后 (也是过去) 发现）
+。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）完成体、坚持体 (或重复体) 现在时或过去时加时间助动词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хүүгээс нь захидал ирүүлээд байна.
+</p>
+<p>
+他儿子来了信。
+</p>
+<p>
+Хүүгээс нь захидал ирүүлээд байжээ (байсан).
+</p>
+<p>
+当时他儿子曾来过信。
+</p>
+<p>
+Хүүгээс нь захидал ирүүлээд байх юм байна.
+</p>
+<p>
+原来他儿子来了信。
+</p>
+<p>
+Хүүгээс нь захидал ирүүлээд байсан юм байна.
+</p>
+<p>
+原来他儿子曾来过信.(现在时口气)
+</p>
+<p>
+Хүүгээс нь захидал ирүүлээд байсан юм байжээ.
+</p>
+<p>
+原来他儿子曾来过信.(过去时口气)
+</p>
+<p>
+Тэр хүн арвин шинэ ном аваад байна.
+</p>
+<p>
+那个人买了不少新书。
+</p>
+<p>
+Тэр хүн арвин шинэ ном аваад байжээ (байсан).
+</p>
+<p>
+那个人曾买过不少新书。
+</p>
+<p>
+Хүнээс сонсоход тэр хүн арвин шинэ ном аваад байх юм байна.
+</p>
+<p>
+听人说, 那个人买了不少新书 (现在事情, 现在知道)
+</p>
+<p>
+Хүнээс сонсоход тэр үед тэр хүн арвин шинэ ном аваад байсан юм байжээ би мэдсэн бол зээлж үзэх юм билээ.
+</p>
+<p>
+听人说，当时那个人买过不少新书，我知道的话借着看看。(过去的事情, 当时未发现)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4) 延续体现在时或过去时加时间助动词
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэд хурлаа хийсээр байна. 他们还在开会。
+</p>
+<p>
+Тэд хурлаа хийсээр байжээ (байсан).
+</p>
+<p>
+他们曾在开会。
+</p>
+<p>
+Хүнээс сонсоход тэд хурлаа хийсээр байх юм байна.
+</p>
+<p>
+听人说，他们还在开会。(现在事情，现在知道)
+</p>
+<p>
+Хүнээс сонсоход тэр үед тэд хурлаа хийсээр байсан юм байна.
+</p>
+<p>
+听人说，当时他们曾在开会。(过去事情，现在知道)
+</p>
+<p>
+Тэд хурлаа хийсээр байсан юм байж би сүүлээр сая мэджээ.
+</p>
+<p>
+当时他们曾在开会，我过后才知道。(过去事情，以后 (也是过去) 才发觉)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+5）形动词现在将来时 (包括具有情态助动词的) 后接加 болох 的形式或者它的体时复合形式。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Монголоор хэлж чадах болно. 将会说蒙古语
+</p>
+<p>
+Монголоор хэлж чадах болжээ.
+</p>
+<p>
+变得会说蒙古语了。
+</p>
+<p>
+Би одоо монголоор хэлж чадах болж байна.
+</p>
+<p>
+我现在逐渐变得会说蒙古语。
+</p>
+<p>
+Одоо тэр лав монголоор хэлж чадах болж байх юм.
+</p>
+<p>
+现在他一定逐渐变得会说蒙古语。
+</p>
+<p>
+Тэр үед тэр монголоор хэлж чадах болж байсан билээ.
+</p>
+<p>
+那时他正在逐渐变得会说蒙古语。
+</p>
+<p>
+Одоо би монголоор хэлж чадах болоод байна.
+</p>
+<p>
+现在我已经变得会说蒙古语了。
+</p>
+<p>
+Одоо тэр лав монголоор хэлж чадах болоод байх юм.
+</p>
+<p>
+他现在一定已经变得会说蒙古语了。
+</p>
+<p>
+Тэр үед тэр монголоор хэлж чадах болоод байсан билээ.
+</p>
+<p>
+那时他已经变得会说蒙古语了。
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph (6) 助动词的简略形式......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-172"><span class="sectionnumber">2.4.2.4.2.6&#x2003;</span>(6) 助动词的简略形式</span>
+<a id="cyrillic-grammar-autopage-172"></a>
+
+</p>
+<p>
+在有些地区语言里，在有些作家的作品中，可以看到 сан , юмсан , санжээ , юм санжээ 等形式。这几个形式从来源说是从 асан , юм асан , асан ажээ, юм асан ажээ 演变而来的。但是在现代蒙古语里 асан 这个助动词已经基本不用，代替
+它的是 байсан , 因此, 从现在的情况看，асан юмсан ,юмсанжээ 在一定意义上也可以看作是 байсан 的一种简略形式。
+</p>
+<p>
+简略形式里偶尔也遇到 юмжээ, юмдаг 但它们的使用范围很小，作用也不重要。因此这里还是主要谈一谈 сан, юмсан , юмсанжээ。
+</p>
+<p>
+1) 简略形式 сан 的用法。сан 的作用类似 байсан , 因而在形动词后边，在静词后边，本来可以用 байсан 的地方常常遇到简略形式 сан。我们从一些作品中看看它的使用情况。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Цэрэгт орсон хойно анх удаа бүтэн шинэ дээл өмд өмссөн сан гэж надад ярьж байжээ.
+</p>
+<p>
+他曾对我说，参军以后他才初次穿上了全新的衣服
+</p>
+<p>
+Хэрвээ гүйцэтгэж дуусаагүй үйлсээ өөр нөхөддөө шилжүүлж амжилгүй элий балайгаар үхвэл тэр ёстой зүрх шимшрэх явдал мөн гэж ярьсан сан.
+</p>
+<p>
+他说，如果不把未完成的事业移交给别的同志稀里糊涂死去，那才是痛心的事呢。
+</p>
+<p>
+Манай энд тэмээ байсан бол танд нэгийг зээлж өгөх сан.
+</p>
+<p>
+如果我们这里有骆驼，本来是可以借给你一峰的.
+</p>
+<p>
+Зовлонд хуучин нийгэм дээр зуд биднийг даруулдаг сан зуд болоод үлдсэнийг нь ноёд залгаад бардаг сан.
+</p>
+<p>
+在苦难的旧社会, 灾害压在我们头上, 遭灾剩下的则被贪官污吏拿走
+</p>
+<p>
+Болдог сан бол тэр зуураа нийслэл Бээжинд нисэн хүрэх байсан.
+</p>
+<p>
+可能的话我当即飞往首都北京。(болдог сан бол = болдог байсан болбол 可能的话。бол 是简写)
+</p>
+<p>
+Хэзээ ч ханцуй тааруулж хуруу барилцан юмны үнийг ярилцаж үзээгүй сан билээ.
+</p>
+<p>
+我从没有在袖口里和人交换手指讨价还价过
+</p>
+<p>
+Нийтэд уужим гэр хэрэгтэй болоход өөрийн гэрээ суллаж өгч байсан хүн сан билээ.
+</p>
+<p>
+公家需要宽大的房子时他曾把自己房子腾出来
+</p>
+<p>
+Сартай хүрэн гэвэл хүрэн халзан гүүгийн ганцхан унага нь сан билээ.
+</p>
+<p>
+星毛紫栗驹曾是紫栗流星骒马的唯一驹子.
+</p>
+<p>
+Гурван жилийн өмнөх хэрэг сан.
+</p>
+<p>
+那是三年前的事
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+从上例看，有的用在-сан(сэн) , -х 后, 有的用在-даг(дэг) , -аа ээ 后，有的用在静词后，表达的意义：
+</p>
+<p>
+-сан(сэн) сан = -сан байсан ：过去的过去时动词
+</p>
+<p>
+-х сан = -х байсан ：过去的未实现动词
+</p>
+<p>
+-даг(дэг) сан = -даг байсан ：过去的经常体动词
+</p>
+<p>
+-аа (ээ) сан = -аа байсан ：过去的继续体动词 (否定形式的话, 未实现动词)
+</p>
+<p>
+静词 + сан = 静词 +байсан ：事物的曾经是什么性质的，曾经具有什么性质
+</p>
+<p>
+2) 简略形式 санжээ 的用法。санжээ 的作用类似 байжээ , 它主要用在 -сан(сэн) 后或静词后。-сан санжээ 表示-сан(сэн) байжээ (过去的过去时) 的意义，静词 +санжээ 表示静词 +байжээ 的意义 (也是过去的过去时)。
+</p>
+<p>
+санжээ 这个形式使用频率很少，使用它的人也较少，不使用 санжээ 的人，把该形式的意义用 байжээ , болжээ 来表达。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ингэж гайхаж сонирхож эргэлзэж түдгэлзэх зуур өвгөний хоёр хөл нь үл мэдэгдэм хөдөлж шилжсээр явж өгсөн санжээ.
+</p>
+<p>
+正这样惊奇犹豫中间，老头的两脚不知不觉移动着走下去了
+</p>
+<p>
+Гэтэл хэрцгий удамт тэр нохой хүрхрэн дайрахаар гарч ирсэн биш санжээ.
+</p>
+<p>
+可是凶恶的狗并没有扑过来。(хүрхрэх(野兽) 吼叫咆哮)
+</p>
+<p>
+Олны хүч гэгч хэцүү л юм санжээ даа.
+</p>
+<p>
+群众的力量是多么惊人呀！
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3) 简略形式 юмсан 的用法。юмсан 主要用在-сан(сэн), -х 之后，有时也用在静词性述语之后。它除了具有过去时的意义外，由于有 юм，所以也具有情态意义。这里-сан юмсан 表示过去的过去时以外，同时还表示出乎预料或遗憾的意
+义。换成普通形式相当于-сан(сэн) байсан нь харин , -сан(сэн) байсан нь гэтэл 。
+</p>
+<p>
+-х юмсан 表示过去的未实现的动词，同时还表示出乎预料或遗憾的意义，换成普通形式相当于 -х байсан нь харин , -х байсан нь гэтэл 。这些形式的情态意义有时清楚一些，有时不够清楚。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Эмч хэрэв хоёр цагийн өмнө ирсэн бол Дорж амьсгаатай байх юмсан ай хөөрхий нэгэнт оройтов.
+</p>
+<p>
+医生如果早来两个小时道尔吉还有气呢，现在已经晚了，很可怜。
+</p>
+<p>
+Би тэр үед манай хүнийг их л уурлаад орж ирэх бэ гэж бодсон юмсан харин манай хүн инээд орж ирэв шүү.
+</p>
+<p>
+我以为他一定生着气进来，不料他笑嘻嘻地进来了
+</p>
+<p>
+Хөөрхий тэр улаан царайтай бяцхан хүү хаа орчихсон юм бэ учирсан бол зүгээр юмсан гэж хөгшин ээж хааяа ярьж байлаа.
+</p>
+<p>
+可怜那红脸蛋的小孩子到哪里去了呢？遇见他就好了。——老太太有时这样说。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4) 简略形式 юмсанжээ 的用法。юмсанжээ 的作用类似 юм байжээ，可以用在 -сан сэн, -х, -аа ээ 及静词之后。表示过去时的同时，具有事后才了解的情态意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Оо, тийм байсан юмсанжээ (юм санжээ).
+</p>
+<p>
+噢，原来那样
+</p>
+<p>
+Өвчүү дээрээ гараа тавьж үзвэл өөрийн мөн амьсгаатай байх юмсанжээ.
+</p>
+<p>
+把手放在胸部一看，原来自己还有气呢
+</p>
+<p>
+Энэ голыг энэ хавьаар гэтэлж болох юм санжээ.
+</p>
+<p>
+这条河原来可从这里渡过. (гэтлэх 渡)
+</p>
+<p>
+Сэрээд үзэхэд тэнгэр нэгэнт гэгээрчихсэн байх бөгөөд …өөрийн мөн гэртээ уг хэвээр байж байгаа юмсанжээ.
+</p>
+<p>
+醒来一看天已亮…自己原来也原样在屋子里
+</p>
+<p>
+Сорох тамхи ч үгүй болоод гачигдаж байгаа юмсанжээ даа.
+</p>
+<p>
+原来连吸的烟也断了正在难受，真可怜
+</p>
+<p>
+Ай хөөрхий дээ , ер нь манай нутгийн дүү-нэр юмсанжээ даа.
+</p>
+<p>
+真可怜！原来是我们家乡的子弟呀。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+总起来看，сан санжээ юмсан юмсанжээ(юм санжээ) 等的简略形式只用于形动词及静词之末，而且它们都不是非用不可的形式，实际上其中有些形式很少使用。很多人不用简略形式。сан 和 санжээ 意义相近，可以互相代替；而
+юмсан 与 юмсанжээ 意义并不相同，所以不能互相代替。<sup>11</sup> <sup>12</sup>
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-173"></a>
+<p>
+<sup>11</sup>&nbsp;-сан(сэн)(байсан) 这种形式常常是同形动词和 юм 等合用，表示愿望或回忆。如 үзэхсэн , үзэх юмсан 希望看到。үздэгсэн，үздэг юмсан 看过, 看看就好了。үзсэнсэн，үзсэн юмсан 看过, 看过了。-санж сэнж 是
+байсан байжээ 的合用形式
+</p>
+<p>
+<sup>12</sup>&nbsp;юмсан (本是, 原是, 本会; 那是; 应该…) 表示愿望或肯定的语气。还有 юмсанж ，юмсанжээ 表示过去的时间。如：гурав дахь өдөр юмсан 那是在第三天。Үзэх юмсан 应该看 (想看)。Хамт байсан юмсан 原是在一
+起的。Үзэх юмсанжээ 本应该看一看。
+</p>
+
+</div>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

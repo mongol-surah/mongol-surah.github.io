@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—动词词干形态 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-134"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... section 动词词干形态......
+-->
+<h4 id="autosec-135"><span class="sectionnumber">2.3&#x2003;</span>动词词干形态</h4>
+<a id="cyrillic-grammar-autopage-135"></a>
+<a id="cyrillic-grammar-autofile-9"></a>
+
+<!-...... subsection 动词词干的层次......
+-->
+<h5 id="autosec-136"><span class="sectionnumber">2.3.1&#x2003;</span>动词词干的层次</h5>
+<a id="cyrillic-grammar-autopage-136"></a>
+
+<p>
+蒙古语动词词干就是去掉式动词、形动词和副动词的各种后缀之后剩下的部分，形式上与式动词第二人称的命令形式相同。形动词的后缀从其动词性变化来说是结尾后缀，从其静词性变化来说却是一种词干后缀。
+</p>
+<p>
+蒙古语动词的词干可以分为词根部分和后缀部分。后缀可以有几个，这里有构词后缀，构形后缀，而且还有过渡性质的后缀。我们为了揭示蒙古语动词的语法特点起见，把蒙古语动词词干后缀分为如下四种：1）构成动词一次词干的
+后缀；2）构成动词二次词干的后缀；3）构成动词态性词干的后缀；4）构成动词体性词干的后缀。
+</p>
+<p>
+<b>（1）构成动词一次词干的后缀：</b>
+</p>
+<p>
+动词一次词干包括所有非派生词干和由其它词类 (例如：名词、形容词、数词、时位词、副词和拟声的摹拟词等) 派生的动词词干。构成动词一次词干的后缀有：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хайч 剪刀 +ла —хайчла 剪 (动词词干)
+</p>
+<p>
+тоо 数 +ло —тооло 数 (动词词干）
+</p>
+<p>
+чулуу 石头 +да —чулууда 抛石头
+</p>
+<p>
+алга 手掌 +да —алгада 用手掌打
+</p>
+<p>
+илүү 多余 +дэ —илүүдэ 多出, 超过
+</p>
+<p>
+охор 短 +до —охордо 变短
+</p>
+<p>
+нэг +дэ —нэгдэ 统一
+</p>
+<p>
+баян 富 +жи —баяжи 致富
+</p>
+<p>
+амар 平安 +жи —амаржи 安心
+</p>
+<p>
+цагаан 白 +рах —цагаара 熟练
+</p>
+<p>
+үгүй 没有 +рэх —үгүйрэ 变穷
+</p>
+<p>
+алдар 名誉 +ши —алдарши 出名
+</p>
+<p>
+суурь 基础 +ши —суурьши 定居
+</p>
+<p>
+сайн 好 +шаа —сайшаа 夸奖, 表扬
+</p>
+<p>
+муу 坏 +шаа —муушаа 指责非难; 诽谤丑化
+</p>
+<p>
+баян 富 +рха —баярха 夸耀财富, 依仗富有
+</p>
+<p>
+ноён 官 +рхо —ноёрхо 以官自豪, 统治
+</p>
+<p>
+өөр 另外 +члө —өөрчлө 改造, 改革
+</p>
+<p>
+шинэ 新 +члэ —шинэчлэ 革新
+</p>
+<p>
+сайн 好 +жра —сайжра 改进，好转
+</p>
+<p>
+муу 坏 +жра —муужра 恶化，晕倒
+</p>
+<p>
+олон 多 +шра —олшро 增多
+</p>
+<p>
+зүг 方向 +шрэ —зүгшрэ 就绪
+</p>
+<p>
+мөс 冰 +дө —мөсдө (=мөстөх) 结冰
+</p>
+<p>
+цан 霜 +та —цанта 结霜，挂霜
+</p>
+<p>
+хуга 断 +чи —хугачи 折断打断弄断 (多次体)
+</p>
+<p>
+дэлбэ 炸, 崩, 裂 +цэ —лэлбэцэ 炸, 轰击
+</p>
+<p>
+халуун 热 +ца —халууца 感到热, 热得难受
+</p>
+<p>
+сэрүүн 凉 +цэ —сэрүүцэ 乘凉, 凉爽起来
+</p>
+<p>
+хага 碎裂地 +ра —хагара 裂开, 破碎, 毁坏
+</p>
+<p>
+тас 断 +ра —тасра 脱离, 断开, 脱落
+</p>
+<p>
+хэмх 碎 +рэ —хэмхрэ 变碎, 破碎
+</p>
+<p>
+хага 破 +ла —хагала 拆毁, 打碎, 切开, 打断
+</p>
+<p>
+тас 断 +ла —тасла 弄断, 切断, 使脱离
+</p>
+<p>
+хэмх 碎 +лэ —хэмхлэ 打碎, 捣碎
+</p>
+<p>
+(摹拟词): шуу 响声 +ги —шууги 喧哗，吵闹
+</p>
+<p>
+хүн 响声 +гэнэ —хүнгэнэ 轰轰响, 轰隆响 (如打雷大炮等)
+</p>
+<p>
+хүр 响声 +хрэ —хүрхрэ 咆哮
+</p>
+<p>
+хүр 响声 +чигнэ —хүрчигнэ 轰隆隆响, 接连发出霹雷声<sup>5</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-137"></a>
+<p>
+<sup>5</sup>&nbsp; 这些动词：хайчлах 剪，тоолох 数，是动词 (派生动词)，хайчла тооло 是动词词干。нухах 揉 (动词)，нух 是词干. 其它同理…
+</p>
+
+</div>
+</div>
+<p>
+动词词干在词汇意义上有及物与不及物的差别。派生动词的及物与不及物的差别可用其后缀来区分 (见及物动词与不及物动词)。
+</p>
+<p>
+<b>（2）构成动词二次词干的后缀有：</b>
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ань 合眼 (аних) +вхий —анивхий 眨眼挤眼
+</p>
+<p>
+ань 合眼 +вчи —анивчи 时时眨眼, 不断挤眼
+</p>
+<p>
+нух 揉, 搓 +ла —нухла 不住地揉搓
+</p>
+<p>
+инээ 笑 +вхийлэ —инээвхийлэ 微笑, 眯眯笑
+</p>
+<p>
+тогто 定 +ни —тогтни (=тогтнох) 安定稳定固定建立
+</p>
+<p>
+зов 愁 +ни —зовни 痛心悲伤忧愁
+</p>
+<p>
+дар 压 +ла —дарла 压迫压挤, 凌辱贬低, 迫害
+</p>
+<p>
+дус 滴 +ла —дусла 不断地滴, 不断漏 (多次体)
+</p>
+<p>
+цохь 打, 跳动 +ло —цохило 跳动 (多次体)
+</p>
+<p>
+нух 揉 +чи —нухчи 揉搓, 逐个揉搓 (多次体)
+</p>
+<p>
+найра 调合, 友好相处 +мда —найрмда 和好和解, 建立亲密关系
+</p>
+<p>
+найга 摇晃 +лза —найгалза 摇动, 袅袅飘动
+</p>
+<p>
+ангай 张口 +лза —ангалза 时时打开，一张一合
+</p>
+<p>
+тата 抽 +валз —татвалза 痉挛, 抽筋, 抽搐
+</p>
+<p>
+ань 合眼 +валз —анивалза 不断眨眼, 频频挤眼
+</p>
+<p>
+эрэ +мэлзэ —эрмэлзэ 期望, 希望
+</p>
+<p>
+тата 拉 +галза —татгалза 犹豫
+</p>
+<p>
+хара 看 +галза —харгалза 关怀
+</p>
+<p>
+сарва 伸手 +гана —сарвагана 挣扎
+</p>
+<p>
+<sup>6</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-138"></a>
+<p>
+<sup>6</sup>&nbsp; 这些都是动词词干，再加上后缀，变成动词二次词干
+</p>
+
+</div>
+</div>
+<p>
+这类后缀还有一些。它们的特点是：
+</p>
+<p>
+1〉有些语法意义。上述例子里能显示出一些它所包含的体的意义。
+</p>
+<p>
+2〉但这些后缀并不常用，仅仅运用于词汇意义比较独特的一部分词上，甚至有的只在一两个词上才会遇到。派生出来的二次词干大都有自己的词汇意义特征。例如：тата 拉, 扯, 拽与 татгалзах 犹豫, 疑虑，хара 看, 瞧与 харгалзах 关怀
+等词的词汇意义很显然是不同的。
+</p>
+<p>
+3〉这些派生词干还能够构成有关的新词。例如：харгалзалга 照顾，дарлал 压迫，тогтнол 存在, 生存，найгалзуур 好摇晃的，дайвалзуур 蹒跚的趔趄的，цохьлалт 跳动等等。从以上这些例词我们可以知道，这些构成二次词干的后缀
+里，占主要地位的是它补充的词汇意义，至于它所表达的语法意义则不是主要的。因此，构成二次词干的后缀可以认为是构词后缀。
+</p>
+<p>
+<b>（3）构成动词态性词干的后缀 (态的后缀)：</b>
+</p>
+<p>
+动词的态性词干是在动词一次词干或动词二次词干上附加态的后缀而构成的。动词态的后缀有 уул үүл , га гэ ，аа ээ …, лга лгэ , лц , лд , гд , цгаа цгээ 等。例如：явуул 让走，ирүүл 让来，суулга 让坐，хийлгэ 让做，босоо 让起来，өсгө
+让长，баригда 被捕，цохьгдо 被打，барилда 摔跤，алалда 撕杀，гарцгаа 都出去，орцгоо 都进去，хэлэлцэ 交谈，явалца 来往, 都走等。构成动词态性词干的这些后缀的特点是：1〉语法意义大。以上所举的例词，都表示着该动词的一
+种态；2〉这些态的后缀不受词汇意义的限制，能普遍使用。附加态的后缀而产生的动词态性词干中，有的虽然在词汇意义方面具有独特的性质，可是在大多数情况下，态的后缀只能给动词补充语法意义；3〉由这些后缀产生的态性词
+干也能构成有关的新词。例如：явуулалга 行为, 行动，тулалдаан 战役，солилцоо 交易，явалцаа 来往等。这里能够添加适当的词汇意义者才能构成新词，而某些后缀 (例如 цгаа цгээ) 则不能。在这些后缀上派生新词的事实说明，这些
+后缀具有一定的补充词汇意义的功能。从上述这几方面来看，态的后缀既具有词汇意义，又具有语法意义。那么，这两者中哪个占主要地位呢？从总的情况来看，语法意义显然比较突出。所以，构成态性词干的态的后缀，可以看作是
+构形后缀。
+</p>
+<p>
+
+<a href="./media/image14.jpeg" target="_blank" ><img
+src="./media/image14.jpeg"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+<p>
+<b>（4）构成动词体性词干的后缀 (体的后缀)：</b>
+</p>
+<p>
+动词体性词干是在动词一次词干、二次词干或态性词干上附加体的后缀而构成的动词词干。构成动词体性词干的体的后缀主要给动词补充语法意义。例如：явчих 走了，байчих 得了，ирчих 来了，идчих 吃了……，байсхийх 待 (一会
+儿)，амсхийх 休息 (一会儿)，явсхийх 走 (一点儿)……。口语中常用的有 гараадах (请) 出去，ороодох (请) 进来，ирээдэх (请) 来，үзээдэх (请) 看等。构成动词体性词干的体的后缀的特点是：1〉语法意义大。从以上所举的例词来看，
+都表达着各该动词的某一种体；2〉这些体的后缀不受词汇意义的限制，能够广泛使用 (后缀 схий 的使用范围比其它后缀小)；3〉由这些后缀构成的体性词干再不能派生新词。这一点使这些后缀区别于前面说过的全部后缀；4〉体的后
+缀是动词词干的最后部分，所有这些后缀必要时前面能接态的后缀，后面能加式动词、形动词和副动词等的词尾。例如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+явуулчих 派遣 (了)，үзүүрлэчих 让看 (了)，барилдчих 摔跤 (了)，явцгаачих (大家) 走 (了)，хэлэлцэчих 讨论 (了)……，явуулаадах (请) 派遣，үзүүлээдэх (请) 让看，хэлэгдээдэх 被说，барилдаадах (请) 摔跤，татгалзаадах 犹豫，
+хэлэлцээдэх (请) 讨论，бага явуулсхийгээд 让稍走一点儿……идүүлсхийгээд 让稍吃一点儿，нэг үзэгдсхийгээд 被稍微看见一忽儿……
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+从上述情况来看，很明显，构成体性词干的体的后缀是属于构形后缀。
+</p>
+<p>
+
+<a href="./media/image15.jpeg" target="_blank" ><img
+src="./media/image15.jpeg"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+
+<!-...... subsection 动词的态范畴......
+-->
+<h5 id="autosec-139"><span class="sectionnumber">2.3.2&#x2003;</span>动词的态范畴</h5>
+<a id="cyrillic-grammar-autopage-139"></a>
+
+<p>
+蒙古语动词有表示行为与其主体之间的关系的态的范畴。表达态的范畴的形式就是上面所说过的构成动词态性词干的那些态的后缀。态的种类及其后缀如下：
+</p>
+<p>
+（1）自动态（没有专门的态的后缀的形式)。<sup>7</sup>
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-140"></a>
+<p>
+<sup>7</sup>&nbsp; 这个名称，有人说是己动态、主动态，“表示自己完成动作”，用哪个更准确
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ном бичиг үзнэ 看书
+</p>
+<p>
+Цаасан дээр бичив 写在纸上
+</p>
+<p>
+Холын бараагаа харж байна 眺望远方
+</p>
+<p>
+Аян замдаа мордлоо 踏上征途
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）使动态后缀为 уул үүл , лга лгэ , га гэ аа ээ . 使动态表示主体令他方进行的动作。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Олон бүгдэд үзүүлнэ. 让大家都看
+</p>
+<p>
+Гарт нь бариулсан. 让 (他) 握在手里了
+</p>
+<p>
+Цаасан дээр бичүүлэв. 让写在纸上了
+</p>
+<p>
+Зарлиг буулга 下命令吧！
+</p>
+<p>
+Хурдан хийлгэ 快让做吧！
+</p>
+<p>
+Танаар заалгая. 让您教。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+га гэ (аа ээ) 接加在书面语辅音结尾 (口语也是辅音结尾) 的动词词干后。га гэ 还接加于书面语中以短元音结尾 (口语中以辅音结尾) 的一部分动词词干后，口语读音为［аа］
+［ээ] ……
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сур 学习 +га —сургах 教
+</p>
+<p>
+хүр 到 +гэ —хүргэх 送
+</p>
+<p>
+хөдөл (自) 动 +гө —хөдөлгөх (他) 动
+</p>
+<p>
+хата 干 +га —хатаах 晒干
+</p>
+<p>
+хала (自) 热 +га —халаах (使) 热〖变成使动态〗
+</p>
+<p>
+ноцо 燃 +го —ноцоох 点燃
+</p>
+<p>
+зогс 站, 停 +го —зогсоох 使之停下
+</p>
+<p>
+бүтэ 成功 +гэ —бүтээх 造成, 完成
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+使动态的意义，主要靠 уул үүл 与 лга лгэ 二者表示。前者用于口语中以辅音结尾的词干后，后者用于口语中以长元音、复合元音结尾的词干后，形成互补关系。至于 аа、ээ、га、гэ 使用范围很小，而且构词成分大于构形成分，这点从
+上述例词中可以看出。
+</p>
+<p>
+（3）被动态，后缀为 гд (д) 。被动态表示主体遭受他方发出的动作。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энэ морь надад бариулахгүй.
+</p>
+<p>
+我抓不住这匹马（直译: 这匹马不能被我抓住)
+</p>
+<p>
+Тэр ном олдоход бэрхтэй. 那本书很难找着
+</p>
+<p>
+Алсын бараа харагдана.
+</p>
+<p>
+可看到远处的景色。(直译: 远处的景色被看到）
+</p>
+<p>
+Тэр нисгэл чамд үзэгдэж байна уу?
+</p>
+<p>
+那个飞机你能看到吗？(直译: 那个飞机被你能看见吗?)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）互动态，后缀为 лд , 表示互相动作。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Байлдааны талбарт алалдах. 在战场上撕杀
+</p>
+<p>
+Наадам дээр барилдах 在那达慕大会上摔跤
+</p>
+<p>
+Хүүхэд үймэлдэж байна. 小孩们在吵闹
+</p>
+<p>
+Хонь овооролдож байна. 羊群在拥挤
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（5）共动态 (同动态)，后缀为 лц , 表示一起动作
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Нэг нэгнээ ширтэлцэнэ. 互相对望
+</p>
+<p>
+Гар гараа барилцана. 相互握手
+</p>
+<p>
+Олноороо инээлцэнэ. 大家都笑
+</p>
+<p>
+Та нар харилцан туслалцах хэрэгтэй.
+</p>
+<p>
+你们要互相帮助
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（6）众动态, 后缀为 цгаа цгээ, 表示众人的动作
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бид хурдан явцгаая. 我们快走吧！
+</p>
+<p>
+Та нар гарцгаа ! 你们都出去！
+</p>
+<p>
+Олноороо сууцгаа ! 大家都坐吧！
+</p>
+<p>
+Ажлаа хийцгээе ! 干活儿吧！
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+动词态的后缀附加于动词一次词干或二次词干时，会因该动词的及物、不及物而产生一些差别。使动态形式能附加于及物、不及物动词，这样派生的态性词干通常都是及物动词。但细致地观察起来，其中也有一点差别：<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 附加于及物动词词干时，会产生含有使动意义的动词。附加于不及物动词词干时: <span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> 假如那个行为是具有主观能动作用的主体的行为的话，那么就会产生含有使动意义的动词；<span
+class="textcircled"
+style="border: 1px solid black"
+>3</span> 假如那个行为是没有主观能动作用的主体的行为的话，那么只能产生及物动词。例如：
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> үзүүлэх 让看，бичүүлэх 让写，авуулах 让拿
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> явуулах 让走，унтуулах 让睡，оруулах 让进去 (允许别人进去)
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>3</span> бүтээх 完成，хатаах 晒干，ноцоох 点燃，босоох 立起 (把木头石头之类的东西)，оруулах 拿进去 (把晒在外面的东西)
+</p>
+<p>
+被动态 гд 和互动态 лд：<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 主要附加于及物动词而构成不及物动词词干。<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> 但也有附加在少数不及物动词而依然构成不及物动词词干的情形。例如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> үзэгдэх 被看见，дарлагдах 被压迫，барилдах 摔跤，харвагдах 互相射击
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> явагдах 被行使，суугдах 留印象，үймэлдэх 喧闹，тэмцэлдэх 互相斗争
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+共动态 (同动态)лц 和众动态 цгаа 都能附加于及物、不及物动词，所派生出来的态性词干在及物与不及物方面，一般不产生多大的变化。例如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сурах 学习—суралцах 一起学习, 学习 барих 捕捉, 拿—барилцах 同捕捉, 同拿, туслах 帮助—туслалцах 同帮助，суух 坐—суулцах 同坐，сурах 学习—сурцгаах 大家学习，идэх 吃—идэцгээх 大家吃，суух 坐—сууцгаах 大家坐，инээх
+笑—инээцгээх 大家笑
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+重叠使用不同态的后缀的情况在蒙古语中常常遇到。例如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+танилцуулах 使之认识 (介绍)，танилцуулацгаах 大家使之认识，таниулагдах 使之被认识，үзэгдүүлэх 使之看见，үймэлдэцгээх 大家喧闹，суралцацгаах 大家学习
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsection 动词的体范畴......
+-->
+<h5 id="autosec-141"><span class="sectionnumber">2.3.3&#x2003;</span>动词的体范畴</h5>
+<a id="cyrillic-grammar-autopage-141"></a>
+
+<p>
+动词的体是表示动词本身性质的一种范畴。它表示：该行为在其发展的哪一阶段 (如：开始、结束、完成、未完成等)，它具有什么特殊性质 (如：瞬间的、一时的、重复的、经常的、继续的等)。
+</p>
+<p>
+从动词体的角度来观察蒙古语的动词，就会发现，蒙古语里具有相当多的体的形态。从它们的外部形式，可以分为如下几类：1〉没有专门形式的零形式，2〉带体的后缀的形式，3〉分析形式，4〉迭词形式。
+</p>
+
+<!-...... subparagraph 1. 没有专门形式的零形式......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-142"><span class="sectionnumber">2.3.3.0.0.1&#x2003;</span>1. 没有专门形式的零形式</span>
+<a id="cyrillic-grammar-autopage-142"></a>
+单独看似乎没有体的意义，可是同其它体比较，在体的方面就显示出差别，因此可以把它叫作普通体。
+</p>
+
+<!-...... subparagraph 2. 带体的后缀的形式......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-143"><span class="sectionnumber">2.3.3.0.0.2&#x2003;</span>2. 带体的后缀的形式</span>
+<a id="cyrillic-grammar-autopage-143"></a>
+前面已经说过，动词一次词干、动词二次词干和动词态性词干上附加体的后缀就能构成体性词干。这种体的后缀如下：
+</p>
+<p>
+(1) 暂短体——后缀是 схийх . (2) 完成体——后缀是 чих . (3) 请求完成体——后缀是 аадах ээдэх．例如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энэ хэргийг байсхийгээд мэдье.
+</p>
+<p>
+待一会儿办理这件事
+</p>
+<p>
+Удасхийвэл та энд ир. 待一会儿您到这里来
+</p>
+<p>
+Энэ бичсэн зүйлийг үзээд болбол явуулчих.
+</p>
+<p>
+你认为所写的这东西可以的话就发出去吧
+</p>
+<p>
+Чи хариад тэр хүнийг нааш ирүүлчих.
+</p>
+<p>
+你回去后，就叫那个人往这儿来
+</p>
+<p>
+Бүгдийг авччихвал нэн дээр бишүү?
+</p>
+<p>
+如果全都拿走，那不更好吗？
+</p>
+<p>
+Бүгдээрээ ирчихвэл энд багтахгүй болно.
+</p>
+<p>
+如果大家都来，这里就容纳不下了
+</p>
+<p>
+Өнгөрөөд гарчихсан хэргийг дахин дахин хэлээд ямар тус байна даа.
+</p>
+<p>
+再三谈论已经过去了的事情有什么用呢。
+</p>
+<p>
+Өөр хүн очоод тусгүй байх та нэг очоодохно уу.
+</p>
+<p>
+别人去可能没有用，您走一趟吧
+</p>
+<p>
+Тэр хүн энэ өдөр энд ирээдэхвэл сайн даа.
+</p>
+<p>
+那个人今天到这里来，那就好了
+</p>
+<p>
+Мэдэхгүйгээр нэг хэлээдэхсэн (хэлээдсэн) чинь хэрэг болжээ.
+</p>
+<p>
+不了解而一说，就闹了事
+</p>
+<p>
+Та хурдан яваадах. 您就请快走吧！
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+完成体和请求完成体在基本意义上虽然相近，但在词的色彩上稍有差别。请求完成体有些希望的意义色彩，使用于第二人称时表现得很明显。例如，та явчих 您走吧，та яваадах [请] 您走吧。后者听起来更为亲切。
+</p>
+
+<!-...... subparagraph 3. 分析形式......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-144"><span class="sectionnumber">2.3.3.0.0.3&#x2003;</span>3. 分析形式</span>
+<a id="cyrillic-grammar-autopage-144"></a>
+副动词的第一类 (并列副动词、先行副动词、联合副动词) 和第三类 (延续副动词) 形式之后连用助动词 байх 就能形成分析形式的体。它们所表示的体的意义是：
+</p>
+<p>
+（1）正在进行体：形式是 -ж байна , -ч байна , 这里并列副动词的 ж , ч 只能起连接作用，бай- 本来表示事物的存在，这里意义略微起了变化，给上面的行为补充了正在进行的意义。合起来共同表示了主要动词的正在进行体。在许多方
+言里 ж(ч) байна 这种形式紧密地结合起来，几乎变成了体性词干后缀。例如：явж байна 正在走着等。
+</p>
+<p>
+（2）重复进行体：形式是 аад бай- , ээд бай- 。先行副动词 (分离副动词) аад ээд 与助动词 бай- 相结合，产生了一种新的意义，表示行为的重复 (为了强调，往往中间加一个 л ) 。例如：
+</p>
+<p>
+Бүү ир гэж байхад ирээд л байна. 不叫他来, 他却常来
+</p>
+<p>
+Тэр хүн чингэж хэлээд л байх юм ямар арга байна даа. 那个人总那样说，有什么办法呢
+</p>
+<p>
+在许多方言里 аад бай- 这种形式紧密地结合起来已经变成了 [a:dai:] 形式了。
+</p>
+<p>
+（3）已经进行体：形式同重复进行体一样，也是 аад бай- , ээд бай- , 但不能简缩语音说成 [а:dai:]。已经进行体的形式必须清清楚楚地分别说成 [a:d bai:] 。这形式具有已经完成行为的意义，而这意义主要是由先行副动词的意义产生出
+来的。助动词在这里满足了由先行副动词产生这种意义的可能性，表达了那个行为的结果仍旧持续的意义，同时也给它以按照动词诸形式变化的可能性 (在这方面其它几个形式也是如此)。例如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би өчигдөр очиход тэр хүн ирээд байжээ.
+</p>
+<p>
+我昨天去时，那个人已经来了
+</p>
+<p>
+Ман тэнд хүртэл тэр хүн очоод байх магадгүй.
+</p>
+<p>
+当我们到那儿时, 那个人也许已经去了
+</p>
+<p>
+Тэр хүн хэзээний ирээд байна. 那个人早已来了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+从这些情况来看，аад бай- 实际上依次地表示着完成和持续两种体的作用。
+</p>
+<p>
+（4）延续进行体：形式是 саар бай- , сээр бай- 。延续副动词 саар сээр 表示该行为在过去的某一时间发生，而现在仍然进行着的意义。бай- 表示存在或持续。所以这两者的意义很容易结合在一起。结合之后 саар сээр 的意义不发生特
+殊的变化，而整个形式要依赖于 бай- 的变化。例如：хүлээсээр байна 仍在等待，хүлээсээр байв(байсан) 曾在等待。
+</p>
+<p>
+这里所说的分析形式的体和前面所说的带体的形式的体虽然在外部结构上不同，可实际上非常相近。其原因是，包含体的后缀的词干在历史进程中也是由分析形式发展而来的；其次，现有的分析形式中，有些形式紧密地结合起来，
+几乎有了词干与后缀的关系 (关于分析形式的体，参见助动词部分)。
+</p>
+
+<!-...... subparagraph 4. 迭词形式......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-145"><span class="sectionnumber">2.3.3.0.0.4&#x2003;</span>4. 迭词形式</span>
+<a id="cyrillic-grammar-autopage-145"></a>
+蒙古语里有重迭相同的词来表示体的意义的方法。重迭动词时，主要相互叠用副动词的单纯连接 (并列、先行、联合) 和混合连接 (延续) 形式，不同形式的重迭，意义稍有差别。这些迭词形式主要有：
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 持续体 саар +саар , сээр +сээр 例如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+үүний учир ёсыг бодсоор бодсоор сая бодож олжээ.
+</p>
+<p>
+想来想去才想到了它的原理
+</p>
+<p>
+Суусаар суусаар ядчихлаа. 坐着坐着 (长时间坐着) 累了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> 继续体 -ж аад , -ж ээд , 例如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чи өглөө эрт очоод тэр өвсийг хадаж хадаад ир.
+</p>
+<p>
+你早晨早些去割一割 (割一阵) 那草，然后回来
+</p>
+<p>
+Тэр хүн энд ирээд сууж суугаад явсан.
+</p>
+<p>
+那个人来这儿坐了一阵之后走了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>3</span> 多次进行体 аад + аад , ээд +ээд 例如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн залаад залаад ирж өгөхгүй.
+</p>
+<p>
+再三聘请了那个人，就是不来
+</p>
+<p>
+Гээсэн малаа эрээд эрээд олсонгүй.
+</p>
+<p>
+寻找了好久，丢失的牲畜还是没找到
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+这个 аад+ аад , ээд+ ээд 形式有时表示很多主体的各个行为, 例如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Гараад гараад явж байна. 陆续出去着
+</p>
+<p>
+Ороод ороод үзэцгээж байна.
+</p>
+<p>
+陆续进来观看着
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>4</span> 一再进行体 н +н , 这个形式往往表示当前一个行为 (一再进行体行为) 发生时，后一个行为也随之发生的意义。例如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бодон бодон уур хүрнэ.
+</p>
+<p>
+想起就生气。(一再地想，愈想愈生气)
+</p>
+<p>
+Харан харан гайхна.
+</p>
+<p>
+看着惊奇。(一再地看，每次看都感觉惊奇)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+从上述各部分来看，蒙古语动词的体是相当复杂的。此外还要注意，形动词和副动词中也有具有体的意义的后缀。
+</p>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

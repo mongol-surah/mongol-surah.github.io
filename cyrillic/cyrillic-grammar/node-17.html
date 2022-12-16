@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—感情词 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-203"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... section 感情词......
+-->
+<h4 id="autosec-204"><span class="sectionnumber">3.7&#x2003;</span>感情词</h4>
+<a id="cyrillic-grammar-autopage-204"></a>
+<a id="cyrillic-grammar-autofile-17"></a>
+
+<!-...... subparagraph 1. 感情词的意义......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-205"><span class="sectionnumber">3.7.0.0.0.1&#x2003;</span>1. 感情词的意义</span>
+<a id="cyrillic-grammar-autopage-205"></a>
+直接表示某种感情、感觉，或者表示答应、呼唤的声音的词叫做感情词。感情词没有形态变化。感情词一般在句外单独使用，不参加句子结构。但在特殊情况下，即在联系动词 гэх 的联系作用下可以构成句子成分。有时感情词可以单
+独构成简单句。
+</p>
+
+<!-...... subparagraph 2. 感情词的分类......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-206"><span class="sectionnumber">3.7.0.0.0.2&#x2003;</span>2. 感情词的分类</span>
+<a id="cyrillic-grammar-autopage-206"></a>
+感情词按其意义可分为：表达某种感情或感觉的，表达呼唤答应的，以及诗歌、颂歌、歌谣、童谣等文学形式里用的呼语等。
+</p>
+<p>
+（1）表达某种感情或感觉的：
+</p>
+<p>
+惊奇：ха , ва , ва лам аа , хөө
+</p>
+<p>
+合心：жахай , аахай , аалай , уухай
+</p>
+<p>
+后悔：пай , ваш , вашд
+</p>
+<p>
+讨厌：ий , ишш , түй , хэн 啍, хай
+</p>
+<p>
+醒悟、领悟：оо
+</p>
+<p>
+痛疼：ёо ёо ,
+</p>
+<p>
+疲劳：ёо ёхоо
+</p>
+<p>
+嫌冷：тий тий
+</p>
+<p>
+嫌热：халхай халхай (=халхцай)
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ха, тэр нисэх онгоц хэдий хурдан юм.
+</p>
+<p>
+哈，那个飞机多快呀。
+</p>
+<p>
+Ва лам аа , хэдий ч арвин байх юм.
+</p>
+<p>
+天哪，多么多呀。
+</p>
+<p>
+Жахай таарч байна. 唉，对了
+</p>
+<p>
+Уухай чиний хэлсэн яг таарна.
+</p>
+<p>
+唉，你说的正对
+</p>
+<p>
+Пай хэрэггүй оччихсон. 呸，多余去了
+</p>
+<p>
+Ий энэ чинь хэдий муухай юм. 咦, 这多难看呀!
+</p>
+<p>
+Ишш дүрийг нь үз. 咦，看他那个模样！
+</p>
+<p>
+Оо тийм үү? 哦，是吗？
+</p>
+<p>
+Ёо ёо нуруу өвдөж байна. 哎哟, 腰痛呢
+</p>
+<p>
+Ёо ёохоо их ядралаа даа. 哎哟，真累。
+</p>
+<p>
+Тий тий сүрхий хүйтэн байна даа. 啊呀，真冷!
+</p>
+<p>
+Халхай халхай яасан халуун юм. 啊呀，多热呀!
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）表达呼唤答应的：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+呼叫：хөөе , хүүе 呼应：өөв 喂
+</p>
+<p>
+阻止：хая
+</p>
+<p>
+交待：май
+</p>
+<p>
+答应：өөе , үю , эе
+</p>
+<p>
+同意：за , зээ
+</p>
+<p>
+伸手要：аль
+</p>
+<p>
+丢脸 (对儿童)：айлуу айлуу
+</p>
+<p>
+Хөөе нааш ир ! 喂，往这儿来！
+</p>
+<p>
+Хая чи бүү ор. 喂，你不要进！
+</p>
+<p>
+Май энийг чамд өгье ! 给, 这东西给你！
+</p>
+<p>
+Өе би энд байна. 唉，我在这里。
+</p>
+<p>
+За чиний хэлснээр хийе. 好, 按照你说的办
+</p>
+<p>
+Аль надад нэгийг өг. 来给我一个
+</p>
+<p>
+Айлуу айлуу. (羞，羞) 丢脸、丢脸
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）有少数感情词表达的意义比较多，如：аа , ай, аа：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+表示赞同：Аа энэ харин болно.
+</p>
+<p>
+啊，这还可以。
+</p>
+<p>
+表示喜爱赞美：Аа хөөрхий дээ.
+</p>
+<p>
+啊，可爱啊
+</p>
+<p>
+Аа яасан сайхан үзэмж бэ.
+</p>
+<p>
+啊，多么优美的风景啊！
+</p>
+<p>
+表示后悔醒悟：
+</p>
+<p>
+Аа би очсон бол таарах байжээ ．
+</p>
+<p>
+啊，我不如去好了
+</p>
+<p>
+Аа одоо сая учирыг нь оллоо.
+</p>
+<p>
+啊！才明白它的意思
+</p>
+<p>
+表示奇怪：Аа сонин даа. 啊！奇怪。
+</p>
+<p>
+表示反问：Аа чи юу гэнэ? 啊? 你说什么？
+</p>
+<p>
+表示不在乎：
+</p>
+<p>
+Аа тэр юу байх юм. 啊，那有什么
+</p>
+<p>
+表示接受：
+</p>
+<p>
+Аа яасан ч мартахгүй.
+</p>
+<p>
+啊，怎么也不会忘记。
+</p>
+<p>
+ай ：表示惊讶：
+</p>
+<p>
+Ай үнэхээр санаанд үгүй хэрэг.
+</p>
+<p>
+唉，真是想不到的事！
+</p>
+<p>
+表示懊悔：
+</p>
+<p>
+Ай би яагаад мартчихсан юм.
+</p>
+<p>
+唉，我怎么忘记了呢！
+</p>
+<p>
+表示责备、不满意：
+</p>
+<p>
+Ай чи яагаад оройтчихсон бэ?
+</p>
+<p>
+唉，你为什么迟到了？
+</p>
+<p>
+Ай даа хэдий ч маягтай юм.
+</p>
+<p>
+唉，多麻烦呀！
+</p>
+<p>
+表示不同意：
+</p>
+<p>
+Ай тэр яагаад болох юм.
+</p>
+<p>
+唉，那怎么成呢！
+</p>
+<p>
+表示不称心：
+</p>
+<p>
+Ай даа хааш л бүтсэнгүй.
+</p>
+<p>
+唉，还是没有成功。
+</p>
+<p>
+表示惆怅：
+</p>
+<p>
+Ай энэ өвчин ер нь эдгэрч өгөхгүй.
+</p>
+<p>
+唉，这个病总是好不了 (эдгэрэх 康复)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）诗歌、颂歌、歌谣、童谣等文学形式里用的呼语：аа ха хөөе , аа хүүе хөө , хүрий хүрий ,бүүвэй бүүвэй , бөмбөрэй бөмбөрэй, 等等。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Арван тавны сарыг хөө бөмбөрэй
+</p>
+<p>
+把十五的月亮呀，本博来
+</p>
+<p>
+Ар дээр гартал хэлэлцье бөмбөрэй
+</p>
+<p>
+一直说到西斜呀，本博来
+</p>
+<p>
+Адуу мал хоёрыг хөө бөмбөрэй
+</p>
+<p>
+把马群和牛群呀，本博来
+</p>
+<p>
+Бэлчээрт гартал хэлэлцье бөмбөрэй
+</p>
+<p>
+一直说到到草场呀，本博来
+</p>
+<p>
+Ургамал цэцэг намайг даллан өсвөр хонь минь бойжиход
+</p>
+<p>
+鲜花向我招手，绵羊肥壮膘厚
+</p>
+<p>
+Үзэх тутам бахархан урам зориг оргилно
+</p>
+<p>
+Аа ха хөе аа ха хөе үзэх тутам бахархан урам зориг оргилно
+</p>
+<p>
+越看越兴奋，激情满怀。啊哈嗨，啊哈嗨，越看越兴奋，激情满怀
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+
+<a href="./media/image20.jpeg" target="_blank" ><img
+src="./media/image20.jpeg"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+<p>
+
+<a href="./media/image21.jpeg" target="_blank" ><img
+src="./media/image21.jpeg"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

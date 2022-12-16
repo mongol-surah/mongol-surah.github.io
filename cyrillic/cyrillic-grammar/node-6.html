@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—代词 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-89"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... section 代词......
+-->
+<h4 id="autosec-90"><span class="sectionnumber">1.5&#x2003;</span>代词</h4>
+<a id="cyrillic-grammar-autopage-90"></a>
+<a id="cyrillic-grammar-autofile-6"></a>
+
+<!-...... subsection 代词及其分类......
+-->
+<h5 id="autosec-91"><span class="sectionnumber">1.5.1&#x2003;</span>代词及其分类</h5>
+<a id="cyrillic-grammar-autopage-91"></a>
+
+<p>
+能够代替名词、形容词、数词和时位词的具有比它们更大的概括性的一类词叫作代词。代词本身很抽象，概括性很大，可以指任何事物或现象，但到具体语言环境，它所指的事物和现象就可以具体化到相当于某个具体的词。所以代
+词所表达的实际意义要联系语言环境或上下文才可以理解。这里说的代词实际上是一种代静词。因为另外还有代替动词类的代动词 (参见动词部分)，根据代词的意义，可把它们分为以下几类：
+</p>
+
+<!-...... subparagraph 1. 人称代词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-92"><span class="sectionnumber">1.5.1.0.0.1&#x2003;</span>1. 人称代词</span>
+<a id="cyrillic-grammar-autopage-92"></a>
+
+</p>
+<p>
+第一人称 (说话者自己)
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+单数 би , 复数 бид , бид нар , биднүүс 我们, 咱们 ман , мануус 我们
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+第二人称 (听话对象）
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+单数 чи 你,та 您
+</p>
+<p>
+复数 та , та нар , тануус 你们
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+第三人称 (对话者以外的第三者)
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+单数 тэр , тэр хүн , 他，那个人
+</p>
+<p>
+энэ , энэ хүн 他，这个人
+</p>
+<p>
+复数 тэд , тэд нар , тэднэр , 他们，тэднүүс 他们，(贬意) 。эд ，эднүүс 他们，这些人
+</p>
+<p>
+бид 咱们 ман 我们
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+бид 咱们 ман 我们，在有的地方有包括对方与排除对方的区别，但一般不太严格。第二人称 та 指单数时是尊称，指复数时是一般称呼。энэ ,эд 是指近的 (指在近处的人)，тэр , тэд 是指远的 (指在较远处的人)。
+</p>
+<p>
+биднүүс мануус тануус эднүүс тэднүүс 是方言性的说法, 多少有些不够尊重的修辞色彩。
+</p>
+
+<!-...... subparagraph 2. 反身代词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-93"><span class="sectionnumber">1.5.1.0.0.2&#x2003;</span>2. 反身代词</span>
+<a id="cyrillic-grammar-autopage-93"></a>
+
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+单数 өөрөө , өөртөө 自己「空」
+</p>
+<p>
+复数 өөрсдөө 自己<sup>18</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-94"></a>
+<p>
+<sup>18</sup>&nbsp;өөсөө 自营, 自生, 自动 (名)
+</p>
+
+</div>
+</div>
+
+<!-...... subparagraph 3. 指示代词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-95"><span class="sectionnumber">1.5.1.0.0.3&#x2003;</span>3. 指示代词</span>
+<a id="cyrillic-grammar-autopage-95"></a>
+
+</p>
+<p>
+代替和指示名词 (人和事物) 的：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+指近单数 энэ үүн 这个
+</p>
+<p>
+指近复数 эдгээр 这些
+</p>
+<p>
+指远单数 тэр түүн 那个
+</p>
+<p>
+指远复数 тэдгээр 那些
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+代替和指示形容词的：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+指近 ийм 这样
+</p>
+<p>
+指远 тийм 那样〖ийн 这样, 这样的。ийнхүү 就是这样的, 像这样的〗
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+代替数词的：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+指近 өдий өчнөөн өдийчинээ 这些个，这么多，总共这些。
+</p>
+<p>
+〖эдий 这些; 这么多。эдийчинээн 这些; 这么多, 这么大〗
+</p>
+<p>
+指远 төдий төчнөөн төдийчинээ 那些个，那么些，总共那些
+</p>
+<p>
+〖тэдүй 那些, 那么多。эдий тэдүй 这些，那些。тэдүйчнээ 那些, 就那么多〗
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+代替时位词的：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+指近 энд 这里，
+</p>
+<p>
+指远 тэнд 那里 өнөө 现在
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 4. 疑问代词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-96"><span class="sectionnumber">1.5.1.0.0.4&#x2003;</span>4. 疑问代词</span>
+<a id="cyrillic-grammar-autopage-96"></a>
+
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+表示人的：хэн 谁
+</p>
+<p>
+表示事物的：юу 什么
+</p>
+<p>
+表示人和事物的哪一个的：аль 哪个
+</p>
+<p>
+表示性质、程度 (形容词) 的：ямар 什么样 хир (зэрэг) 什么程度
+</p>
+<p>
+表示数词的：хэд 几个，хэдий 多少. хичнээн 多少〖хэдийчинээн 多么, 多少, 多大〗
+</p>
+<p>
+表示时位的：хаа 哪里, хэзээ 什么时候
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 5. 不定代词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-97"><span class="sectionnumber">1.5.1.0.0.5&#x2003;</span>5. 不定代词</span>
+<a id="cyrillic-grammar-autopage-97"></a>
+
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+表示人物：хэн 谁 хэн нэг 或者谁，хэн хүн 谁某 хэн ч 谁也
+</p>
+<p>
+表示事物的：юу 什么 юу нэг 什么东西 юу ч 什么也
+</p>
+<p>
+表示形容词的：ямар , ямар нэг 什么样的。ямар ч 什么样也
+</p>
+<p>
+表示数词的：хэд , нэг хэд 几个，өдий төдий 若干，хэдий ч 不论几个. 〖хэдээд 各几个〗
+</p>
+<p>
+表示时位的：хэзээ , хэзээ нэг 什么时候，хаа 哪里, хаа нэг 有时, 偶尔; 在某地，хэзээ ч 什么时候也，хаа ч 什么地方也, энэгүүр 在这里, 从这里; 经这里，энүүгээр 用这个; 在这一带; 这期间 тэрүүгээр 用他, 让他; 在那一带, 在当时
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 6. 范围代词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-98"><span class="sectionnumber">1.5.1.0.0.6&#x2003;</span>6. 范围代词</span>
+<a id="cyrillic-grammar-autopage-98"></a>
+
+</p>
+<p>
+表示总括的：бүгд (бүгдээр) 全部，нийт (нийтээр) 总共，бүхэн (бүхнээр) 全，даяар (даян) 全体，элдэв 各种，эл 各，хамаг 所有的，цөм 都，бүр 都，хуу 都
+</p>
+<p>
+表示区分的：зарим 某些，бусад 别的, 其他的 (人)，өөр 别的，ондоо 不同的, 别的，астаан 单独的, 不同的，нөгөө 其余的, 另一个，бишин 另外的
+</p>
+
+<!-...... subsection 代词的语法特征......
+-->
+<h5 id="autosec-99"><span class="sectionnumber">1.5.2&#x2003;</span>代词的语法特征</h5>
+<a id="cyrillic-grammar-autopage-99"></a>
+
+<p>
+代词能够代替名词 (人和事物)、形容词、数词和时位词，所以它的语法特征也分别和它所代替的这几个词类相似。这几个词类都属于静词类，因而有某些共同点，同时作为一个词类它们分别都有自己的特点。这两方面的情况反映在
+代词上就形成了各类型代词既有共同点又有各自的特点，除这些以外，代词本身特有的新的特点却很少。
+</p>
+
+<!-...... subparagraph 1. 人称代词的语法特点......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-100"><span class="sectionnumber">1.5.2.0.0.1&#x2003;</span>1. 人称代词的语法特点</span>
+<a id="cyrillic-grammar-autopage-100"></a>
+人称代词是表示人和事物的，所以它的特点与名词很近。它有数的变化，格的变化，可以用领属附加成分。它也和名词一样可以充当各种句子成分。代词专有的特点是一部分人称代词在变格时，词干本身也起变化。如：би 我
+—миний 我的 —надад 给我。这里表示“我”的词干有了 би—ми—на 的变化。这很象屈折语类型的变化，对粘着语类型的蒙古语来说这是一种例外现象。
+</p>
+<p>
+人称代词用例：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чиний тэр номыг би үзэж байна.
+</p>
+<p>
+我在看你那本书
+</p>
+<p>
+Чи тэднэрийг үзэв үү? 你看见他们了吗?
+</p>
+<p>
+Тэд надтай уулзаад чамайг асууж байсан.
+</p>
+<p>
+他们遇见我时曾问过你。
+</p>
+<p>
+Бид та нарынхаа тухай сураглаж л байсан.
+</p>
+<p>
+我们一直在打听你们的消息
+</p>
+<p>
+Бид одоо явахаар бэлтгэе. 我们现在准备走吧
+</p>
+<p>
+Энэ ажлыг тэднээр хийлгье. 把这件事让他们做吧
+</p>
+<p>
+Энэ хүний хийж байхыг үз. 看看这个人的做法
+</p>
+<p>
+Та манд нэг үлгэр хэлж өгнө үү？
+</p>
+<p>
+您能给我们讲个故事吗？
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+би 是第一人称的主格形式，而搭配于其它格时却用 над , 绝不能用 би . 如：надад 给我，намайг 把我，надаар 使我, 让我，надаас 从我, 比我，надтай 同我, 和我。表示所属关系时用 миний 我的。有时以 миний бие (直译是我的身体) 的
+形式来委婉地表达 би 我的意思。为了表达的委婉，有时以第一人称复数来代替第一人称单数。人称代词第一人称复数有时包括第二人称。
+</p>
+<p>
+чи 和 та 是第二人称的主格形式，而搭配于其它格时却用 чам , 绝不能用 чи 。如 чамд 给你, танд 给您，чамайг 把你, таныг 把您，чамаар 使你, 让你，танаар 让您，чамаас 从你, 比你，танаас 从您, 比您，чамтай 和你，тантай 和您。表
+示所属关系时用 чиний 你的，таны 您的。
+</p>
+<p>
+ман 没有主格形式 (在古代它的主格形式是 ба , 现在已不用)，但在后置词前边可以用词干形式，如：ман шиг 象我们。
+</p>
+<p>
+近指单数 энэ 和远指单数 тэр 是第三人称的主格形式，而搭配于其它格时它的词干形式是：
+</p>
+<p>
+近指是 энэ(үү) 远指是 тэр(түү)
+</p>
+<p>
+үүний 他的 түүний 他的
+</p>
+<p>
+үүнд 给他 түүнд 给他
+</p>
+<p>
+үүнийг 把他 түүнийг 把他
+</p>
+<p>
+үүнээс 从他 түүнээс 从他
+</p>
+<p>
+үүнээр 让他 түүнээр 让他
+</p>
+<p>
+үүнтэй 和他 түүнтэй 和他
+</p>
+<p>
+энэний энийг энэнд энэнээс энүүгээр энэнтэй тэрний тэрийг тэрэнд тэрнээс тэрүүгээр тэрэнтэй<sup>19</sup>
+</p>
+<p>
+бидний биднийг бидэнд биднээс биднээр бидэнтэй
+</p>
+<p>
+Та нарын (танай), та нарыг , та нарт , та нараас , та нараар ,та нартай
+</p>
+<p>
+Тэдний тэднийг тэдэнд тэднээс тэднээр тэдэнтэй
+</p>
+<p>
+Та энийг хэнээр бичүүлсэн бэ？
+</p>
+<p>
+您让谁写了这个呢?
+</p>
+<p>
+Би тэрүүгээр захиа бичүүлсэн. 我让他写信了
+</p>
+<p>
+
+<a href="./media/image8.jpeg" target="_blank" ><img
+src="./media/image8.jpeg"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+
+<!-...... subparagraph 2. 反身代词的语法特点......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-101"><span class="sectionnumber">1.5.2.0.0.2&#x2003;</span>2. 反身代词的语法特点</span>
+<a id="cyrillic-grammar-autopage-101"></a>
+反身代词表示它所代替的人物本身之意。它所代替的词有时与反身代词并列出现，有时可以省略。反身代词有单数复数的分别，有格的变化。但主格形式附有反身领属附加成分 аа ээ оо өө (内蒙古的是 аан ээн оон өөн 写及发音略有不
+同)。在别的格上也可以附加反身领属附加成分，借以强调反身的意义。
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-102"></a>
+<p>
+<sup>19</sup>&nbsp;энэнтэй 和这个。энэтээ(=энтээ) 这一次; 这边。тэрэнтэй 和那个, 和他。тэртээ 那边。意思不一样。
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би өөрөө очъё. 我自己去
+</p>
+<p>
+Асуудал тулгарвал өөрсдөө шийдвэрлэ.
+</p>
+<p>
+遇到问题 (请你) 自己解决
+</p>
+<p>
+Энэ чинь чиний өөрөө бичиг үү？
+</p>
+<p>
+这是你自己的书吗？
+</p>
+<p>
+Өөрийн хүчээрээ дэгжрэх.
+</p>
+<p>
+自力更生（дэгжэх 上升, 发展, 兴旺; 壮大)
+</p>
+<p>
+Бид түүний өөрийн чинь морийг унав.
+</p>
+<p>
+我们骑了他自己的马
+</p>
+<p>
+Чи үүнийг өөрийн биедээ хадгала.
+</p>
+<p>
+你把这个收藏在自己身上
+</p>
+<p>
+Өөрийн биеэр ололцох. 亲自参加
+</p>
+<p>
+Баатар нөхрөөр өөрөө(гөөр) нь хийлгье
+</p>
+<p>
+让巴特尔同志自己做
+</p>
+<p>
+Өөрийн биеэсээ асуу . 问自己本身
+</p>
+<p>
+Өөрийн биетэйгээ үлитгэх. 与自己对比 (对照)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+上述例中是反身代词与它所代替的词并列出现的例子。一般用同格复指，或中间用属格连接。
+</p>
+<p>
+反身代词在变格中常常附加一个 бие 身，这样意义更加清楚，不至于与同音词 өр өөр(别的) өөрөө 混同。如：өөрийн биеэр 用自己或 өөрсдийн биеэр 用自己。өөртөө 在形式上是方向格，但实际上与 өөрөө 相同。需要方向格的地方则
+用 өөрийн биедээ 来表示。
+</p>
+<p>
+би минь (миний ), чи чинь (чиний) та тань(таны) тэр нь (түүний), бид маань (бидний,манай), та нар тань (та нарын,танай), тэд нь (тэдний)
+</p>
+
+<!-...... subparagraph 3. 指示代词的语法特点......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-103"><span class="sectionnumber">1.5.2.0.0.3&#x2003;</span>3. 指示代词的语法特点</span>
+<a id="cyrillic-grammar-autopage-103"></a>
+指示代词可以指示并代替名词，也可以代替形容词、数词以及表示时间、空间的词，它们的语法特点随着它所指示、代替的词而有所不同。
+</p>
+<p>
+（1）代替人和事物的 энэ (үүн) 这, 这个，тэр (түүн) 那, 那个，эдгээр 这些，тэдгээр 那些，有单复数的区别，有格的变化，可以有领属附加成分。这些指示代词既可以代替表示人和事物的名词，又可以代替整个事件或事情。除此以外，
+指示代词还有“指示”或“区别”作用 (一般在充当定语时起这种作用) 。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энэ бол монгол хятад толь.
+</p>
+<p>
+这是蒙汉词典。
+</p>
+<p>
+Та үүнийг авчиж үз. (代替)
+</p>
+<p>
+你把这个拿去看看。
+</p>
+<p>
+Энэ хэлзүйн бичгийг үзэв үү？(指示)
+</p>
+<p>
+这本语法书看过了吗？(хэлний зүй 语法)
+</p>
+<p>
+Энэнээс (үүнээс) ондоог нь үзжээ.
+</p>
+<p>
+看了这个以外的 (代替)
+</p>
+<p>
+Үүнээр монгол хэл сурч болно уу？
+</p>
+<p>
+拿这个可以学习蒙古语吗？(代替)
+</p>
+<p>
+үүнтэй хамтаар өөр ном үзэх хэрэгтэй.
+</p>
+<p>
+和这个一起 (同时) 需要看别的书. (指事情)
+</p>
+<p>
+Энэ бол нэг асуудал. 这是一个问题 (指事情)
+</p>
+<p>
+Тэр чинь таарна. 那是对的。(指事情)
+</p>
+<p>
+Эдгээр хэргийг би бүр сонссонгүй.
+</p>
+<p>
+这些事情我都没有听说
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+口语里有 мэнэ, 是 мөн энэ 的简化形式；мөтэр 是 мөн тэр 的简化形式。
+</p>
+<p>
+（2）代替形容词的 ийм 这样 тийм 那样与形容词一样没有复数，可以有格的变化，可以有领属附加成分。它们既可以代替形容词充当定语，又可以代替形容词的事物本身。它们也可以表示整个事情。除这些外，它们还可以有“指示”
+或“区别”作用 (一般在修饰形容词时起这种作用)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энэ өдөр сайхан өдөр байна даа.
+</p>
+<p>
+今天是个好天气。(代替)
+</p>
+<p>
+Ийм өдөр ойрд их ховор.
+</p>
+<p>
+这样的天气近来很少
+</p>
+<p>
+Тэр авдар хэтэрхий бага. 那个箱子太小
+</p>
+<p>
+Тиймийг би авахгүй. 那样的我不要 (指事情)
+</p>
+<p>
+Иймийг мэдсэн бол эрт ирэх байжээ.
+</p>
+<p>
+如果知道这样，我就早来了。(指事情)
+</p>
+<p>
+Тэр хэрэг чинь тийм байсан юм санжээ.
+</p>
+<p>
+原来那件事情是那样的呀. (юмсанж 本来, 原来)
+</p>
+<p>
+Ийм улаан өнгө нь тийм ногоон өнгөнөөс дээр.
+</p>
+<p>
+这样的红色比那样的绿色好
+</p>
+<p>
+Ийм их болон тийм багыг ондоо ондоо тавь.
+</p>
+<p>
+把这么大的和那么小的分别放起来。
+</p>
+<p>
+口语里还有 мөн ийм 就这样; мөн тийм 就那样.
+</p>
+<p>
+тиймийн тул 由于那样; тиймээс 由于那样；иймээс 由于这样；иймд 因此；ийм учраас 由于这个缘故等形式已成为一种连接词。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）代替数词的 өдий 这些个，төдий 那些个，өчнөөн 这么多，төчнөөн 那么多，өдийчнээ 就这么多，төдийчинээ 那么多，可以有格的变化，也可以有领属附加成分，可以附加嫌少的附加成分 хэн 。但不能附加其它的数词专有的附加
+成分，其中集合数词、概数词或不定数词、分配数词的意义则用 энэ хэдүүл 这几个，эд хэдүүл 这几个，тэр хэдүүл 他们几个，тэд хэдүүл 他们几个，өдий төдий 若干，өчнөөн төчнөөн 若干，很多，өдий төдийгээр 以 (用) 若干…来表示。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Одоо өдий үлдээд байна. 还剩下这些个
+</p>
+<p>
+Хэдий байвал төдий авъя. 有多少要多少
+</p>
+<p>
+Та өчнөөн өдөр юу хийв? 您这些日子作什么了?
+</p>
+<p>
+Төдийчнээ өдөр хэрэглэнэ үү? 用那么多日子吗?
+</p>
+<p>
+Эд хэдүүлд хэлж өг. 说给这几个人
+</p>
+<p>
+Эд хэдүүлээ хамт ирэв үү? 这几个人一起来的吗?
+</p>
+<p>
+Тэд хэдүүлтэй зөвд.
+</p>
+<p>
+和那几个人商量。(зөвдөх 商量, 商谈; 咨询)
+</p>
+<p>
+Тэд хэдүүлхэнтэй зөвдөвэл болчихно уу？
+</p>
+<p>
+只和那几个人商量就可以吗？
+</p>
+<p>
+Өдийд тэднэр хурал хийсээр байх байхаа.
+</p>
+<p>
+这时候他们可能还在开会
+</p>
+<p>
+Маргаашийн найман цагт очоорой.
+</p>
+<p>
+明天八点去吧
+</p>
+<p>
+Төдийд очиж болно уу？那时候去可以吗？
+</p>
+<p>
+өдийд , төдийд 可以表示时间，意为“这时”&#x202f;“那时”。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）代替时位词的 энд 这里，тэнд 那里，өнөө 现在。有时位词的变化。如：энэтэй 这边，тэртэй 那边，энэтээ 这边，тэртээ 那边，эндэх 这边的，тэндэхи 那里的，энэгүүр 沿这边，тэргүүр 沿那边，ийш 向这里，тийш 向那里。这些形
+式如同时位词的情况一样，具有不同程度的格的变化，可以有领属附加成分。өнөө 有比较完整的格的变化，也可以有领属附加成分。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энд нь тэндээс дулаан. 这里比那里暖和
+</p>
+<p>
+Энэтэй нь ном бичиг овоолж тэртэй нь авдар тавиж байна.
+</p>
+<p>
+这边堆着书，那边放着箱子。
+</p>
+<p>
+Эндэх байдалыг нь ойлгов. 了解了这里的情况
+</p>
+<p>
+Тэртээгүүр чинь зам үгүй шүү.
+</p>
+<p>
+在那边没有道路。(түүгээр)
+</p>
+<p>
+Хүмүүс ийш тийшээ явж байна.
+</p>
+<p>
+人们向这里向那里走着
+</p>
+<p>
+Өнөө орой үдэшлэгтэй. 今晚有晚会
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+口语里有 мөн энд 就在这里，мөн тэнд 就在那里等说法。
+</p>
+
+<!-...... subparagraph 4. 疑问代词的语法特点......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-104"><span class="sectionnumber">1.5.2.0.0.4&#x2003;</span>4. 疑问代词的语法特点</span>
+<a id="cyrillic-grammar-autopage-104"></a>
+疑问代词表示对人和事物、性质和数量、时间和地点的询问。它们的特点与它们所表示的词类的特点相似。疑问代词除了表示询问的意义以外，还表示不确定的意义 (见不定代词)，可以给别的词附加蔑视、不满意或不同意的语气。用
+在感叹句里表示感叹的意义。
+</p>
+<p>
+（1）表示人的 хэн 谁，表示事物的 юу 什么，表示人和事物的哪一个的 аль , 它们都与名词一样有格的变化，但没有单数复数的区别，有时可以用 хэн хэн 谁谁 (哪些人), юу юу 什么什么，аль аль 哪个哪个 (哪些) 等重复词干的形式表
+达复数意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэнд явж байх хэн бэ？那里走的是谁呀?
+</p>
+<p>
+Тэрэг дээр тээж байх чинь юу вэ？
+</p>
+<p>
+车上拉的是什么呀?
+</p>
+<p>
+Тэр хэдэн хүний аль алийг нь та таних вэ?
+</p>
+<p>
+那几个人的哪几个你认识？
+</p>
+<p>
+Энэ хэдэн зохиолын альд нь та дуртай вэ?
+</p>
+<p>
+你喜欢这几部著作中的哪个？
+</p>
+<p>
+Та хэн хэнтэй учраж юу юу сонсов？
+</p>
+<p>
+您遇见了哪些人, 听到了些什么？
+</p>
+<p>
+Би юугаараа үүнийг баглах вэ？
+</p>
+<p>
+我用什么包这个呢?
+</p>
+<p>
+Та хэнээс нь сонссон бэ？
+</p>
+<p>
+您从谁那里听说的呢?
+</p>
+<p>
+Хэн мэдэх юм. 谁知道呢！
+</p>
+<p>
+Юуны чинь тус болох юм. 哪能有什么好处!
+</p>
+<p>
+Юуны чинь сайн юм. 哪能谈得上好呢！
+</p>
+<p>
+(后三例表示蔑视或不同意的语气)
+</p>
+<p>
+Юутай сайхан зураг вэ ！
+</p>
+<p>
+多么漂亮的画啊！(表示感叹)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+在习惯上 юутай 多么，表示感叹的意义。юунд 常常表示 ямар учраас 为什么的意义。
+</p>
+<p>
+（2）表示性质特征的 ямар 什么样，有与形容词相似的格的变化和领属附加成分。也可以用 ямар ямар 什么样什么样的形式表示复数的意义。хир 程度, 界限, 如何, 怎样，一般与 зэрэг 程度连用，表示程度。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энэ чинь ямар өнгө вэ？这是什么颜色?
+</p>
+<p>
+Та ямрыг нь авна. 您要什么样的。
+</p>
+<p>
+Танай энд ямар ямар өнгөтэй бөс байна даа?
+</p>
+<p>
+你们这里有些什么颜色的布？
+</p>
+<p>
+Та англи хэл хир зэрэг сурсан бэ？
+</p>
+<p>
+您学英语学到了什么程度？
+</p>
+<p>
+Үерийн ус хир зэрэг болов？
+</p>
+<p>
+洪水达到什么程度了？
+</p>
+<p>
+Энэ өдөр ямар сайхан өдөр вэ !
+</p>
+<p>
+今天是多么美好的天气呀！
+</p>
+<p>
+Тэр чинь ямар муу амьтан бэ !
+</p>
+<p>
+那是多么坏的家伙！
+</p>
+<p>
+（上二例表示感叹）
+</p>
+<p>
+Чи ямар мэдэхгүй юм үү
+</p>
+<p>
+你又不是不知道。
+</p>
+<p>
+Тэр ямар танихгүй хүн юм үү
+</p>
+<p>
+他也不是什么不认识的人。
+</p>
+<p>
+(上二例表示不满意)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）表示数词的 хэд 几个，хэдий 多少, хичнээн 多少 (指较大数量); 多么 (感). хэдийчинээн 多少。хэд 用于询问数量较小的和具体的数词。хэд 有类似数词的变化，如：хэддүгээр 第几，хэдүүл 几个 (人)，хэд хэд 各几个, 几个几个，
+хэдээд 各几个，及表示嫌少的 хэдхэн 只有几个等。хэдий , хичнээн , хэдийчинээн 表示数量较大的和大概的数词。它们没有类似数词的变化。хэдий 可以有 хэдийхэн 的形式。表示数词的疑问代词都有类似数词的格的变化和领属形式。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Танай ангид хэдэн багш хэдий сурагчтай вэ?
+</p>
+<p>
+你们班有几个老师多少学生？
+</p>
+<p>
+Хэдээр нь судалгааны ажил хийлгэж байх вэ?
+</p>
+<p>
+让几个人作研究工作? (судалгаа 研究, 探讨, 修业)
+</p>
+<p>
+Хичнээн зүйлийн хичээл байх вэ？
+</p>
+<p>
+有多少种类的课程？
+</p>
+<p>
+Одоохондоо хэдхэн зүйлийн хичээл сурч байна.
+</p>
+<p>
+在目前只有这几门课程。
+</p>
+<p>
+Энэ жимс хэдий амттай вэ ！
+</p>
+<p>
+这个水果多好吃呀！(感叹)
+</p>
+<p>
+Энэ зураг хэдий сайхан бэ ！
+</p>
+<p>
+这个图画多么好看呀！(感叹)
+</p>
+<p>
+Хэдийд эндээс мордох вэ?
+</p>
+<p>
+几时从这里动身 (出发)?
+</p>
+<p>
+Тэр хүн хэдийгээр энд ирэх вэ？
+</p>
+<p>
+那个人几时到这里来?
+</p>
+<p>
+Хурал хэдийнээс эхлэх вэ？
+</p>
+<p>
+会议从什么时候开始？
+</p>
+<p>
+Хэдийгээр арвин бэрхшээл байвч бид зориг мохохгүй.
+</p>
+<p>
+虽然有很多困难，但我们不灰心。
+</p>
+<p>
+Тэр хүн хэдий нь явчихсан. 那个人早就走了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+хэдийд(在) 什么时候，хэдийгээр 虽然; 何时，хэдийнээс 从几时～～可以表示 хэзээ 何时，хэзээгээр 何时, хэзээнээс 从几时的意义。хэдий нь 可以表示 хэзээний 早就。хэдийний(хэдийн ; хэдийнээ) 表示“早就”
+。хэдийгээр 这种形式则有
+了“虽然”的词汇意义<sup>20</sup>。
+</p>
+<p>
+хэд 的带 н 的形式 хэдэн 除了作定语外，还有表示日期（几号几日）的意义。
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-105"></a>
+<p>
+<sup>20</sup>&nbsp;хэзээд 永远, 任何时候
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энэ өдөр хэдэн бэ? 今天是几号？
+</p>
+<p>
+Энэ өдөр гаригийн хэдэн бэ? 今天是星期几?
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）表示时位意义的 хэзээ 什么时候，хаа 哪里。хаа 有时位词的变化，如：хаана 哪里，(хааных) хаанахь 哪里的，хаагуур 在何处，沿哪一带，хааш 向哪里。此外，它们都有与一般时位词相似的不完全的格变和领属形式。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хэзээ наадам болох вэ？几时有那达慕大会?
+</p>
+<p>
+Наадам хэзээнээс эхэлж хэзээ дуусах вэ？
+</p>
+<p>
+那达慕大会从什么时候开始到什么时候结束?
+</p>
+<p>
+Хэзээгээр хонь хяргах вэ？什么时候剪羊毛?
+</p>
+<p>
+Тэд энэ өдөр хаанаас хаа хүрэх вэ?
+</p>
+<p>
+他们今天从哪里到哪里？
+</p>
+<p>
+Тэр хүн чинь хаанахь хүн бэ？
+</p>
+<p>
+那个人是哪里的人呀？
+</p>
+<p>
+Тэд хаагуур явахаар болсон бэ？
+</p>
+<p>
+他们决定沿着 (从) 哪里走？
+</p>
+<p>
+Одоо хаашаа явбал таарах вэ？
+</p>
+<p>
+这回往哪个方向走才对呀？
+</p>
+<p>
+Хаа байсан хэрэг юм 或 хаа байсан юм
+</p>
+<p>
+哪里的事！(表示不同意)
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 5. 不定代词的语法特点......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-106"><span class="sectionnumber">1.5.2.0.0.5&#x2003;</span>5. 不定代词的语法特点</span>
+<a id="cyrillic-grammar-autopage-106"></a>
+所有疑问代词在非疑问句里一般都可以当作不定代词来使用。除此之外还可以在疑问代词后边加 нэг , ба 或 ч (үгүй) 来表示不定代词的意义。不定代词的其它语法特点与疑问代词相似。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хэн учравал хэнээс асууна. 碰到谁问谁。
+</p>
+<p>
+Хэн ч мэднэ. — хэн хэнгүй мэднэ. 谁都知道
+</p>
+<p>
+Та эртхэн ирвэл хэн альд нь ашигтай.
+</p>
+<p>
+您早来的话对哪方面都有利。
+</p>
+<p>
+Би одоо яараад юу юунд нь завдахгүй.
+</p>
+<p>
+我现在忙的什么也顾不过来。
+</p>
+<p>
+Би юуг нь ч мэдсэнгүй. 我什么也没有知道。
+</p>
+<p>
+Та аль сайнаас нь сонгож ав. 您从好的里挑选
+</p>
+<p>
+Юу авбал юуг нь авчиж өгье.
+</p>
+<p>
+要什么的话给拿什么
+</p>
+<p>
+Ямар бөс байвал тэр бөсөөр хийе.
+</p>
+<p>
+有什么布就用什么布做. (бөс 布)
+</p>
+<p>
+Хэдий байвал төдий авъя. 有多少要多少吧
+</p>
+<p>
+Хэзээ нэг сайхан ярилцъя. 什么时候好好谈一谈
+</p>
+<p>
+Хэзээ ч ирнэ. ——хэзээ хэзээгүй ирнэ.
+</p>
+<p>
+什么时候都来
+</p>
+<p>
+Хаа ч очиж болно. 到哪里都可以
+</p>
+<p>
+Хаа очвол хаа оч. 愿到哪里就到哪里
+</p>
+<p>
+Хаа нэг газар амарч сууя.
+</p>
+<p>
+在一个什么地方休息一下。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+除了这些外，хэн хүн 谁某，хэн боловч 谁也，зарим нэг 某一，өдий төдий 若干，(эдий тэдүй 若干)，өчнөөн төчнөөн 若干，都有不定的意义。(өчнөөн 这么，这么多，这么些。төчнөөн 那么多，那种程度。)
+</p>
+
+<!-...... subparagraph 6. 范围代词的语法特点......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-107"><span class="sectionnumber">1.5.2.0.0.6&#x2003;</span>6. 范围代词的语法特点</span>
+<a id="cyrillic-grammar-autopage-107"></a>
+
+</p>
+<p>
+（1）表示总括的范围代词中，бүгд (бүгдээр) 全部, 都，нийт (нийтээр) 总共，бүхэн (бүхнээр, бүх) 全，даян (даяар) 全部等四个词变格较全，也可以有领属形式。在句中可以充当主语和宾语。这几个代词常以用让格 (凭借格) 形式表达
+主格意义，进而这些用让格也可以变格。这几个词既可以在主体词前充当定语，也可以在主体词后充当概括语或复指语。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Төв хорооны бүгд хурал. 中央委员会全体会议
+</p>
+<p>
+Та очоод бүгдийг дуудаад ир. 您去把大家都叫来
+</p>
+<p>
+Бүгдээрээ ярилцвал сайн. 大家讨论好
+</p>
+<p>
+Бүгдээрт хэлж өг. 告诉大家
+</p>
+<p>
+Бүгдээртэй ярилцаж үзье. 和大家商量商量
+</p>
+<p>
+Ард нийтийн эд хөрөнгийг хамгаалах хэрэгтэй.
+</p>
+<p>
+应当保护人民的财产
+</p>
+<p>
+Тэр төлөвлөгөөг нийтээрээ зөвшөөрөв.
+</p>
+<p>
+那个计划大家通过了〖төлөвлөгөө 计划〗
+</p>
+<p>
+Дугуйлангийн хүмүүс бүх хүчээрээ чармайж байна.
+</p>
+<p>
+小组成员正以全副精力努力着
+</p>
+<p>
+Өнөөдөр би тэр бүхнийг ярихгүй.
+</p>
+<p>
+今天我不谈全部 (事情)
+</p>
+<p>
+Энэ чимээ улс даяарт мэдэгдээд даян дэлхийд тархаж байна.
+</p>
+<p>
+这个消息传遍全国扩散到全世界
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）表示总括的范围代词中，цөм, бүр , хуу 三个词变格不完全, 可以充当主语和宾语，可以在主体词后充当复指语或概括语，但不能在主体词前充当定语。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Янз бүрийн аргыг аваад цөм тус гарсангүй.
+</p>
+<p>
+虽然采取了各种办法但没有见效
+</p>
+<p>
+Тэр хэргийг цөмөөрөө мэджээ.
+</p>
+<p>
+那件事情大家都知道了
+</p>
+<p>
+Та явсан ч үлдсэн ч бүр болно.
+</p>
+<p>
+您走也可以留下也可以
+</p>
+<p>
+Зочид бүр ирчихэв үү？客人都来了吗？
+</p>
+<p>
+Тарисан мод хуу эдгэжээ.
+</p>
+<p>
+种的树都活了.(эдгэрэх=эдгэх 痊愈, 复元, 愈合)
+</p>
+<p>
+Хэлсэн үгийг чинь хуу дамжуулжээ.
+</p>
+<p>
+把你说的话都转达了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）表示总括的范围代词中，эл 各; 这个 элдэв 一切的, 各种各样的; хамаг 全部的, 所有的; 三个词变格形式很少，主要是充当定语，有的偶尔充当宾语或状语。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Эл үндэстний ард түмэн лүгээгийн бүлгэмдэл.
+</p>
+<p>
+与各族人民的团结
+</p>
+<p>
+Эл хошуунаас хүн томилж ирүүлэх.
+</p>
+<p>
+从各旗派人来. (томилох 任命, 委任; 派遣, 委派)
+</p>
+<p>
+Элдэв зүйлийн аргыг бодолхийлэх. 想各种办法
+</p>
+<p>
+(бодолхийлэх 反复想, 深思熟虑,бодох 的多次体)
+</p>
+<p>
+Элдвээр аашлах. 乱弹琴。瞎胡闹
+</p>
+<p>
+Хар утаа манараад, хамаг дэлхий чичрээд.
+</p>
+<p>
+黑烟弥漫, 大地颤动…〖манарах 缭绕, 飞起,(尘土) 飞扬; 晕迷。чичрэх 颤抖, 发抖, 战栗, 振颤〗
+</p>
+<p>
+Хамаг биеэс хөлс гарах. 全身发汗
+</p>
+<p>
+Хамаг хэрэг амжилттай биелэгдэх.
+</p>
+<p>
+一切事情顺利实现
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）表示区分的范围代词 зарим бусад өөр ондоо астаан нөгөө бишин 它们有格的变化，也可以有领属形式。它们可以区别性质特征，也可以区别事物本身。它们可以充当各种句子成分。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Зарим хүний хэлэх нь тийм биш.
+</p>
+<p>
+有些人说的不是那样
+</p>
+<p>
+Бусад зүйлийг дараагаар ярилцъя.
+</p>
+<p>
+别的事情以后再谈
+</p>
+<p>
+Бусдаас зээлсэн юм. 从别人借的东西
+</p>
+<p>
+Өөр хэрэг байна уу？有别的事情吗？
+</p>
+<p>
+Тэнд очиход үүнээс ондоо зам байхгүй.
+</p>
+<p>
+要到那里去除此以外没有别的路
+</p>
+<p>
+Тэр гурваас өөр нь бүр иржээ.
+</p>
+<p>
+除那三个以外别的都来了
+</p>
+<p>
+Ондоо хүний саналыг бас сонсож үз.
+</p>
+<p>
+也听一听别人的意见
+</p>
+<p>
+Тэр хүний санал нь астаан.
+</p>
+<p>
+那个人的意见不一样
+</p>
+<p>
+Үүнийг(энийг) ав, бишинийг нь бүү ав.
+</p>
+<p>
+要这个，不要别的
+</p>
+<p>
+Нэг л хүн иржээ, бишин нь бүр ирсэнгүй.
+</p>
+<p>
+只来了一个人，别的都没有来
+</p>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

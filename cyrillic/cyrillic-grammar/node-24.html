@@ -1,0 +1,2323 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—形容词的派生 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-334"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... section 形容词的派生......
+-->
+<h4 id="autosec-335"><span class="sectionnumber">2.2&#x2003;</span>形容词的派生</h4>
+<a id="cyrillic-grammar-autopage-335"></a>
+<a id="cyrillic-grammar-autofile-24"></a>
+<p>
+形容词也有原形容词与派生形容词之分。
+</p>
+<p>
+派生形容词也分为由静词类派生和动词类派生两类。
+</p>
+
+<!-...... subsubsection 由静词类派生的形容词......
+-->
+<h6 id="autosec-336"><span class="sectionnumber">2.2.0.1&#x2003;</span>由静词类派生的形容词</h6>
+<a id="cyrillic-grammar-autopage-336"></a>
+
+<p>
+（1）тай тэй т үгүй : 名词 (形容词) 加 тай тэй т 可产生具有该事物特征的关系形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ашиг 利益 —ашигтай 有利的
+</p>
+<p>
+ач 恩惠 —ачтай 有恩惠的
+</p>
+<p>
+эв 和睦 —эвтэй 和睦的
+</p>
+<p>
+эрдэм 学识 —эрдэмтэй 有学问的
+</p>
+<p>
+зүрх 心脏 —зүрхтэй 大胆的
+</p>
+<p>
+шим 营养 —шимтэй 有营养的
+</p>
+<p>
+зориг 勇敢, 志气 —зоригтой 有意志的
+</p>
+<p>
+болгоомж 谨慎—болгоомжтой 谨慎的
+</p>
+<p>
+ухаан 理智 —ухаантай 有理智的
+</p>
+<p>
+сайн 好——сайтай 好的
+</p>
+<p>
+гайхамшиг 奇迹—гайхамшигтай 奇妙的
+</p>
+<p>
+аймшиг 恐惧——аймшигтай 恐惧的
+</p>
+<p>
+сонирхол 兴趣 —сонирхолтой 有兴趣的
+</p>
+<p>
+чадал 能力 —чадалтай 有能力的
+</p>
+<p>
+сэжиглэл 怀疑——сэжиглэлтэй 可疑的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+与这些带有 тай тэй 的形容词相应的具有否定意义 ашиггүй (不利的）эвгүй (不合适的）ухаангүй(不懂事的）аймшиггүй（无畏的）等也看作是一种形容词；结合不紧密的临时的、自由的 ширээтэй (有桌子）ширээгүй (无桌子）цаастай
+(有纸）цаасгүй (无纸) нөхөртэй（有朋友）нөхөргүй (没有朋友）等不是构词成分，这些例子中 тай тэй үгүй 可看作是肯定、否定语气词。
+</p>
+<p>
+区别派生形容词与自由词组的办法是看它回答什么问题，能回答 “怎样的”&#x202f;“什么样的” 这种问题的，一般属于派生形容词。能回答 “有什么”&#x202f;“没有什么” 这种问题的一般属于实虚词组。
+</p>
+<p>
+т 的意义与 тай тэй 一样，书面语传统上多用 т 的形式。
+</p>
+<p>
+эрдэмт 有学问的 зүтгэлт 有贡献的，зоригт 有志气的，ачит 有恩惠的，морьт 骑马的，галт 用火的，журамт 有义气的
+</p>
+<p>
+有些形式如 морьт цэрэг (骑兵)，галт тэрэг (火车）已作为一个词组固定下来了。这些在口语里不能叫做［морьтой , галтай ］
+</p>
+<p>
+Т 的形式，在一些指人的和指从属关系的名称上，人名、地名上已经变成名词了。
+</p>
+<p>
+харьяат 从属的, 国籍 албат 属民，纳贡者
+</p>
+<p>
+Чулуут Тариат Могойт（均为地名）
+</p>
+<p>
+Цогт Зоригт Эрдэмт (均为人名）
+</p>
+<p>
+（2）дхи тхи : 这是从 д (т )+хи 演变而来，加在表示地点、部位的名词上构成表示地点的关系形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гэртэхи 家里的
+</p>
+<p>
+ууландахи 山里的
+</p>
+<p>
+Хөх хотодохи 呼和浩特的
+</p>
+<p>
+Бээжиндэхи 北京的
+</p>
+<p>
+гартахи 手里的
+</p>
+<p>
+зүрхэндэхи 心里的
+</p>
+<p>
+гэдсэндэхи 肚子里的
+</p>
+<p>
+сэтгэлдэхи 心中的
+</p>
+<p>
+бичиг зохиолдохи 书籍中的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）саг сэг : 名词加 саг сэг 可构成爱好 (以至嗜好) 该事物的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+мах 肉——махсаг 好吃肉的
+</p>
+<p>
+цай 茶——цайсаг 好喝茶的
+</p>
+<p>
+архи 酒——архисаг 爱喝酒的
+</p>
+<p>
+тамхи 烟——тамхисаг 好抽烟的
+</p>
+<p>
+нөхөр 友——нөхөрсөг 友谊的
+</p>
+<p>
+төрөл 亲族——төрөлсөг 相亲近的
+</p>
+<p>
+ижил 处熟的——ижилсэг 相惯的
+</p>
+<p>
+хань 朋友——ханьсаг 好交友的
+</p>
+<p>
+элэг 肝——элэгсэг 亲切的
+</p>
+<p>
+найр 友情——найрсаг 友好的
+</p>
+<p>
+морь 马——морьсог 爱骑马的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）лаг лэг : 名词、形容词加 лаг лэг 可构成富于该事物或具有该特征的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+мах 肉——махлаг 丰满的
+</p>
+<p>
+тос 油——тослог 含油的
+</p>
+<p>
+ус 水——услаг 水分多的
+</p>
+<p>
+үс 毛——үслэг 多毛的
+</p>
+<p>
+эвэр 犄角——эвэрлэг 角质的
+</p>
+<p>
+давс 盐——давслаг 咸的
+</p>
+<p>
+чулуу 石头——чулуулаг 多石的
+</p>
+<p>
+хөрөнгө 资金——хөрөнгөлөг 有资金的
+</p>
+<p>
+сүр 威风——сүрлэг 有威风的
+</p>
+<p>
+эв 和睦——эвлэг 合适的
+</p>
+<p>
+баян 富——баялаг 富饶的
+</p>
+<p>
+бөх 坚固——бөхлөг 坚固的
+</p>
+<p>
+хурц 锋利——хурцлаг 机灵的
+</p>
+<p>
+ядуу 贫——ядуулаг 贫穷的
+</p>
+<p>
+чинээ 能力, 财力——чинээлэг 殷实的
+</p>
+<p>
+нарийн 细的——нарийлаг 精细的
+</p>
+<p>
+бүдүүн 粗——бүдүүлэг 粗糙的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（5）гч гчин : 在颜色名称上加 гч гчин 可构成母畜毛色名称的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+саарал 白青毛色——саарагч 白青毛色的 (骒马)【сааралтгүй 灰毛色的 (马的毛色)】
+</p>
+<p>
+шарга 淡栗毛色——шаргачин 淡黄乳白色的 (母马毛色)
+</p>
+<p>
+бор 铁青毛色——борогч 青灰毛色的 (骒马）
+</p>
+<p>
+хуа(хоо) 黄栗毛色——ухаагч 土黄色的 (母牛)，栗毛色的 (骒马)
+</p>
+<p>
+цагаан 白色的——цагаагч(ин) 白色 (指雌性动物的毛色)
+</p>
+<p>
+хар 黑色的——харагч 黑的 (母畜毛色)
+</p>
+<p>
+цохо 斑点的 (牝牛牝马毛色)—цохогч 有斑点的, 花点的 (母牛)
+</p>
+<p>
+эрээн 色彩斑斓——эрээгч 花斑的 (母牛)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（6) ч : 名词加 ч 可表示有关的性质。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ажил 工作——ажилч (хүн) 勤劳的 (人）
+</p>
+<p>
+нам 党——намч (чанар) 党性, 党的
+</p>
+<p>
+гол 中心——голч 公正的
+</p>
+<p>
+үнэн 真实——үнэнч 诚实的
+</p>
+<p>
+хот 家——хоточ (нохой) 看家的 (狗）
+</p>
+<p>
+могой 蛇——могойч (бүргэд,хулгана) 捕蛇的 (鹰, 鼠)
+</p>
+<p>
+мах 肉——махчин (шувуу) 食肉的 (鸟) 以肉为食的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（7）нцар нцэр : 名词加 нцар нцэр 可构成表示嗜好该事物的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+архи 酒——архинцар 爱喝酒的
+</p>
+<p>
+мах 肉——маханцар 肉墩子 (名词)
+</p>
+<p>
+мах 肉——махангар 肌肉发达的
+</p>
+<p>
+ам 嘴——аманцар 饶舌的, 多嘴的
+</p>
+<p>
+амь 自己——аминцар 自私的，аминч 自私的; 自私者利己主义者
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（8）мсаг мсэг : 名词、形容词加 мсаг мсэг 可构成爱好、崇尚该事物和特征的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хүүхэн 姑娘——хүүхэмсэг 少女性格的
+</p>
+<p>
+их 大——ихмсэг 庄重的、自大的
+</p>
+<p>
+эрхэм 尊贵的——эрхэмсэг 尊敬的、骄横的
+</p>
+<p>
+хөнгөн 轻——хөнгөмсөг 谦虚的、轻率的
+</p>
+<p>
+гоё 美丽的——гоёмсог 漂亮的
+</p>
+<p>
+элэг 肝脏, 心怀——элэгсэг 亲切的, 亲热的
+</p>
+<p>
+торго 缎子—— торгомсог 象缎子一样的, 丝质的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（9）лжин : 数词加 лжин 可构成表示形状的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гурав 三 ——гурвалжин 三角形
+</p>
+<p>
+дөрөв 四 ——дөрвөлжин 四角形
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（10）хан хэн : 表示形容词 (弱) 程度的附加成分 хан хэн 有时有构词作用.
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сайн 好 ——сайхан 美丽的
+</p>
+<p>
+хүү 儿子——хүүхэн 女儿
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+由静词类派生形容词除上述几种附加成分外，还有一些在少数词或个别词上见到的构词附加成分。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+цагаан 白——цагаавар 清白的, 诚实的, 磊落的
+</p>
+<p>
+хар 黑——харанхуй 黑暗的
+</p>
+<p>
+шар 黄——шаранхуй 微黄的
+</p>
+<p>
+дээр 上——дээрэнгүй 高傲的
+</p>
+<p>
+өвгөн 老头—өвөгжөөр,өвөгжөөл 年老的，显老的
+</p>
+<p>
+эмгэн 老太婆—эмэгжээр,эмэгжээл 象老太婆的, 年近老境的
+</p>
+<p>
+ас 直——асвар 直爽的
+</p>
+<p>
+цөөн 少——цөөвөр 稀少的
+</p>
+<p>
+цөөн 少——цөөнхи 少数的
+</p>
+<p>
+их 大——ихэнх 多数的、大部分
+</p>
+<p>
+нус 鼻涕——нусанхай 常流鼻涕的
+</p>
+<p>
+ер(йө) 平常——ерөнхий 总的
+</p>
+<p>
+ер 平常——ерөмдөг 平凡的、普通的
+</p>
+<p>
+эе 和气——эелдэг 和蔼的
+</p>
+<p>
+нарийн 细的——нарийвч 详细情节
+</p>
+<p>
+бүдүүн 粗——бүдүүвч 简略的，粗线条的
+</p>
+<p>
+заль 诡计——зальхай 奸诈的
+</p>
+<p>
+муу 不好——муухай 不好看的
+</p>
+<p>
+өнгө 颜色——өнгөц 表面的、浅色的
+</p>
+<p>
+хамар 鼻——хамрадай 大鼻子 (鼻夹)
+</p>
+<p>
+амь 生命——амьд 活的
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 由动词类派生的形容词......
+-->
+<h6 id="autosec-337"><span class="sectionnumber">2.2.0.2&#x2003;</span>由动词类派生的形容词</h6>
+<a id="cyrillic-grammar-autopage-337"></a>
+
+<p>
+（1）мал мэл : 动词加 мал мэл 可构成由于该动词的结果而产生的关系形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+зур-画 (зурах)——зурмал 画的
+</p>
+<p>
+нэхэ-织——нэхмэл 织的
+</p>
+<p>
+сийлэ-雕刻; 削——сийлмэл 雕刻的
+</p>
+<p>
+бич-写——бичмэл 写的
+</p>
+<p>
+дара-印——дармал 印的, 印刷品
+</p>
+<p>
+зохио-作——зохиомол 人为的
+</p>
+<p>
+буд-染——будмал 染的
+</p>
+<p>
+сонго-选——сонгмол 选的
+</p>
+<p>
+тарь-种——таримал 种植的; 农作物
+</p>
+<p>
+тогто-固定——тогтмол 固定的, 定期的, 习惯的
+</p>
+<p>
+хатаа-晒——хатаамал 干的
+</p>
+<p>
+ург-生长——ургамал 生长着的; 植物
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+其中有些已经变成了名词，如 дармал 印刷品，ургамал 植物。
+</p>
+<p>
+（2）шгүй : 动词加 шгүй 可构成表示否定意义的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+халда-粘着, 侵犯, 传染—халдашгүй 不可侵犯的; 不传染的
+</p>
+<p>
+марта-忘——марташгүй мартагдашгүй 不能忘的，难忘的
+</p>
+<p>
+эвдрэ-损坏, 瓦解——эвдэршгүй 牢不可破的
+</p>
+<p>
+үнэлэ-估价——үнэлшгүй 不可估价的, 不可估量的
+</p>
+<p>
+сала-分离——салашгүй 不可分离的, 紧密的
+</p>
+<p>
+болзо-约定——болзошгүй 难以确定的; 说不定, 可能
+</p>
+<p>
+үзэ-看——үзэшгүй 难看的, 看不下去的
+</p>
+<p>
+хэлэ-说——хэлэшгүй 难说的, 说不出的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）мхай мхий, мтгай мтгий : 动词加上这些附加成分构成表示具有进行该项动作癖性的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+түрэ-侵占——түрэмгий 强横的
+</p>
+<p>
+ич-害羞——ичимгий 好害羞的
+</p>
+<p>
+ай-怕——аймхай 胆小的, 胆怯的
+</p>
+<p>
+хэсэ-游逛——хэсэмхий 爱游逛的
+</p>
+<p>
+гуй-请求——гуймхай=гуймтгай 爱请求的
+</p>
+<p>
+ав-要——авамхай 贪婪的
+</p>
+<p>
+ай-怕——аймтгай 胆小的 (=аймхай)
+</p>
+<p>
+хий-做——хиймхий 好惹事的 (字典里没有)
+</p>
+<p>
+уйла-哭——уйламтгай 爱哭的
+</p>
+<p>
+буц-返——буцамтгай 好改口的
+</p>
+<p>
+урв-翻——урвамтгай 反复无常的
+</p>
+<p>
+натга-惊跳——натгамтгай 容易惊跳的
+</p>
+<p>
+хөөрө-兴奋——хөөрөмтгий 易兴奋的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）мгай мгий : 动词加 мгай мгий 可构成表示善于进行该项工作或具有进行该项工作能力的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+чад-会——чадамгай 能干的
+</p>
+<p>
+дад-养成习惯——дадамгай 习惯的, 熟练的, 有经验的
+</p>
+<p>
+сур-学——сурамгай 娴熟的
+</p>
+<p>
+хэлэ-说——хэлэмгий 健谈的
+</p>
+<p>
+хяна-审查——хянамгай 仔细慎重的
+</p>
+<p>
+гар-出——гарамгай 杰出的, 特殊的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（5）г : 动词加 г 可构成与该动词意义相应的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+цэлмэ-晴朗——цэлмэг 晴朗的
+</p>
+<p>
+бүрхэ-覆盖, 蒙上——бүрхэг 阴暗的
+</p>
+<p>
+сийрэ-变稀落——сийрэг 稀疏的
+</p>
+<p>
+бээрэ-受冻——бээрэг 怕冷的
+</p>
+<p>
+баярха-夸耀财富——баярхаг 好夸耀财富的
+</p>
+<p>
+ноёрхо-统治, 摆官架子——ноёрхог 强权的, 摆官架子的
+</p>
+<p>
+оморхо-傲慢, 自高自大——оморхог 高傲的
+</p>
+<p>
+ихэрхэ-自大——ихэрхэг 自高自大的
+</p>
+<p>
+эрэлхэ-逞勇——эрэлхэг 勇敢的
+</p>
+<p>
+идэрхэ-逞强——идэрхэг 强壮的
+</p>
+<p>
+хүчирхэ-强制, 强迫——хүчирхэг 强大的
+</p>
+<p>
+зочирхо-讲礼貌, 客气——зочирхог 讲客气的, 拘礼节的
+</p>
+<p>
+мэдэрхэ-假充知道——мэдэрхэг 自夸的，不懂装懂的
+</p>
+<p>
+усархаг 多水的，含水多的
+</p>
+<p>
+өвсэрхөг 草茂盛的, 草状的, 草本的
+</p>
+<p>
+үүлэрхэг 多云的,
+</p>
+<p>
+элсэрхэг 多沙的，像沙似的
+</p>
+<p>
+модорхог 多树木的
+</p>
+<p>
+навчирхаг 叶子茂盛的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（6）уу үү : 动词加 уу үү 可构成与该动词意义相应的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+бээрэ-受冻——бээрүү 怕冷的
+</p>
+<p>
+тойро-绕——тойруу 绕远的
+</p>
+<p>
+яар-忙——яаруу 急忙的
+</p>
+<p>
+дара-压——даруу 谦虚的
+</p>
+<p>
+хөлдө-冻——хөлдүү 封冻的, 结冰的
+</p>
+<p>
+царца-凝——царцуу 凝结的
+</p>
+<p>
+яда-累——ядуу 贫穷的
+</p>
+<p>
+дута-缺——дутуу 缺少的
+</p>
+<p>
+дава-超过——давуу 优势的, 更好些的
+</p>
+<p>
+эндэ-看错, 误解——эндүү 误会的
+</p>
+<p>
+эргэ-转——эргүү 糊涂的
+</p>
+<p>
+согто-醉——согтуу 喝醉的
+</p>
+<p>
+зөрө-违犯, 错开, 不一致——зөрүү 斜的, 差异, 固执的
+</p>
+<p>
+барь-抓——бариу 衣服窄小的, 紧的, 挤的 (衣鞋等)
+</p>
+<p>
+тавь-放——тавиу 宽阔的, 丰饶的, 宽松的
+</p>
+<p>
+модорхуу 多树木的 =модорхог
+</p>
+<p>
+ёсорхуу 客气的, 讲礼貌的
+</p>
+<p>
+усархуу 多水的, 含水多的
+</p>
+<p>
+тосорхуу 油脂多的
+</p>
+<p>
+ихэрх-自大 (ихэрхэх)——ихэрхүү 自高自大的
+</p>
+<p>
+хүүхэдэрхүү 孩子气的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（7）хай хий : 动词加 хай хий 可构成表示该动作的结果的形容词。Хай хий 附加成分主要用在 р 之后。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+балра-模糊——балархай 模糊的
+</p>
+<p>
+бутра-分散——бутархай 分散的
+</p>
+<p>
+хагар-破裂——хагархай 破裂的
+</p>
+<p>
+илэрэ-显露——илэрхий 明显的
+</p>
+<p>
+хэтрэ-超出——хэтэрхий 过分的
+</p>
+<p>
+эвдрэ-损坏——эвдэрхий 破的
+</p>
+<p>
+нэвтрэ-通, 穿透——нэвтэрхий 通的, 透彻的
+</p>
+<p>
+сэтрэ-裂口——сэтэрхий 有裂口的, 有豁口的
+</p>
+<p>
+шуна-贪求——шунахай 贪婪的
+</p>
+<p>
+цамла-嫌少——цамлахай 贪得无厌的, 不知足的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（8）нхай нхий : 动词加 нхай нхий 可构成表示该动词的结果的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+тура-消瘦——туранхай 瘦的, 虚弱的
+</p>
+<p>
+ура-撕破——уранхай 撕破的; 多嘴的, 藏不住话的
+</p>
+<p>
+цооро-成破洞——цооронхой 有很多洞的, 漏洞百出的
+</p>
+<p>
+эцэ-瘦——эцэнхий 瘦的
+</p>
+<p>
+нооро-掉毛——нооронхой 破烂的, 褴褛的
+</p>
+<p>
+уйл-哭——уйланхай 爱哭的
+</p>
+<p>
+түлэ-烧——түлэнхий 被烧了的, 烧焦的
+</p>
+<p>
+яда-无力量…; 疲乏——яданги 贫寒的
+</p>
+<p>
+хата-变干——хатанхай 干枯的
+</p>
+<p>
+элэ-用坏, 磨损——элэнхий 磨损的, 穿破的; 风化了的
+</p>
+<p>
+зогсо-停——зогсонги 停顿的, 停滞的
+</p>
+<p>
+сал-分离——саланхай 分开的, 单独的
+</p>
+<p>
+согто-醉——согтонхой 沉醉的
+</p>
+<p>
+наалда-粘——наалданхай 易粘的
+</p>
+<p>
+тогто-固定——тогтонги 固定的, 稳定的; 停滞的, 停顿的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（9）нгуй нгүй : 动词加 нгуй нгүй 可构成与该动词相应的或表示该动词的结果的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хичээ-用心——хичээнгүй 勤奋的, 慎重的
+</p>
+<p>
+хураа-收——хураангуй 概括的
+</p>
+<p>
+дэлгэр-展开——дэлгэрэнгүй 展开的, 宽广的, 广泛的
+</p>
+<p>
+асра-照料——асрангуй 关心的, 仁爱的
+</p>
+<p>
+энэр-发慈悲, 怜悯——энэрэнгүй 仁慈的
+</p>
+<p>
+бадра-兴旺, 昂扬——бадрангуй 繁荣的, 兴旺的, 高昂的
+</p>
+<p>
+боловсро-受教育, 成熟的——боловсронгуй 有学问的, 成熟的, 文明的
+</p>
+<p>
+найда-指望, 依赖——найдангуй 好依赖的, 嫉妒的
+</p>
+<p>
+баяс-喜悦——баясангуй 欢乐的, 乐观的, 兴奋的
+</p>
+<p>
+хайрла-爱惜——хайрангуй 让人爱惜的, 惹人爱的 (＝ хайрлалтай)
+</p>
+<p>
+дара-压——дарангуй 谦虚的
+</p>
+<p>
+хоцро-落后——хоцронгуй 落后的
+</p>
+<p>
+хоцрогд-落后——хоцрогдонгуй 落后的, 后滞的, 落伍的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（10）гай гий : 动词加 гай гий 可构成与该动词相应的表示形状的形容词。把 й 去掉后加 гай гий。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хазай-歪斜——хазгай 歪斜的
+</p>
+<p>
+унжий-下垂, 垂头丧气—унжгай 下垂的
+</p>
+<p>
+хэлтий-倾斜——хэлтгий 倾斜的, 不完整的
+</p>
+<p>
+хотой-凹下去——хотгор 中间凹下的
+</p>
+<p>
+сондой-成单, 变孤独——сондгой 奇数的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（11）гар гэр : 动词加这些附加成分可构成与该动词相应的表示形状的形容词。把 й 去掉加 гар гэр。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сэртий-警觉地耸起, 竖起 (耳朵)——сэртгэр 警觉地耸起的, 竖起的
+</p>
+<p>
+хазай-歪斜——хазгар 歪斜的
+</p>
+<p>
+шовой-变尖头的——шовгор 圆锥形的, 尖头的; 尖顶的
+</p>
+<p>
+бүлтий-隆起——бүлтгэр 凸起来, 突出的
+</p>
+<p>
+бөгций-弯腰——бөгцгөр 驼背的
+</p>
+<p>
+навхай-下垂, 缩短; 变低矮——навхгар 低矮的, 矮胖的, 扁平的
+</p>
+<p>
+шолдой-变得尖瘦——шолдгор 瘦削的, 尖瘦的
+</p>
+<p>
+тэний-伸直, 舒展——тэнигэр(=тэнэгэр) 伸展的
+</p>
+<p>
+годой-(短尾巴) 翘起——годгор 翘起的 (秃尾等), 细而短的 (尾巴, 辫子等)
+</p>
+<p>
+гүдий-凸起——гүдгэр 凸起的, 鼓起的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（12）лдан лдэн (дан дэн) : 动词加 лдан лдэн 可构成表示形状的形容词。〖这种后缀字典里没有〗
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гозой-竖起, 撅起—гозойлдон (=гозгор) 竖起的
+</p>
+<p>
+ярвай-裂口, 撇嘴 —ярвайлдан (=ярвагар) 裂口的, 咧嘴的
+</p>
+<p>
+шувтай-变瘦, 成上宽下窄状 —шувтайлдан (=шувтгал) 消瘦的, 上宽下窄的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（13）н : 动词加 н 可构成表示动作结果的形容词。如果加在表示动态的词上可构成形象地表示状态的形容词，这类形容词重叠使用可构成一种拟态形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+дүүр-满——дүүрэн 满的
+</p>
+<p>
+догол-变瘸——доголон 瘸子
+</p>
+<p>
+далбий-变斜扁——далбин 宽大而斜弯的, 斜扁的
+</p>
+<p>
+далжий-偏斜——далжин 歪斜的，歪向一旁的
+</p>
+<p>
+барда-矜夸, 骄傲, 自负——бардан 骄傲的, 狂妄的 (=бардам)
+</p>
+<p>
+арвайж сарвайх 参差不齐——арван сарван 手扒脚蹬的
+</p>
+<p>
+арвайх 伸开, 张开; 蓬乱, 散乱
+</p>
+<p>
+сарвайх 伸展, 张开，用力
+</p>
+<p>
+эрвийж сэрвийх 参差丫叉——эрвэн сэрвэн 丫丫叉叉的, 参差不齐的
+</p>
+<p>
+эрвийх 竖起, 耸起, 崛起
+</p>
+<p>
+сэрвийх 竖起, 向上突起, 崛起; 略痊愈, 恢复健康
+</p>
+<p>
+бөгций-驼背, 弯腰; 蜷缩——бөгцөн бөгцөн 一躬一躬地
+</p>
+<p>
+бөгтийх 弯腰, 曲背, 哈腰 бөгтгөр 驼背的，弯曲的，
+</p>
+<p>
+хэлбий-倾斜——хэлбин хэлбин、хэлбэн хэлбэн 摇摇晃晃地
+</p>
+<p>
+дайвах 摇荡, 摇曳, 摇晃, 振动
+</p>
+<p>
+дайвайх 歪斜 дайвийх 变歪, 变外八字脚
+</p>
+<p>
+хайван дайван 摇摇晃晃的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（14）галан гэлэн : 动词加 галан гэлэн 可构成有关状态的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ама-小憩, 歇息 (амах)——амгалан 平安, 安宁, 幸福（名词)
+</p>
+<p>
+баяс-喜悦——баясгалан 愉快，欢乐，快活 (名词)
+</p>
+<p>
+урс-流——урсанги 流动的, 流体的
+</p>
+<p>
+цад-饱—— (此词字典里没有)
+</p>
+<p>
+өлс-饿——өлсгөлөн 饥饿的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(15) м : 动词加 м 可构成表示可能进行、值得进行该项动作的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+унш-念——уншим 可以念的
+</p>
+<p>
+үзэ-看——үзэм 可以看的
+</p>
+<p>
+гайха-奇怪——гайхам 惊奇的
+</p>
+<p>
+булаа-夺——булаам 夺取的
+</p>
+<p>
+тата-拉——татам 吸引的
+</p>
+<p>
+сонирхо-欣赏——сонирхом 可欣赏的
+</p>
+<p>
+өнгий-俯瞰——өнгийм 向前倾斜的, 悬垂的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（16）маг мэг : 动词加 маг мэг 可构成表示相应的特性或由于该动词的结果而产生的特征的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хуур-行骗——хуурмаг 虚伪的
+</p>
+<p>
+холь-混合在一起, 掺上——холимог 混合的
+</p>
+<p>
+ээдэ-发酵; 凝结——ээдмэг(=ээдэм) 凝乳, 乳酪 (名词)
+</p>
+<p>
+зорь-奔向——зоримог 坚定的, 固执的
+</p>
+<p>
+цочи-受惊, 吃惊——цочмог 意外的, 突然的; 急性的
+</p>
+<p>
+сур-学——сурмаг 好学的, 熟练的
+</p>
+<p>
+чад-会——чадмаг 能干的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+有的已经变成了名词，如 хайлмаг 表示一种奶食品 (奶皮煎饼)，царцмаг 表示凝结物 (明胶)。
+</p>
+<p>
+（17）ч : 动词加 ч 可构成好进行该行为的形容词。发音时 ч 前边的短元音发长元音。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хорло-伤害——хорлооч 好伤害的
+</p>
+<p>
+уучла-原谅——уучлаач (=уучламтгай 宽恕的) 宽宏大量的
+</p>
+<p>
+ухчла-挑剔; 再三思量——ухчлаач 好追问的, 吹毛求疵的
+</p>
+<p>
+（18）аа ээ : 动词加 аа ээ 可构成与该动词具有相应特征的形容词。
+</p>
+<p>
+бархира-喊, 咆啸——бархираа 好尖叫的, 好吼叫的
+</p>
+<p>
+хашгар-叫喊——хашгараа 好叫喊的
+</p>
+<p>
+ёргь-吹牛, 吹嘘——ёргио 好自夸的, 吹嘘的
+</p>
+<p>
+онгиро-自夸, 自吹——онгироо 吹牛的, 狂妄的
+</p>
+<p>
+хэвтэ-躺——хэвтээ 卧着的; 卧式的, 低矮的
+</p>
+<p>
+бос-起来, 竖立——босоо 立起来的, 垂直的
+</p>
+<p>
+урга-生长——ургаа 生长的
+</p>
+<p>
+нурши-啰嗦——нуршаа 唠叨的, 废话连篇的 (нуршуу 唠叨的, 罗嗦的）
+</p>
+<p>
+гунши-以鼻音说话, 发嘟嚷声——гуншаа 鼻音重的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（19）даг дэг : 动词加形动词源出的 даг дэг, 可构成具有与该动词相应的特性的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сонго-选——сонгодог 精选的, 精华的; 典范的
+</p>
+<p>
+өши-作对, 闹对立 —өшдөг 好作对的
+</p>
+<p>
+【字典里有：өшит 好作对 (抬扛) 的; 爱记仇的】
+</p>
+<p>
+өргө-举; 呈献——өргөдөг 夸张的<sup>5</sup><a id="cyrillic-grammar-autopage-338"></a>
+</p>
+<p>
+хаза-咬——хаздаг 爱咬的, 有咬癖的
+</p>
+<p>
+зуу-咬——зуудаг 爱咬人的
+</p>
+<p>
+мөргө-顶撞<sup>6</sup>—–мөргөдөг 爱顶架的<sup>7</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-339"></a>
+<p>
+<sup>5</sup>&nbsp;【字典里是：өргөдөг 起重工具, 极瘦弱的牲畜 (名词)】
+</p>
+<p>
+<sup>6</sup>&nbsp; 叩首, 顶角
+</p>
+<p>
+<sup>7</sup>&nbsp;【мөргөмтгий,мөргөмхий,мөргөөч 好顶撞的】
+</p>
+
+</div>
+</div>
+<p>
+（20）уур үүр : 动词加 уур үүр 构成具有与该动词相应的性质、特征的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хяна-审查——хянуур 谨慎的<sup>8</sup>
+</p>
+<p>
+гуйвалза-动摇<sup>9</sup>——гуйвалзуур 好动摇的<sup>10</sup>
+</p>
+<p>
+хотолзох-一沉一沉<sup>11</sup>——хотолзуур 一沉一沉的
+</p>
+<p>
+гэдэлзэх-一上一下<sup>12</sup>——гэдэлзүүр<sup>13</sup> 一上一下的
+</p>
+<p>
+бамбалза-软物弹动<sup>14</sup>——бамбалзуур 软颤颤的<sup>15</sup>
+</p>
+<p>
+анивалза-不住眨巴眼<sup>16</sup>——анивалзуур 好眨巴眼的<sup>17</sup>
+</p>
+<p>
+нялгана-发黏<sup>18</sup>——нялгануур 发黏的<sup>19</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-340"></a>
+<p>
+<sup>8</sup>&nbsp; 小心的; 细心的
+</p>
+<p>
+<sup>9</sup>&nbsp; 不断摇摆
+</p>
+<p>
+<sup>10</sup>&nbsp; 易动摇的 (=гуйваач)
+</p>
+<p>
+<sup>11</sup>&nbsp;(=хотгонох 压得一弯一弯, 压得一陷一陷, 中间不断凹下)
+</p>
+<p>
+<sup>12</sup>&nbsp;(=гэдэгнэх 一上一下地频频动弹)
+</p>
+<p>
+<sup>13</sup>&nbsp;(=гэдэгнүүр) 好昂首的, 一仰一仰的; 好点头的, 点头哈腰的
+</p>
+<p>
+<sup>14</sup>&nbsp; 颤
+</p>
+<p>
+<sup>15</sup>&nbsp; 有弹性的, 颤悠悠的
+</p>
+<p>
+<sup>16</sup>&nbsp; 不断眨眼 (=анилзах)
+</p>
+<p>
+<sup>17</sup>&nbsp; 频频眨眼的 (=анилзуур)
+</p>
+<p>
+<sup>18</sup>&nbsp; 粘连, 黏糊
+</p>
+<p>
+<sup>19</sup>&nbsp; 黏糊的
+</p>
+
+</div>
+</div>
+<p>
+（21）уун үүн : 动词加 уун үүн 可构成与该动词相应的形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хала-热——халуун 热的
+</p>
+<p>
+хөгж-发展——хөгжүүн 发展的
+</p>
+<p>
+өрнө-发达, 高涨——өрнүүн 高涨的, 旺盛的, 发达的
+</p>
+<p>
+сэрэ-醒——сэрүүн 醒着的
+</p>
+<p>
+агши-变短; 变浓, 变稠——агшуун 稠密的, 干的
+</p>
+<p>
+хөши-变僵——хөшүүн 僵硬的
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+除上述由动词派生形容词的附加成分外，还有一些在少数词或个别词上见到的附加成分。
+</p>
+<p>
+бай-存在——байнга 经常的
+</p>
+<p>
+алжаа-[敬] 疲劳 ——алжаангуу 甚疲乏的, 疲惫不堪的
+</p>
+<p>
+солжих 弯曲, 扭歪——солжир 不对称的, 不匀称的, 单独的
+</p>
+<p>
+долий-斜视——должир 斜的, 斜眼的
+</p>
+<p>
+тахий-弯卷——тахир 弯曲的, 残疾的
+</p>
+<p>
+баа-大便——бааран 好大便的
+</p>
+<p>
+шээ-小便——шээрэн 好小便的
+</p>
+<p>
+буу-降——буурай 衰弱的
+</p>
+<p>
+бол-成熟——боловсруун 成熟的, 文明的
+</p>
+<p>
+ээ-晒, 烤 (ээх)——ээвэр 日射的, 日照的
+</p>
+<p>
+гүйцэ-实现, 达到; 完结——гүйцэд 完整的, 充足的
+</p>
+<p>
+ич-害羞——ичгүүр 羞耻, 耻辱, 害臊 (名词）ичихтэр 可耻的 (形)。
+</p>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

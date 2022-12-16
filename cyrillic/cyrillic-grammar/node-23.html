@@ -1,0 +1,2576 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—形态学构词法 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-325"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... chapter 形态学构词法......
+-->
+<h3 id="autosec-326"><span class="sectionnumber">第二章&nbsp;&#x2003;</span>形态学构词法</h3>
+<a id="cyrillic-grammar-autopage-326"></a>
+<a id="cyrillic-grammar-autofile-23"></a>
+
+<!-...... section 名词的派生......
+-->
+<h4 id="autosec-327"><span class="sectionnumber">2.1&#x2003;</span>名词的派生</h4>
+<a id="cyrillic-grammar-autopage-327"></a>
+
+<p>
+名词有原名词和派生名词之分别，原名词是非派生的如 гар 手、хөл 脚、хүн 人、мал 牲畜等词根名词。派生名词是在名词或其它词类上接加各种构词词缀而形成的。派生名词的构词词缀许多，大体上可分为由静词类派生和由动词类
+派生这样两类。
+</p>
+
+<!-...... subsubsection 由静词类派生的名词......
+-->
+<h6 id="autosec-328"><span class="sectionnumber">2.1.0.1&#x2003;</span>由静词类派生的名词</h6>
+<a id="cyrillic-grammar-autopage-328"></a>
+
+<p>
+（1）чин、ч ：名词加 ч, чин 可构成从事该事物的人的称谓。在以 н 辅音结尾的名词后接加 ч ,чин 时，н 辅音脱落。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ажил 工作 —ажилчин 工人
+</p>
+<p>
+тариа 庄稼 —тариачин 农民
+</p>
+<p>
+загас 鱼 —загасчин 渔民
+</p>
+<p>
+тогоо 锅 —тогооч 炊事员
+</p>
+<p>
+хонь 绵羊 —хоньчин 牧羊者
+</p>
+<p>
+эм 药 —эмч 医生
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）тан тэн ：名词加 тан тэн 可构成具有该事物的人的称谓，或表示具有该事物特征的生物。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+мэргэжил 技术 —мэргэжилтэн 技术员、专家
+</p>
+<p>
+хөрөнгө 资本 —хөрөнгөтөн 资本家
+</p>
+<p>
+нас 岁数 —настан 老人
+</p>
+<p>
+идэвх 积极 —идэвхтэн 积极分子
+</p>
+<p>
+амь 生命 —амьтан 动物
+</p>
+<p>
+жигүүр 翅膀 ——жигүүртэн 禽类
+</p>
+<p>
+сээр 脊椎 —сээртэн 脊椎动物
+</p>
+<p>
+туурай 蹄 —туурайтан 有蹄类
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）х, хан хэн ：名词及名词性静词 (属格) 加 х 可表示属于该事物的某种事物，加 хан хэн хон хөн 则表示属于该事物的人。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+аавын 父亲的 —аавынх 父亲的东西
+</p>
+<p>
+гадаадын 外国的 —гадаадынх 外国的东西
+</p>
+<p>
+миний 我的 —минийх 我的东西
+</p>
+<p>
+нутагийн 家乡的—нутагийнхан 家乡的人
+</p>
+<p>
+манай 我们的 —манайхан 我们的人
+</p>
+<p>
+ойр орчимын 附近的 —ойр орчимынхон 附近的人
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）вч ：名词加 вч 可派生出护围该事物、用于该事物 (名词所表示的事物) 的用具的名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хуруу 手指—хуруувч 顶针
+</p>
+<p>
+хүзүү 颈—хүзүүвч 脖套
+</p>
+<p>
+чих 耳朵—чихэвч 耳套
+</p>
+<p>
+хэт 火镰—хэтэвч 火镰包
+</p>
+<p>
+мөр 肩—мөрөвч 护肩，垫肩
+</p>
+<p>
+салхи 风—салхивч 通风口
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（5）гана,гэнэ : 名词 (以及形容词) 加 гана гэнэ 可构成表示该动物和植物的名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+алт 金—алтгана 白皮锦鸡儿 (植), 金丝燕 (动)
+</p>
+<p>
+хар 黑—харгана 锦鸡儿 (植)
+</p>
+<p>
+улаан 红—улаагана 欧李 (赤李子）
+</p>
+<p>
+улаалж 白茅—улаалзгана 五味子
+</p>
+<p>
+боролж 白桦 (植) —боролзгоно 苇子
+</p>
+<p>
+зээр 黄羊—зээргэнэ 麻黄
+</p>
+<p>
+тэмээлз 像骆驼一样的—тэмээлзгэнэ 螳螂
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（6）чууд чүүд, чуул чүүл 和 д : 在表示人的属性的形容词以及一些名词上加这些复数附加成分可构成表示人们的名词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+залуу 年轻的—залуучууд 年轻人们
+</p>
+<p>
+хөгшин 年老的—хөгшид、хөгшичүүд 老年人们
+</p>
+<p>
+бага 小—багачууд 少年 (багачуул)
+</p>
+<p>
+баян 富—баячууд 富人 (баячуул) (复数)
+</p>
+<p>
+идэр 壮年的—идэрчүүд (青年们), 壮年人们
+</p>
+<p>
+үгээгүү 贫穷的—үгээгүүчүүд 贫穷人 (复数)
+</p>
+<p>
+уран 灵巧的—урачууд 艺匠
+</p>
+<p>
+сайн 好—сайд 大臣
+</p>
+<p>
+уран сайхан 艺术—уран сайханчууд 文艺工作者
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+此外，可由数词构成 дөрвөд (杜尔伯特), түмэд (土默特) 等专有名词，从一般名词构成的 ахмад (兄长辈)，дүүмэд (弟辈), эгчмэд (姐辈)，эхнэр 女人也都是由复数附加成分构成的。
+</p>
+<p>
+（7）лиг лаг лэг : 名词 (以及形容词) 加 лиг лаг лэг 可构成具有该事物 (或特征) 的性质的事物。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+зар 通知、公告—зарлиг 命令
+</p>
+<p>
+уран 巧—урлаг 艺术
+</p>
+<p>
+нийгэм 社会—нийгэмлэг 社会团体
+</p>
+<p>
+цэцэг 花—цэцэглэг 花圃 (цэцэрлэг 花园, 植物园, 幼儿园）
+</p>
+<p>
+төмөр 铁 —төмөрлөг 金属
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（8）нцар, нцэр : 名词加 нцар нцэр 可构成具有微小意义的名词，还可以构成具有该事物特征的事物。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+зээ 外孙—зээнцэр 外曾孙
+</p>
+<p>
+бүл 姨表亲—бүлэнцэр 下一辈的姨表亲
+</p>
+<p>
+уут 口袋—уутанцар 小口袋
+</p>
+<p>
+зууван 椭圆形—зууванцар 椭圆体 (近似椭圆的)
+</p>
+<p>
+шил 玻璃—шилэнцэр 玻璃体 (玻璃制品)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（9）лз, лж, лзай, лжин : 静词加 лз лж лзана лжин 可构成动物植物名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гүрвэл 蜥蜴 —гүрвэлжин 石龙子
+</p>
+<p>
+бор 灰色 —боролж (艾菊）白桦
+</p>
+<p>
+улаан 红色 —улалж 白茅草 (植物)<sup>1</sup>
+</p>
+<p>
+тэмээ 骆驼——тэмээлжин 蝙蝠
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-329"></a>
+<p>
+<sup>1</sup>&nbsp;——улаалж 甘松茅（улаалзай 百合属，улаалзгана 五味子，улаагана 欧李子）
+</p>
+
+</div>
+</div>
+<p>
+（10）гтай гтэй : 表示性别的名词上加 гтай гтэй 可构成较为尊敬的同义名词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+эр 雄性的——эрэгтэй 男人
+</p>
+<p>
+эм 雌性的——эмэгтэй 女人
+</p>
+<p>
+хатан 夫人——хатагтай 夫人
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（11）ж, жин : 表示牲畜岁口的一定名词上加 ж жин 可以构成表示母畜岁口的名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Гуна 三岁公动物 (牛)—гунж 三岁母动物 (牛)
+</p>
+<p>
+Дөнө 四岁公牛、骆驼—дөнж 四岁母牛、骆驼
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+除上述构词附加成分以外，还有一些在少数或个别词上见到的构词附加成分。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хүүхэн 女儿——хүүхэлдий 木偶, 洋娃娃
+</p>
+<p>
+гургуул 雉, 野鸡——гургуулдай 小雉
+</p>
+<p>
+дүү 弟弟——дүүдий 小弟弟 (爱称)
+</p>
+<p>
+шувуу 鸟——шувуухай 雏鸟
+</p>
+<p>
+адуу 马——адуус 牲畜 (адуус=адгуус 畜生、动物)
+</p>
+<p>
+үе 代、辈——үеэл 堂兄弟
+</p>
+<p>
+бух(ан) 公牛——бухандай 公牛
+</p>
+<p>
+гөрөө 狩猎; 野兽——гөрөөс 野兽; 鹿
+</p>
+<p>
+анд 义兄弟——андгай 誓言
+</p>
+<p>
+инээд 笑——инээдэм 玩笑；笑语
+</p>
+<p>
+зүс 外貌; 气色——зүсэм 毛色
+</p>
+<p>
+дов 丘, 岗——довцог 小土丘
+</p>
+<p>
+битүү 封闭的——битүүмж 密封
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+蒙古语还有以词尾 H 的有无为条件分化为形容词与名词的情况。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+эмэг 祖母——эмгэн 老太太
+</p>
+<p>
+өвөг 祖父——өвгөн 老头
+</p>
+<p>
+тарга 膘——тарган 肥
+</p>
+<p>
+хурд 速度; 快——хурдан 快速的
+</p>
+<p>
+улаа бутрах 火花四溅与 улаан өнгө 红色
+</p>
+<p>
+ногоо ургуулах 种菜与 ногоон өвс 绿草 (ургах 生长, 发芽）
+</p>
+<p>
+гэгээ тасрах 黑暗起来, 入暮与 гэгээн болох 变得明朗
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 由动词派生的名词......
+-->
+<h6 id="autosec-330"><span class="sectionnumber">2.1.0.2&#x2003;</span>由动词派生的名词</h6>
+<a id="cyrillic-grammar-autopage-330"></a>
+
+<p>
+（1）л : 动词加 л 可构成与该动词相应的抽象名词，有时也可构成与该动词有某种关系 (结果、地点) 的事物名词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+үүсэ-(үүсэх) 产生——үүсэл 产生
+</p>
+<p>
+хөгжи- 发展 —хөгжил 发展
+</p>
+<p>
+үржи- 繁殖 —үржил 繁殖
+</p>
+<p>
+бод- 想 —бодол 想法
+</p>
+<p>
+чад- 能, 会 —чадал 能力
+</p>
+<p>
+сурга- 教 —сургал 教导
+</p>
+<p>
+шийтгэ- 处理 —шийтгэл 处分
+</p>
+<p>
+гар-出 ——гарал 出身
+</p>
+<p>
+ирэ-来 ——ирэл 来源
+</p>
+<p>
+зохио-作 —зохиол 作品
+</p>
+<p>
+төрө-出生 —төрөл 亲属
+</p>
+<p>
+тань-认识 —танил 熟人
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）аа ээ : 动词加 аа ээ аан ээн 这些词缀可构成与该动词有某种关系 (结果、工具、对象、地点等) 的事物名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+атир-打皱 —атираа 皱纹 (名词)
+</p>
+<p>
+алд-丢失 —алдаа 错误
+</p>
+<p>
+сана-想 —санаа 想法
+</p>
+<p>
+багла-包 (动)——баглаа 包 (名词)
+</p>
+<p>
+ача-驮货 —ачаа 货物
+</p>
+<p>
+аргамжи-拴住 —аргамжаа 系绳
+</p>
+<p>
+хаш-围住 —хашаа 围栏, 圈, 院
+</p>
+<p>
+хори- 阻挡 —хорио 禁止忌讳; 劝阻, 关押所, 监狱
+</p>
+<p>
+ярь- 说 —яриа 话
+</p>
+<p>
+холбо-联结 —холбоо 联系, 联络
+</p>
+<p>
+хэлэлц-谈 —хэлэлцээ 舆论
+</p>
+<p>
+худалда-卖 —худалдаа 商业
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+但是有些 аан ээн 的形式逐渐固定下来单独形成了一种构词形式，任何时候都用该形式。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+байлдах 战斗——байлдаан 战斗
+</p>
+<p>
+маргах 争论——маргаан 争论
+</p>
+<p>
+маргалд-争论 (互动态)—маргалдаан 争论
+</p>
+<p>
+зөрөлд-相抵触——зөрөлдөөн 分歧
+</p>
+<p>
+хөдлө-动 —хөдөлгөө(н) 运动, 移动
+</p>
+<p>
+шуугь-嘈杂 —шуугиан 喧嚣
+</p>
+<p>
+шуура-起暴风——шуурга 暴风雪
+</p>
+<p>
+идэ-吃 —идээн 食物 идээ(н)
+</p>
+<p>
+уха-理解 —ухаан 智慧, 才智
+</p>
+<p>
+шүтэ-信仰 —шүтээн 牌位，佛像
+</p>
+<p>
+хувила-变化 —хувилгаан 活佛
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(3) лага лэгэ 与 га гэ : 动词加 лага лэгэ 可构成与该动词相应的抽象名词，也可构成与该动词有某种关系 (结果、工具、对象等) 的事物名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+удирд-领导 (удирдах) —удирдлага 领导
+</p>
+<p>
+жолоодо-指挥 —жолоодлого 指挥
+</p>
+<p>
+гар-出 —гарлага 支出
+</p>
+<p>
+оро-入 —орлого 收入
+</p>
+<p>
+бос-起 —бослого 起义
+</p>
+<p>
+урва-翻转 —урвалга 叛变
+</p>
+<p>
+унши-读, 念 —уншлага 阅读
+</p>
+<p>
+бичи-写 —бичлэг 书写，字体
+</p>
+<p>
+барь-抓, 建 —барилага 建筑物
+</p>
+<p>
+байгуул-创立建造 —байгууллага 机关, 机构
+</p>
+<p>
+хучи-覆盖 —хучлага 盖的东西 (床单…)
+</p>
+<p>
+шатаа-烧 —шатаалага 烧柴
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+га гэ 的意义与用法和 лага лэгэ 一样，它是用在 л, р 之后。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ажилла-工作 —ажиллагаа(н) 活动, 业务
+</p>
+<p>
+орчуул-翻译 —орчуулга 翻译作品
+</p>
+<p>
+найруул-编辑 —найруулга 编辑, 著作, 作品
+</p>
+<p>
+нэвтрүүл-广播 —нэвтрүүлэг 广播
+</p>
+<p>
+сануул-提醒—сануулга 提醒警告预告; 指示训令
+</p>
+<p>
+уриала-号召 —уриалга 号召 (书）
+</p>
+<p>
+тул-支撑 —тулга 锅架, 托架；木桩
+</p>
+<p>
+үүр-背, 扛 —үүрэг 任务
+</p>
+<p>
+нөмөр-披 —нөмрөг 斗蓬
+</p>
+<p>
+дара-压 —дарга 首长
+</p>
+<p>
+эргүүл-转 —эргүүлэг 绞车
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）лт : 动词加 лт 可构成与该动词相应的抽象名词或与该动词有某种关系 (结果、工具等) 的事物名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+асуу-问 —асуулт 问题
+</p>
+<p>
+хариу 答 —хариулт 回答
+</p>
+<p>
+нэмэ-加 —нэмэлт 增加
+</p>
+<p>
+хас-减 —хасалт 减少
+</p>
+<p>
+өс-生长 —өсөлт 增长
+</p>
+<p>
+хөгжи-发展 —хөгжилт 发展
+</p>
+<p>
+цохь-打 —цохилт 打击
+</p>
+<p>
+шалга-考 —шаргалт 考试
+</p>
+<p>
+үзэ-看 —үзэлт 观点
+</p>
+<p>
+тань-认识 —танилт 认识
+</p>
+<p>
+ол-得到 —ололт 收获
+</p>
+<p>
+амра-休息 —амралт 休息，假期
+</p>
+<p>
+гар-出 —гаралт 出产
+</p>
+<p>
+уна-落 —уналт 收获
+</p>
+<p>
+наа-粘 —наалт 胶水
+</p>
+<p>
+ороо-缠 —ороолт 绷带
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（5）бар бэр (мар мэр) вар вэр : 动词加 бар бэр вар вэр 可构成与该动词有某种关系的 (结果、工具、对象等) 事物名词，有时可构成相应的抽象名词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+тайл-讲解 —тайлбар 解释
+</p>
+<p>
+хуул-抄写 —хуулбар 抄本, 副本
+</p>
+<p>
+шийд-决定—шийдвэр 决议, 决断, 裁决
+</p>
+<p>
+чад-会, 能—чадвар 能力
+</p>
+<p>
+сал-分离 —салбар 分科
+</p>
+<p>
+заа-指示 —заавар 指导, 条令
+</p>
+<p>
+тэжээ-饲养 —тэжээвэр 饲养的
+</p>
+<p>
+хонж-得利 —хонжвор 利润, 利息
+</p>
+<p>
+үйлд-作 —үйлдвэр 工厂
+</p>
+<p>
+үгүүл-说 —үгүүлбэр 句子<sup>2</sup>
+</p>
+<p>
+хөдлө-动 —хөдөлмөр 劳动
+</p>
+<p>
+өс-生长 —өсвөр 生长
+</p>
+<p>
+үүс-起源, 产生 —үүсвэр 起源, 开端, 发生
+</p>
+<p>
+дуус-完结 —дуусвар 完结
+</p>
+<p>
+шилээ-拨火, 拨弄 —шилээвэр 烧火棍
+</p>
+<p>
+долоо-舔 —долоовор 可舔的东西, (牲畜喜舔的) 盐碱地
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-331"></a>
+<p>
+<sup>2</sup>&nbsp;(үгүүл=өгүүл,өгүүлбэр=үгүүлбэр)
+</p>
+
+</div>
+</div>
+<p>
+(6) уур үүр, уул үүл(р 之后）: 动词加 уур үүр 可构成有关该动词的工具名称。有时表示地点。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+арчи-擦试, 抹; 铲 —арчуур 毛巾; 锄头
+</p>
+<p>
+хад-割 —хадуур 镰刀
+</p>
+<p>
+сор-吸 —соруур 吸器、吸管
+</p>
+<p>
+бүлэ-搅拌—бүлүүр 搅拌杆; 旋转塞
+</p>
+<p>
+хутга-搅合混合—хутгуур 搅拌器
+</p>
+<p>
+тавь-放 —тавиур 架子、支垫物
+</p>
+<p>
+барь-抓 —бариул 把儿、柄
+</p>
+<p>
+өлгө-挂 —өлгүүр 挂衣架
+</p>
+<p>
+ээр-纺 —ээрүүл 纺锤
+</p>
+<p>
+ил-抹 —илүүр 抹泥板
+</p>
+<p>
+хэмжи-量 —хэмжүүр 量器
+</p>
+<p>
+цэгнэ-过秤 —цэгнүүр 秤<sup>3</sup>
+</p>
+<p>
+ханс-刮 (皮上的) 毛 —хансуур 锄头
+</p>
+<p>
+дэлг-展开 —дэлгүүр 商店
+</p>
+<p>
+уулз-会见; 会合, 交叉 —уулзуур 交叉点<sup>4</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-332"></a>
+<p>
+<sup>3</sup>&nbsp;(нэгнэх=цэннэх，нэгнүүр=цэннүүр)
+</p>
+<p>
+<sup>4</sup>&nbsp;(=уулзар 交叉点)
+</p>
+
+</div>
+</div>
+<p>
+（7）уул : 动词加 уул 可构成进行该动作的人物名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+турш-试 —туршуул 侦探，试验员
+</p>
+<p>
+тагна-探 —тагнуул 特务
+</p>
+<p>
+хар-看 —харуул 哨兵
+</p>
+<p>
+мана-看守 —мануул 夜哨
+</p>
+<p>
+хай-寻找 —хайгуул 侦察
+</p>
+<p>
+дага-跟 —дагуул 卫星
+</p>
+<p>
+босго-使起 —босгуул(=босгол) 逃犯, 逃亡者
+</p>
+<p>
+гарга-使出 —гаргуул 抛弃的东西
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（8）мж : 动词加 мж 可构成与该动词相应的抽象名词。有时也可表示有关事物的名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+тусла-帮助 —тусламж 帮助
+</p>
+<p>
+асар-照料 —асрамж 照料
+</p>
+<p>
+сэрэ-醒 —сэрэмж 警觉
+</p>
+<p>
+анхаар-注意 —анхаарамж 注意事项
+</p>
+<p>
+үзэ-看 —үзэмж 景色
+</p>
+<p>
+зохь-合适 —зохимж 适当
+</p>
+<p>
+сурга-教 —сургамж 教训
+</p>
+<p>
+бүт-成功 —бүтэмж 成绩
+</p>
+<p>
+багтаа-容纳 —багтаамж 容量
+</p>
+<p>
+итгэ-相信 —итгэмж 信用
+</p>
+<p>
+орхь-遗留，披—орхимж 袈裟
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（9）хуун хүүн хуй хүй : 这些是在形动词的 х 基础上构成的名词。хуун хүүн 表示动词的结果和用具、对象。хуй хүй 表示抽象名词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+үйлдэ-作 —үйлдэхүүн 产品
+</p>
+<p>
+өгүүлэ-说 —өгүүлэхүүн 谓语
+</p>
+<p>
+бүрэлдэ-构成 —бүрэлдэхүүн 成分
+</p>
+<p>
+өгүүлэгд-被说 —өгүүлэгдэхүүн 主语
+</p>
+<p>
+бүтээгд-被造 —бүтээгдэхүүн 产品
+</p>
+<p>
+судлагд-被研究—судлагдахуу 研究对象
+</p>
+<p>
+тусагд-被打中 —тусагдахуун 宾语
+</p>
+<p>
+хэрэглэгд-被使用—хэрэглэгдэхүүн 用品
+</p>
+<p>
+сэтгэ-思维 —сэтгэхүй 思维
+</p>
+<p>
+мэдрэ-知觉 —мэдрэхүй 知觉
+</p>
+<p>
+тань-认识 —танихуй 认识
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（10）гсад гсэд : 这是在形动词 гсан гсэн 的基础上接加复数附加成分构成的，表示人物。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+дага-跟 —дагагсад 随从
+</p>
+<p>
+оро-进 —орогсод 进士
+</p>
+<p>
+мэдэ-知 —мэдэгсэд 知者
+</p>
+<p>
+өгө-给 —өгөгсөд 给者
+</p>
+<p>
+алагд-被杀—алагдагсад 被杀者
+</p>
+<p>
+шархта-受伤—шархтагсад 受伤者
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（11）гч : 这是从形动词 гч 分化出来的构词形式，表示人物。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сур-学习 —сурагч 学生
+</p>
+<p>
+байлда-战斗 —байлдагч 战士
+</p>
+<p>
+зөө-运送 —зөөгч 搬运工
+</p>
+<p>
+сувила-护理 —сувилагч 护士
+</p>
+<p>
+ухуула-宣传 —ухуулагч 宣传员
+</p>
+<p>
+нэвтрүүл-广播 —нэвтрүүлэгч 广播员
+</p>
+<p>
+төлөөлө-代理 —төлөөлөгч 代表
+</p>
+<p>
+тэргүүлэ-为首 —тэргүүлэгч 主席
+</p>
+<p>
+орчуул-翻译 —орчуулагч 翻译者
+</p>
+<p>
+найруул-编辑 —найруулагч 编辑
+</p>
+<p>
+удирда-领导 —удирдагч 领袖
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（12）аач ээч : 可表示善于从事该动作的人物。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+харва-射击 —харваач 射手
+</p>
+<p>
+зура-画 —зураач 画匠
+</p>
+<p>
+бичи-写 —бичээч 文书 (秘书)
+</p>
+<p>
+бодо-想 —бодооч 算命先生
+</p>
+<p>
+барь-抓 —бариач 接骨师
+</p>
+<p>
+тоно-抢劫 —тонооч 抢劫者, 强盗
+</p>
+<p>
+үзэ-看 —үзмэрч 相面者 (үзээч)
+</p>
+<p>
+ала-杀 —алаач 刽子手, 屠夫
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(13) дал дэл : 动词加 дал дэл 可构成与该动词相应的抽象名词以及与该动词有某种关系 (结果、对象、工具、地点等) 的事物。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+яв-走 —явдал 事情
+</p>
+<p>
+бай-有 —байдал 情况
+</p>
+<p>
+нүү-搬家, 迁移 —нүүдэл 移动
+</p>
+<p>
+оё-缝 —оёдол 缝纫
+</p>
+<p>
+гүй-跑 —гүйдэл 跑动, 跑法
+</p>
+<p>
+асуу-问 —асуудал 问题
+</p>
+<p>
+захь-嘱咐 —захидал 信
+</p>
+<p>
+сур-学 —суртал 作风
+</p>
+<p>
+боо-包 —боодол 包裹
+</p>
+<p>
+үх-死 —үхдэл 尸体
+</p>
+<p>
+зар-使用 —зардал 用处
+</p>
+<p>
+өргө-呈 —өргөдөл 申请书
+</p>
+<p>
+суу-坐 —суудал 座位
+</p>
+<p>
+буу-下降; 下榻 —буудал 旅社
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（14）ш : 动词加 ш 可表示该动词的对象、地点、结果。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+идэ-吃 —идэш 食物
+</p>
+<p>
+уу-喝 —ууш 饮料
+</p>
+<p>
+зуу-咬, 叮, 咬紧 —зууш 菜肴
+</p>
+<p>
+тээ-装运 —тээш 货物
+</p>
+<p>
+түл-烧 —түлэш 烧柴
+</p>
+<p>
+хэвтэ-卧、躺 —хэвтэш 兽穴
+</p>
+<p>
+бул-埋 —булаш 坟墓
+</p>
+<p>
+ала-杀 —алаш 宰杀的牲畜
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（15）ц : 动词加 ц 可构成该动作进行状态的名称，动作对象的名称，动作结果、地点的名称等。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+яв-走 —явц 行走; 进度, 过程
+</p>
+<p>
+ахь-前进 —ахиц 进程
+</p>
+<p>
+урга-生长 —ургац 长势
+</p>
+<p>
+хий-做 —хийц 构造
+</p>
+<p>
+бүт-成功 —бүтэц 结构
+</p>
+<p>
+багтаа-容纳 —багтаац 容量
+</p>
+<p>
+далай-挥起, 抡 —далайц 规模
+</p>
+<p>
+хар-看 —харц 目光, 视线
+</p>
+<p>
+зар-使用 —зарц 仆人
+</p>
+<p>
+барь-拿、献 —бариц 贡品
+</p>
+<p>
+өргө-举、献 —өргөц 奉献物
+</p>
+<p>
+мэдэ-知 —мэдэц 知识
+</p>
+<p>
+түлх-推 —түлхэц 推动
+</p>
+<p>
+суу-坐 —сууц 住处
+</p>
+<p>
+буу-留宿, 安居—бууц 暂宿处; 遗迹, 古迹
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（16）г : 动词加 г 可构成与该动词有关的心理状态，感觉以及表示该动词的结果、工具、对象的名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+зорь-主张 —зориг 志气
+</p>
+<p>
+гунь-悲伤 —гуниг 忧伤，烦恼
+</p>
+<p>
+гац-刁难; 阻拦 —гачиг 贫乏; 不幸, 灾祸
+</p>
+<p>
+анга-渴 —ангаг 渴的 (形)
+</p>
+<p>
+цанга-干渴 —цангаг 易渴的 (形)
+</p>
+<p>
+амра-休息, 安宁—амраг 爱情
+</p>
+<p>
+зур-画 —зураг 图画
+</p>
+<p>
+бич-写 —бичиг 书
+</p>
+<p>
+чим-装饰 —чимэг 装饰品
+</p>
+<p>
+буда-染 —будаг 染色
+</p>
+<p>
+хорь-阻止 —хориг 障碍、禁止
+</p>
+<p>
+түши-依靠 —түшиг 靠山、支柱
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（17）уурь үүр (ууль үүл) : 动词加 уурь үүр 可构成与该动词有关的心理状态、感觉的名称，以及表示该动词的结果、对象、地点的名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+жигши-厌恶 —жигшүүр 厌恶, 憎恶
+</p>
+<p>
+ич-害羞 —ичгүүр 羞耻
+</p>
+<p>
+зов-忧虑 —зовуур 苦恼
+</p>
+<p>
+зүд-疲乏 —зүдүүр 疲惫不堪
+</p>
+<p>
+түгш-惊悸 —түгшүүр 担心, 惶恐, 惊悸
+</p>
+<p>
+торго-罚 —торгууль 罚金
+</p>
+<p>
+хонж-得利 —хонжоо 利润
+</p>
+<p>
+сонго-选 —сонгууль 选举
+</p>
+<p>
+хэвт-卧 —хэвтүүл 兽穴
+</p>
+<p>
+сург-教 —сургууль 学校
+</p>
+<p>
+агна-打猎 —агнуурь 打猎场
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+
+（18）аар ээр ：动词加 аар ээр 这类附加成分可构成由于该动词的结果产生的事物、工具的名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+эмжи-镶边 —эмжээр 沿条边
+</p>
+<p>
+хавчи-夹 —хавчаар 夹子
+</p>
+<p>
+эвхэ-折迭 —эвхээр 折叠, 叠法
+</p>
+<p>
+хада-钉 —хадаар 钉钉处
+</p>
+<p>
+сүлбэ- 穿透; 串起 —сүлбээр 发卡; 胸饰, 饰针
+</p>
+<p>
+хэлхэ-穿成串 —хэлхээс 线, 目录
+</p>
+<p>
+тата-拉 —татаар (套马杆梢) 绳索
+</p>
+<p>
+залга- 接上 —залгаар 接头儿
+</p>
+<p>
+үдэ-缀订 —үдээр 皮条, 带子
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（19) аас ээс : 动词加 аас ээс 可构成由于该动词的结果而产生的事物、工具的名称。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+шав-抹泥 —шаваас 泥皮
+</p>
+<p>
+эвхэ-折迭 —эвхээс 折子
+</p>
+<p>
+нөх-补 —нөхөөс 䃼钉
+</p>
+<p>
+зур-画 —зураас 条纹、线条
+</p>
+<p>
+дара-压 —дараас 负担
+</p>
+<p>
+бүрхэ-蒙、盖 ——бүрхээс 覆盖物
+</p>
+<p>
+хад-钉 —хадаас 钉子
+</p>
+<p>
+үдэ-装订 —үдээс 装订线 (带子)
+</p>
+<p>
+хүл-捆 —хүлээс 捆绳 (绳子)
+</p>
+<p>
+бич-写 —бичээс 记载
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（20）с : 动词加 c 可构成由于该动词的结果而产生的事物。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+нулима-吐痰, 吐口水 —нулимас 痰, 唾液; 眼泪
+</p>
+<p>
+хөө-鼓起 —хөөс 泡沫
+</p>
+<p>
+шээ-小便 —шээс 小便 (尿)
+</p>
+<p>
+баа-大便 —баас 大便 (粪便)
+</p>
+<p>
+бөөлжи-吐, 作呕—бөөлжис 呕吐物
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（21）дас дэс : 动词加 дас дэс 表示由于该动词的结果而产生的东西或进行该动作的工具。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+угаа-洗 —угаадас 洗用过的污水
+</p>
+<p>
+үрэ-挫、磨 —үрэдэс 渣滓
+</p>
+<p>
+цавчи-砍 —цавчдас (劈削而出的) 碎片, 碎屑
+</p>
+<p>
+ороо-缠 —ороодос 绷带
+</p>
+<p>
+зүй-拼合 —зүйдэс 拼缀
+</p>
+<p>
+зар-使用 —зардас 佣人
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（22）м : 动词加 м 表示动词的结果以及动词的对象。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хэрч-切 —хэрчим 小片
+</p>
+<p>
+зүсэ-削 —зүсэм 小块、条
+</p>
+<p>
+алх-迈 —алхам 步
+</p>
+<p>
+ээдэ-变酸 —ээдэм 乳酸
+</p>
+<p>
+тох-备鞍 —тохом 鞍垫 (鞍鞯）
+</p>
+<p>
+наада-玩 —наадам 那达慕
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（23）н(г) лан(г) лэн(г) : 动词加 н(г) 表示地点、事物、牲畜岁口。加 лан(г) лэн(г) 表示地点、抽象事物。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+тариала-种 —тариалан 田
+</p>
+<p>
+хүрээлэ-围 —хүрээлэн 院
+</p>
+<p>
+зус-度夏 —зуслан 夏营地
+</p>
+<p>
+дугуйла-围 —дугуйлан(г) 小组
+</p>
+<p>
+ээдэ-变酸 —ээдэн 浆
+</p>
+<p>
+гасла-悲伤 —гаслан(г) 悲伤, 悲痛; 灾难苦难
+</p>
+<p>
+шүдлэ-长牙齿 —шүдлэн 大畜三岁, 小畜二岁
+</p>
+<p>
+соёоло-长虎牙 —соёолон 五岁的 (牲畜)［形］
+</p>
+<p>
+хада-割 —хадлан(г) 割草场
+</p>
+<p>
+жарга-享福 —жаргалан 幸福, 享乐
+</p>
+<p>
+зово-忧虑 —зовлон(г) 苦恼
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+由动词派生名词方面除上述构词附加成分以外，还有一些在少数词或个别词上见到的构词附加成分.
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хуваа-分 —хуваарь 分配分派
+</p>
+<p>
+суу-坐 —суурь 基础
+</p>
+<p>
+бай-有 —байрь 地位 (=байр）
+</p>
+<p>
+суу-坐 —суугааль 居留、常住
+</p>
+<p>
+бэлчи-放牧 —бэлчээр 牧场
+</p>
+<p>
+хэлэлц-交谈 —хэлэлцээр 谈判
+</p>
+<p>
+харь-回 —хариу 回答
+</p>
+<p>
+дэгдэ-飞腾 —дэгдээхэй 小鸟 (雏鸟)
+</p>
+<p>
+сана-想 —санамсар 预料, 预知
+</p>
+<p>
+уха-理解 —ухамсар 觉悟
+</p>
+<p>
+ай-怕 —аймшиг 恐惧
+</p>
+<p>
+гайха-惊奇 —гайхамшиг 奇迹
+</p>
+<p>
+оло-得到 —олз 收获
+</p>
+<p>
+гар-出 —гарз 支出损失
+</p>
+<p>
+боо-勒, 扼 —боомь (打野鸡的活套子)
+</p>
+<p>
+уха-剜 —ухамь 剜刀
+</p>
+<p>
+инээ-笑 —инээд 笑
+</p>
+<p>
+ханиа-咳嗽 —ханиад 咳嗽
+</p>
+<p>
+барь-握 —баримт 证据; 票据, 证件
+</p>
+<p>
+боо-阻挡、封锁 —боомт 边卡; 关口; 港口
+</p>
+<p>
+саа-挤奶 —сааль 乳食品
+</p>
+<p>
+зохь-合适 —зохис 合适, 妥当
+</p>
+<p>
+сэдэ-倡议 —сэдэв 题目
+</p>
+<p>
+дэвс-铺 —дэвсгэр 褥子
+</p>
+<p>
+оно-击中 —оновч 中肯, 恰当, 精确, 准确
+</p>
+<p>
+бүрхэ-遮盖—бүрхэвч 外罩 (外壳)(бүрхүүл)
+</p>
+<p>
+хавда-肿 —хавдар 肿胀, 肿瘤, 浮肿
+</p>
+<p>
+ороо-缠 —ороонго 蔓藤
+</p>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

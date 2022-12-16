@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—无变化词类 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-174"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... chapter 无变化词类......
+-->
+<h3 id="autosec-175"><span class="sectionnumber">第三章&nbsp;&#x2003;</span>无变化词类</h3>
+<a id="cyrillic-grammar-autopage-175"></a>
+<a id="cyrillic-grammar-autofile-11"></a>
+<p>
+无变化词类正如名称所表示的那样，没有形态变化，有些静词类的变化形式固定化起来，起某种无变化词的作用的，也算是一种无变化词。无变化词类多数是表示语法意义的。此外，有的直接表示人和事物的声音，或形象地表示状
+态，或表示某种感情。无变化词分为：1）副词，2）情态词，3）摹拟词，4）后置词，5）语气词，6）连接词，7）感情词等。
+</p>
+
+<!-...... section 副词......
+-->
+<h4 id="autosec-176"><span class="sectionnumber">3.1&#x2003;</span>副词</h4>
+<a id="cyrillic-grammar-autopage-176"></a>
+
+<!-...... subparagraph 1. 副词的意义......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-177"><span class="sectionnumber">3.1.0.0.0.1&#x2003;</span>1. 副词的意义</span>
+<a id="cyrillic-grammar-autopage-177"></a>
+表示行为、状态和性质的某种特征的词叫做副词。蒙古语里的副词比起其它语言 (如英语俄语) 少，原因是在意义上相当于其它语言里的副词的一些词，在蒙古语里则属于形容词和时位词。
+</p>
+<p>
+蒙古语副词的语法特征是，没有形态变化，句法功能是修饰动词，一部分副词也修饰形容词。一般不能作后置词用，也不能修饰名词 (少数副词接加属格附加成分后可修饰名词，如 үргэлжийн чанар 经常性，гэнэтийн хэрэг 突然事件，
+түр цагийн үзэгдэл 暂时现象)。
+</p>
+
+<!-...... subparagraph 2. 副词的分类......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-178"><span class="sectionnumber">3.1.0.0.0.2&#x2003;</span>2. 副词的分类</span>
+<a id="cyrillic-grammar-autopage-178"></a>
+蒙古语副词可按其意义分为：程度副词、时态副词、状态副词、造形副词等。
+</p>
+<p>
+（1）程度副词：тун 很，нэн 更，овоо 挺，хамгийн 最，онцгой 特别，хэтэрхий 过分, 过于，ялангуяа 尤其，маш 很，ихэд 很, 非常，ихт 很, 极, 非常，лут 很, 非常，нэлээд(=нилээд) 相当，асар 巨，很，улам 更，дэмий 不大地, 白白地,
+徒劳地，дэндүү 太, 过分，сайтар 好好地，халти 险些, 一滑地，【дөмүү 几乎, 差一点】，эсэл 差一点儿，сайндаа 至多，ихдээ 最多, 充其量，адаглаад 至少，ядахдаа 至少，ихэнхдээ 多半是, нэгэнт 已经，нэгмөсөн 全部地，彻底地，
+бүрмөсөн 完全, 彻底地，огт 根本, 绝对。сэмээр 悄悄地, 偷偷地，шууд 直接，чадахаараа 尽量，яг сайхан 正好，баахан 相当, 甚, 颇
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Эндэх үзэмж тун сайхан байна.
+</p>
+<p>
+这里的景致非常好
+</p>
+<p>
+Ажлийн үүрэг нэн хүнд болжээ.
+</p>
+<p>
+工作任务更重了
+</p>
+<p>
+Маш нарийн нямбай байцаалаа.
+</p>
+<p>
+很仔细地检查了
+</p>
+<p>
+Сонсоод ихэд сонирхов. 听了大为奇怪。
+</p>
+<p>
+Нилээд удаад сая иржээ. 过了相当时间才来的
+</p>
+<p>
+Та нар асар их амжилт гаргажээ.
+</p>
+<p>
+你们作出了巨大的成绩
+</p>
+<p>
+Бид ч баахан амжилт олсон.
+</p>
+<p>
+我们也获得了一些成绩
+</p>
+<p>
+Улам зориг оржээ. 更有信心了。
+</p>
+<p>
+Эндээс дэмий холгүй. 离这里不太远。
+</p>
+<p>
+Дэндүү аашилж байна. 举止太过分了。
+</p>
+<p>
+Хүүгээ сайтар сургах хэрэгтэй. 儿子要好好地教育
+</p>
+<p>
+Халти унах алдав. 险些掉下去。
+</p>
+<p>
+Эсэл оройтчих алдав. 差一点儿迟到 (дөмүү)
+</p>
+<p>
+Энэ сүрэг хонь ихдээ найман зуу байна.
+</p>
+<p>
+这一群羊至多有八百只
+</p>
+<p>
+Үгүй ядахдаа мянга байна. 不, 至少有一千只
+</p>
+<p>
+Ажлаа бүрмөсөн дуусгав үү? 工作都完成了吗?
+</p>
+<p>
+Түүний царай нь нэгмөсөн хувилжээ.(хувирчээ)
+</p>
+<p>
+他的脸色完全变了
+</p>
+<p>
+Би түүний хэлснийг огт сэжиглэхгүй.
+</p>
+<p>
+我毫不怀疑他说的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）时态副词：үргэлж , цаг үргэлж 经常，хэзээд 永远. Ямагт 经常, цаг ямагт 时时刻刻, хэзээ ямагт 总是 үүрд 永远, үни (өнө) үүрд 永远, үргэлжид 经常, 总是, ердөө 平时, 一般, байнга 经常，ашид 永久，хааяа 有时，
+【хааяагүй 到处, 各
+地】
+，байн байн 常常，хаана цаана 偶尔，заримдаа 有时，дахин дахин 再三，байн дахин 再三，ахин дахин 再三，идэг идэг 逐渐，бага багаар 逐渐，мөддөө 一会儿，даруй 立刻，даруйхан 立刻，барин 立即，доороо 立即马上，ор
+доороо 立即, 马上，одоохон 立即，үдтэр 立即, 顷刻, 须臾，байсхийгээд 一会儿，гэнэт 突然，сая 刚才，саяхан 刚才，нэгэнт 已经，түр 暂时，түр цаг 暂时，түр зуур 暂时, 临时，агшин зуур 刹那 (хоромхон зуур)。аяар 静静地, 不响地;
+慢慢地; 随后, 稍后。<sup>1</sup> <sup>2</sup>
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-179"></a>
+<p>
+<sup>1</sup>&nbsp;уул нь 原先，урьдчилан 预先，аль эрт 早就，аль хэдийний 早就，эхлээд 开头，(юуны өмнө 首先)，дараа нь 其次，хамгийн эцэс 最后, ойрдоо 近期, 近几日, 最近
+</p>
+<p>
+<sup>2</sup>&nbsp;хором(时间之) 微秒；一刹那一瞬间
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Үргэлж анхаарч байх хэрэгтэй. 应该经常注意
+</p>
+<p>
+Хэзээдээ мартахгүй. 永远不忘记
+</p>
+<p>
+Цаг ямагт бэлхэн байх хэрэгтэй. 应该时刻准备着
+</p>
+<p>
+Үүрд салахгүй. 永远不分离
+</p>
+<p>
+Зүрхнээс ердөө салдаггүй. 总是离不开心怀.
+</p>
+<p>
+Байнга оролцно. 经常参加
+</p>
+<p>
+Хаана цаана нэг учирна. 偶尔见一面
+</p>
+<p>
+Хааяа нэг цас орно. 有时下一次雪
+</p>
+<p>
+Манайд байн байн ирдэг. 常常到我们家
+</p>
+<p>
+Заримдаа хичээлээс сааддаг. 有时误课
+</p>
+<p>
+Дахин дахин асууж байсан. 再三问过
+</p>
+<p>
+Идэг идэг дасалцаж сайн танил болсон.
+</p>
+<p>
+逐渐熟了，成了朋友
+</p>
+<p>
+Би мөддөө очъё. 我一会儿去
+</p>
+<p>
+Чи бас даруй буцаж ир. 你也立刻回来吧
+</p>
+<p>
+Энэ хэргийг даруйхан шийдвэрлэе.
+</p>
+<p>
+这事要马上解决
+</p>
+<p>
+Би очвол доороо буцаж ирнэ. 我去的话马上回来
+</p>
+<p>
+Чи бага хүлээж бай би аяар авч өгье.
+</p>
+<p>
+你稍等一会儿我一会儿给你拿
+</p>
+<p>
+Чингэвэл би байсхийгээд ирье. 那样的话我一会儿来。байсхийх (байх 的瞬间体) 稍等, 略等
+</p>
+<p>
+Гэнэт хар үүл гарав. 突然乌云遮天
+</p>
+<p>
+Нэгэнт бороо дусалжээ. 已经下雨了
+</p>
+<p>
+Чи энд түр зуур хүлээж бай.
+</p>
+<p>
+你暂时在这里等一等
+</p>
+<p>
+Агшин зуур бороо шаагив. 倾刻间下起雨来了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）状态副词：进行动作时的状态：арай царай 好不容易，санд мэнд 慌慌张张，хааш яаш 潦潦草草，халт мөлт 粗枝大叶, 马马虎虎地（халти мөлт 粗枝大叶, 不认真地, 勉勉强强地，талт мөлт 粗枝大叶马马虎虎地）
+，дөнгөн данган
+勉勉强强，яв цав 恰好 (=явцав)，зориуд 故意，аяндаа 自然而然，〖тэртээ тэргүй 不管怎样, 反正; 无论如何〗
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би тэр модыг арай царай үүрч ирэв.
+</p>
+<p>
+我把那个木头勉勉强强背起来了
+</p>
+<p>
+Тэр хүн санд мэнд гараад явсан.
+</p>
+<p>
+那个人慌慌张张出去了
+</p>
+<p>
+Энэ хэргийг хааш яаш өнгөргөж болохгүй.
+</p>
+<p>
+这个事不能潦潦草草结束
+</p>
+<p>
+Би тэр номыг халти мөлт үзэж өнгөрөв
+</p>
+<p>
+我把那本书大致翻阅了一下
+</p>
+<p>
+Дөнгөн данган тоог гүйцэтгэв. 勉勉强强凑了个数
+</p>
+<p>
+Яв цав таарна. 恰好合适
+</p>
+<p>
+Зориуд очих хэрэггүй. 不需要专门去
+</p>
+<p>
+Аяндаа хүрээд ирэх юм. 自然会到来的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）造形副词：цоо 穿，тас 断，цөм 塌，өм 豁，хага 破，хуга 断，суга 抽掉，балба 烂，дэлбэ 破，хэмх 粉碎，бут 碎, 散，бяц 粉碎，няц 碎，зад 分裂，шувт 穿，сэт 裂, 豁，хэлт 裂，нэвт 穿透，мулт 拔掉，булт 出，脱
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Цаасыг цоо чичив. 把纸戳破了
+</p>
+<p>
+Дээсийг тас цавчив. 把绳子砍断了
+</p>
+<p>
+Зоорийг цөм гишгэв. 把窖踏塌了 (зоорь 窖)
+</p>
+<p>
+Шүдийг өм цохив. 把牙打豁了
+</p>
+<p>
+Аягыг хага цохив. 把碗打破了
+</p>
+<p>
+Нарийн модыг хуга дэвсэв. 把细木踹断了
+</p>
+<p>
+Ширээнийг балба дарав. 把桌子压坏了
+</p>
+<p>
+Дайсныг бут цохив. 把敌人粉碎了
+</p>
+<p>
+Бөмбөгийг дэлбэ өшиглөв. 把球踢坏了
+</p>
+<p>
+Аяганы ирмэг сэт очив. 碗边出了豁口
+</p>
+<p>
+Хаврын салхи дээлийг нэвт үлээнэ.
+</p>
+<p>
+春风把衣服吹透了。(дээл 衣服, 服装)
+</p>
+<p>
+Үндсээр нь булт татав. 连根拔掉了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<sup>3</sup>
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-180"></a>
+<p>
+<sup>3</sup>&nbsp;чичих 扎, 戳, 刺，цавчих 砍, 劈, 切, 剁; 眨眼, 瞬间，гишгэх 踩, 踏，дэвсэх 践踏, 跺脚，өшиглөх 脚踢; 用鞋尖踢，үлээх 吹 (нүд цавчих зуур 一瞬间, 一转眼)
+</p>
+<p>
+〖如：суга тат 拔掉，дэлбэ цохь 使劲儿打，хэмх цохь 打碎，бут цохь 打散，бяц цохь 打烂，няц цохь 打破，зад цохь 打裂，шувт цохь 打穿，сэт цохь 打豁，булт цохь 打脱，тас цохь 打断，цөм цохь 打塌，өм цохь 打缺，хага цохь 打
+碎，хуга цохь 打断，мулт цохь 打掉，балба цохь 打烂〗
+</p>
+
+</div>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

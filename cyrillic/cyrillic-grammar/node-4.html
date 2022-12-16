@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—数量词 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-58"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... section 数量词......
+-->
+<h4 id="autosec-59"><span class="sectionnumber">1.3&#x2003;</span>数量词</h4>
+<a id="cyrillic-grammar-autopage-59"></a>
+<a id="cyrillic-grammar-autofile-4"></a>
+
+<!-...... subsection 数词及其分类......
+-->
+<h5 id="autosec-60"><span class="sectionnumber">1.3.1&#x2003;</span>数词及其分类</h5>
+<a id="cyrillic-grammar-autopage-60"></a>
+
+<p>
+表示事物和行为的数量及次序的词叫作数词。数词同时也表示抽象的数目。
+</p>
+<p>
+根据数词的意义和形态，可以把它分为如下几类：
+</p>
+
+<!-...... subparagraph 1. 基数词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-61"><span class="sectionnumber">1.3.1.0.0.1&#x2003;</span>1. 基数词</span>
+<a id="cyrillic-grammar-autopage-61"></a>
+基数词里包括简单数词和合成数词。简单数词是以单词表示的，合成数词是两个以上单词构成的。平常用的简单数词有二十五个。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+нэг 1 , хоёр 2, гурав 3, дөрөв 4, тав 5, зургаа 6, долоо 7, найм 8, ес 9, арав 10, хорь 20, гуч 30, дөч 40, тавь 50, жар 60, дал 70, ная 80, ер 90, зуу 100, мянга 千, түм 万, бум 十万, сая 百万，жаваа(=голдь) 一千万, дүншүүр 亿。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+这里边 бум 十万,сая 百万,жаваа 千万, 不太常用。<sup>10</sup>
+</p>
+<p>
+合成数词的内部关系有两种：一种是加法关系，如 арван хоёр 十二,хорин тав 二十五, гучин хоёр 三十二,дөчин нэг 四十一,тавин тав 五十五,жаран зургаа 六十六,далан долоо 七十七,наян найм 八十八,ерэн ес 九十九等，十位数后接加个
+位数都属于加法关系。
+</p>
+<p>
+再一种是乘法关系，如 нэг зуу 一百, хоёр зуу 二百，гурван зуу 三百, дөрвөн зуу 四百…，нэг мянга 一千，хоёр мянга 二千，гурван мянга 三千…，нэг түм 一万，…таван түм 五万……总之百位以上的数词，小位数修饰大位数的都属于
+乘法。日常生活中在一个复合词里常常包含着这两种关系。如 1973 年叫作 нэг мянга есөн зуун далан гурван он =(1x1000)+(9x100)+(70+3) 年
+</p>
+<p>
+简单数词除 хоёр 二外，其它的词，在词干末都可以出现 н。当作定语用时 (包括数词之间的乘法关系)，简单数词都有 н 音。基数词在名词前或在另一数词前要出现 н，除 нэг 一、хоёр 二以外。如：
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-62"></a>
+<p>
+<sup>10</sup>&nbsp;тэрбум 十亿
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гурван салаа 三支
+</p>
+<p>
+дөрвөн өнцөг 四角 (方形四角)
+</p>
+<p>
+таван хошуу мал 五种牲畜
+</p>
+<p>
+дөрвөн мянга 四千
+</p>
+<p>
+таван түм 五万
+</p>
+<p>
+тавны хоёр 五分之二
+</p>
+<p>
+аравны гурав 十分之三
+</p>
+<p>
+зууны хорь 百分之二十
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+在数词之间的加法关系上，即在十位数加个位数的时候，除 ес 九以外，其它个位数前的十位数都有 н 音。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+арван нэг 十一，арван тав 十五，арван найм 十八，хорин долоо 二十七，гучин дөрөв 三十四，дөчин тав 四十五……
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+但 арав ес 十九，хорь ес 二十九，гуч ес 三十九，дөч ес 四十九…没有 н 音。<sup>11</sup>
+</p>
+<p>
+除了上述两种情况外，数词当作名词用的时候，或者表示几日、星期几的时候 (实际上这也是一种名词化的用法) 词干末都有 н 音,(必须要加 н)。如：
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-63"></a>
+<p>
+<sup>11</sup>&nbsp; 内蒙古是这样的
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+арван 十，зуун 百，мянган 千，түмэн 万 (军事或行政单位名称)，найман 八 (部落名)，тавин 五十 (长老)，шинийн нэгэн 初一，шинийн гурван 初三，шинийн таван 初五，энэ сарын арван таван 这个月十五，дараа сарын хорин 下个月
+二十，гаригийн нэгэн 星期一，гаригийн хоёр 星期二，гаригийн гурван 星期三，гаригийн таван 星期五
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+在其它情况下，一般可变词干名词有 н 的地方，数词也不用 н 。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Таваас хоёрыг нь хас. 从五里减去二。(不是 тавнаас)
+</p>
+<p>
+Тав дээр хоёр нэм. 五上加二。(不是 таван дээр)
+</p>
+<p>
+Тэр гурвад өг. 给他们三人, 给那三位。(不是 гурванд)
+</p>
+<p>
+Тэр гурваас асуу. 问他们三个，和他们三个问。(不是 гурванаас)
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 2. 次序数词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-64"><span class="sectionnumber">1.3.1.0.0.2&#x2003;</span>2. 次序数词</span>
+<a id="cyrillic-grammar-autopage-64"></a>
+在基数词接加 дугаар дүгээр 附加成分就可以构成次序数词。次序数词表示事物和行为的次序，相当于“第一”&#x202f;“第二”……的词。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+нэгдүгээр 第一，хоёдугаар 第二 (词尾 р 音脱落)<sup>12</sup>，гуравдугаар 第三，дөрөвдүгээр 第四，тавдугаар 第五，зургадугаар 第六，долдугаар 第七,(上列二词也有语音脱落)，наймдугаар 第八，есдүгээр 第九，аравдугаар 第十，
+хорьдугаар 第二十，тавьдугаар 第五十，зуудугаар 第一百，арван нэгдүгээр 第十一，хорин хоёдугаар 第二十二，гучин гуравдугаар 第三十三，тавин зургадугаар 第五十六，дал есдүгээр 第七十九……
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-65"></a>
+<p>
+<sup>12</sup>&nbsp; 蒙古国是 хоёрдугаар
+</p>
+
+</div>
+</div>
+<p>
+次序数词还有一些别的表示法，如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+нэг дэх 第一的，хоёр дахь 第二的，гурав дахь 第三的，……нэгдэгч 第一, 第一位; хоёрдогч 第二, 第二位; гуравдагч 第三, 第三位; ……тэргүүн 首，дэд 次, 副，гутгаар 第三 (гуравдугаар), дөтгөөр 第四，анхдугаар 第一，首次等。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+在儿女的顺序上有 ууган 第一个，……отгон 末一个的说法。
+</p>
+<p>
+在次序数词下边一般不再接加别的数词附加成分。
+</p>
+
+<!-...... subparagraph 3. 集合数词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-66"><span class="sectionnumber">1.3.1.0.0.3&#x2003;</span>3. 集合数词</span>
+<a id="cyrillic-grammar-autopage-66"></a>
+在基数词上接加 уул үүл 附加成分可以构成集合数词。<b> 集合数词表示两个以上的人物的集合体 </b>。因而这类数词在意义和语法特征方面有近似名词之处。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хоёул 两个、хоёулаа 两个,(有语音脱落)，гурвуул 三个，дөрвүүл 四个，тавуул 五个，зургуул 六个，долуул 七个，наймуул 八个，есүүл 九个，арвуул 十个;
+</p>
+<p>
+Хоёулаа сайхан нэг ярилцна. 咱俩好好谈一谈
+</p>
+<p>
+Гурвуул хамт явсан бололтой.
+</p>
+<p>
+大概他们三个一起走了。
+</p>
+<p>
+Тэр тавуулад хэлж өг. 告诉那五个人
+</p>
+<p>
+Хорь гучаадуул хамт явж байна.
+</p>
+<p>
+二三十人一起走呢。
+</p>
+<p>
+Энэ дөрвүүлийг дагуулж яв.
+</p>
+<p>
+把这四个人你领走吧。
+</p>
+<p>
+Тэр гурвуулаар хийлгье. 让那三个人做吧。
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 4. 概数词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-67"><span class="sectionnumber">1.3.1.0.0.4&#x2003;</span>4. 概数词</span>
+<a id="cyrillic-grammar-autopage-67"></a>
+表示事物和行为的大概的不太确切的数时，使用概数词。概数词有三种构成方式：
+</p>
+<p>
+（1）在基数词上加 аад ээд 附加成分可以构成概数词。但这个方式一般只用于十到千的简单数词上。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+арваад 十来个，хориод 二十来个，гучаад 三十来个，дөчөөд 四十来个，тавиад 五十来个，жараад 六十来个，лалаад 七十来个，наяад 八十来个，ерээд 九十来个，зуугаад 一百来个，мянгаад 一千来个，зуу тавиад 一百五十来个，мянга
+есөн зуу далаад 一千九百七十来个。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）用相近的两个数词来表示概数。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+нэг хоёр цаг 一两个小时，хоёр гурван өдөр 两三天，гурав дөрвөн газар 三四里地，тав зургаан тэрэг 五六个车，тав гурван өдөр 三五天，арав таван хоног 五天十天，хорь гучин хүн 二三十人，зуу ная ерэн газар 一百八九十里地，арав
+хориод 十个二十个，хорь гучаад 二三十个，мянга түм 千千万万
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）在十以上的数词后可以加 шахам (将近) гаруй (超过) илүү (多余的) 等数量后置词表示概数。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+арав гаруй 十多个，тавь гаруй 五十多个，зуу гаруй 一百多个，арав шахам 十来个，тавь шахам 五十来个，зуу шахам 一百来个，зуу илүү 一百多个，арваад илүү 十多个，хориод илүү 二十多个，тавиад илүү 五十多个
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+有时可以两个方式并用 (如上后三例) 。
+</p>
+<p>
+此外，在表示日期的 шинэ 初，арван 十，арван таван 十五，хорин 二十等词后，接加附加成分 д 可以产生出表示大概日期的 шинэд 初几，арвад 十号左右，арван тавд 十五号左右，хорьд 二十号左右等词，这些词都带有名词的性质。
+</p>
+
+<!-...... subparagraph 5. 分配数词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-68"><span class="sectionnumber">1.3.1.0.0.5&#x2003;</span>5. 分配数词</span>
+<a id="cyrillic-grammar-autopage-68"></a>
+数词的重叠形式可以表示分配数词，相当于“几个几个”。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хоёр хоёр өг 两个两个给.
+</p>
+<p>
+гурав гурав өг 三个三个分配.
+</p>
+<p>
+Тав таваар тавих 五个五个 (一起) 放
+</p>
+<p>
+арав арваар хуваах 十个十个分.
+</p>
+<p>
+зуугаад зуугаадаар түгээх.
+</p>
+<p>
+一百来个一百来个地分.
+</p>
+<p>
+хүн нэгбүрд тавь тавь олгох. 每人分给五十
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+在书面语和某些地区可以用 нэжээд 一个一个，хошоод 两个两个，гурваад 三个三个，дөрвөөд 四个四个来表示个位分配数词的意义。现在除 нэжээд хошоод 二词外其它已经不大使用。
+</p>
+
+<!-...... subparagraph 6. 次数词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-69"><span class="sectionnumber">1.3.1.0.0.6&#x2003;</span>6. 次数词</span>
+<a id="cyrillic-grammar-autopage-69"></a>
+在基数词上接加 таа тээ 附加成分可以构成次数词。这种次数词主要用在书面语里，口语里主要用 удаа 次、回，дахин 再, 来表示，次数词表示行为的反复的次数。它相当于“几次”。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хоёртоо 二次 =хоёр удаа 二次
+</p>
+<p>
+гурвантаа 三次 =гурван удаа 三次
+</p>
+<p>
+дөрвөнтөө 四次 =дөрвөн удаа 四次
+</p>
+<p>
+тавантаа 五次 =таван удаа 五次
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+нэгэнт 这个形式词义有了变化，主要表示“已经”的意思。
+</p>
+
+<!-...... subparagraph 7. 分数词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-70"><span class="sectionnumber">1.3.1.0.0.7&#x2003;</span>7. 分数词</span>
+<a id="cyrillic-grammar-autopage-70"></a>
+表示“几分之几”的分数词，在蒙古语是用所属格来表示。也可用 хувь 这个词来表示百分之几，арван таван хувь 百分之十五，наян хувь 百分之八十。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хоёрын нэг (хагас) 二分之一 (一半)
+</p>
+<p>
+гуравны хоёр 三分之二
+</p>
+<p>
+тавны гурав 五分之三
+</p>
+<p>
+аравны ес 十分之九
+</p>
+<p>
+зууны ная 百分之八十
+</p>
+<p>
+зууны хорин тав 百分之二十五
+</p>
+<p>
+хоёр бүхэл гуравны нэг 二又三分之一
+</p>
+<p>
+тав бүхэл аравны нэг 五又十分之一
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+分数变为小数形式的表示法：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+2.5 хоёр цэг тав , 20.05 хорь цэг тэг тав , 125.205 зуу хорин тав цэг хоёр тэг тав
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsection 数词的语法特征......
+-->
+<h5 id="autosec-71"><span class="sectionnumber">1.3.2&#x2003;</span>数词的语法特征</h5>
+<a id="cyrillic-grammar-autopage-71"></a>
+
+<p>
+数词的语法方面的特征，主要表现在下列几个方面：
+</p>
+<p>
+1. 数词有上述次序数词 дугаар дүгээр ，集合数词 уул үүл , 概数词 аад ээд оод өөд , 次数词 таа тээ , 以及分配数词等一系列变化，这些变化既表示一种语法意义，同时也在构成数词的种种类别。
+</p>
+<p>
+2. 数词后边可以接加量词，构成数量词结构，从而可以更清楚地表达事物的数量。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+арван өдөр 十天
+</p>
+<p>
+гурван аяга 三碗
+</p>
+<p>
+хоёр лонх 两瓶
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<b>3. 数词后边接加 хан хэн 后缀 </b>，可以给数词附加“嫌少”的语法意义，表示“只有这些”&#x202f;“只是几”&#x202f;“仅仅几”(有的数词不附加，如次序数词)
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гуравхан 只有三个, 仅仅三个
+</p>
+<p>
+арваадхан настай 只有十来岁
+</p>
+<p>
+дөрөв тавхан өдөр орно. 只用四五天
+</p>
+<p>
+хоёр гуравхан газрын зайтай. 只有二三里距离
+</p>
+<p>
+нэглэхэн үгээр хэлж болно. 可以只用一句话说出 (нэг + лэ + хэн )
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4. 数词有格的变化。数词可以表示事物的数量，在这方面与表示事物性质特征的形容词很接近。形容词可以代替它所修饰的事物，数词也可以代替它所修饰的事物，在这种情况下它有格的变化和相应的句法作用。在格变数词前边要
+有指明事物的词或有指示代词 энэ 这, тэр 那. 如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би энэ жил дөч естэй. 我今年四十九岁
+</p>
+<p>
+Ирсэн зочины гурав нь явчээ,хоёр нь явахгүй.
+</p>
+<p>
+来客的三个走了, 两个还没走。
+</p>
+<p>
+Энэ хоёрын аль нь дээр вэ? 这两个哪个好?
+</p>
+<p>
+Би энэ нэгий нь авъя. 我要这一个
+</p>
+<p>
+Тэр хоёрт очиж хэл. 去给他俩说
+</p>
+<p>
+Тэр гурвуулаас асуу. 和他们三个问一问
+</p>
+<p>
+Тэр нь энэ нэгтэй адилгүй.
+</p>
+<p>
+那一个和这一个不一样
+</p>
+<p>
+Энэ гурваар тэр хоёрыг сольё.
+</p>
+<p>
+用这三个换那两个吧
+</p>
+<p>
+Тэдгээр номоос би тавыг нь авъя.
+</p>
+<p>
+从那些书里我要五本
+</p>
+<p>
+Хониноосоо хэдэн өгнө үү？把羊给几只吗?
+</p>
+<p>
+Хониноос гурав ямаанаас хоёрыг өгье.
+</p>
+<p>
+给绵羊三只山羊两只吧
+</p>
+<p>
+Би тэр хоёртой ярилцах хэрэгтэй.
+</p>
+<p>
+我需要和他们俩谈一谈
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+数词可以离开具体的事物而表示抽象的数目，在数学运算里这种情况很平常 (形容词有时也有抽象名词性质，但没有数词这样普遍)。在这种情况下也都采取格变形式，并充当种种句子成分。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гуравны хоёр 三分之二
+</p>
+<p>
+гурвыг хоёроор үржүүлэх. 用二乘三
+</p>
+<p>
+Далан наймыг таваар хуваа. 七十八除五
+</p>
+<p>
+гурав дээр хоёр нэмэх. 三个上加两个
+</p>
+<p>
+гуравнаас хоёрыг хасах 三减去二
+</p>
+<p>
+гурван тав арван тав 三五——十五
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+5. 数词的领属。数词的领属与形容词的领属相似。人称领属 нь чинь 具有主格标志的作用。其它格的形式必要时可以有领属形式。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хоёр нь үлджээ. (其中) 两个剩下了
+</p>
+<p>
+Тэр хоёр чинь тэнд байна. 那两个在那里
+</p>
+<p>
+Та тэр таваа ав. 您要 (您的) 那五个
+</p>
+<p>
+Би энэ гурваа авъя 我要 (我的) 这三个
+</p>
+<p>
+Энэ нэгий нь түр зээлье. 这个我暂时借一下
+</p>
+<p>
+Чиний тавыг буцаая. 还回你的五个
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+6. 数词没有单数复数的区别，数词的少数几个复数形式都是一种构词附加成分。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Дөрвөн 四—дөрвөд 杜尔伯特 (旗名)
+</p>
+<p>
+түм 万 —түмэд 土默特 (旗名)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+7. 数词和形容词一样，既可以修饰名词 (作定语)，也可以修饰动词 (作状语)，如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хоёр туйл 两极
+</p>
+<p>
+эрийн гурван наадам 好汉三艺
+</p>
+<p>
+арван нас 十岁
+</p>
+<p>
+арван настай 有十岁
+</p>
+<p>
+нэг л алгадах 一巴掌
+</p>
+<p>
+хоёр буудах 打两枪
+</p>
+<p>
+гурав цавчих 砍三下
+</p>
+<p>
+Түм хэлээд тус ярихгүй.
+</p>
+<p>
+说多少遍 (一万遍) 也没用
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+8. 在并列成分之后用的数词具有概括作用
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+эр эм хоёул 两口子
+</p>
+<p>
+эгч дүү хоёул 姐妹俩
+</p>
+<p>
+ах дүү тавуул 兄弟五个
+</p>
+<p>
+өвгөн эмгэн хоёр 老头老婆俩
+</p>
+<p>
+багш сурагч тавиадуул 师生五十多个人
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsection 量词......
+-->
+<h5 id="autosec-72"><span class="sectionnumber">1.3.3&#x2003;</span>量词</h5>
+<a id="cyrillic-grammar-autopage-72"></a>
+
+<p>
+表示事物和行为的计量单位的词叫做量词。根据量词的意义和用法，可以分为如下几类：
+</p>
+
+<!-...... subparagraph 1. 物量词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-73"><span class="sectionnumber">1.3.3.0.0.1&#x2003;</span>1. 物量词</span>
+<a id="cyrillic-grammar-autopage-73"></a>
+包括度量衡单位：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+长度：миллиметр(мм) 毫米，сантиметр(см) 厘米，метр 米，километр(км) 公里，газар 里，алд 五尺，хос алд 一丈，тохой 尺，ямх 寸，
+</p>
+<p>
+重量：грамм(г) 克，тонн(т) 吨，килограмм(кг) 千克 (公斤)
+</p>
+<p>
+面积：хавтгай дөрвөлжин метр 平方米 босоо дөрвөлжин метр 立方米
+</p>
+<p>
+容量：литр(л) 公升
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+其它事物单位的：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хормой 大襟, сагс 筐 (сэвэг), хүрз 锹, битүү 捧, өрх 户, таарцаг 袋, тогоо 锅, шанага 勺, суулга 桶, аяга 碗, ширхэг 件, 条 (线), цом 杯, лонх 瓶, өрөө,тасалгаа 间，боть 部, 卷，бут 丛，толгой 头，дэвтэр 本，хуудас 页，бадаг 段，мөр 行，ам
+口, 嘴，сүрэг 群，хуй 整捆, 卷，багц 一束、把，хэсэг 块，бүлэг 段, 部分，овоо 堆，дамнуур 担，тэврэх,тэвэр 抱，үмх 一口，ооч 一口，атга 一把，зүсэм 条，хэрчим 块，чимх 撮，төгрөг 元，мөнгө 分，арван мөнгө 角<sup>13</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-74"></a>
+<p>
+<sup>13</sup>&nbsp; 下载《固什词典》查看更多
+</p>
+
+</div>
+</div>
+
+<!-...... subparagraph 2. 动量词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-75"><span class="sectionnumber">1.3.3.0.0.2&#x2003;</span>2. 动量词</span>
+<a id="cyrillic-grammar-autopage-75"></a>
+
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+удаа 次，дахин 再，倍，алхам 步
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 3. 时间量词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-76"><span class="sectionnumber">1.3.3.0.0.3&#x2003;</span>3. 时间量词</span>
+<a id="cyrillic-grammar-autopage-76"></a>
+
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+цаг 小时，мөч 一刻，өдөр 天，сар 月，жил 年，хоног 一昼夜，гариг 星期，зуун 世纪
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+量词和数词一起构成一个数量词词组，在句子里组成一个句子成分。与量词一起构成数量词词组的主要是基数词、概数词、分配数词、分数词等。数量词词组的语法特征与构成它的数词 (即该词组的数词部分) 的语法特征相近。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Одоо тавхан байна. 现在只有五个
+</p>
+<p>
+Одоо тавхан төгрөг байна. 现在只有五元
+</p>
+<p>
+Энэ хоёры нь би авъя. 这两个我要吧。
+</p>
+<p>
+Энэ хоёр дэвтэр номыг нь би авъя.
+</p>
+<p>
+这两本书我要吧
+</p>
+<p>
+Энэ гурваар тэр хоёрыг сольё.
+</p>
+<p>
+用这三个换那两个吧
+</p>
+<p>
+Энэ гурав өрөөгөөр тэр өрөөг сольё.
+</p>
+<p>
+用这三间屋换那两间屋吧
+</p>
+<p>
+Хориод нь үлджээ. 剩下了二十几个
+</p>
+<p>
+Хориод өрх нь үлджээ. 剩下了二十来家
+</p>
+<p>
+Чиний тавыг чинь буцаая. 把你的五个还给你
+</p>
+<p>
+Таны арван метр бөсий чинь буцаая.
+</p>
+<p>
+把您的十米布还给您。
+</p>
+<p>
+Нэг нэгээр өгье 一个一个地给。
+</p>
+<p>
+Нэг нэг дэвтрээр өгье. 一本一本地给
+</p>
+<p>
+Гурвын нэг нь хорогдожээ. 少了三分之一
+</p>
+<p>
+Гурвын нэг (лан) килограмм нь хорогдожээ.
+</p>
+<p>
+少了三分之一两（公斤）。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+【Хэмжээ 度量衡】
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<b> Хүндийн хэмжээ 重量：</b> Нэг грамм 一克，зуун грамм 一百克，нэг кило 一公斤，жин 斤，лан 两，цэн 钱，фун 分，энэ ямар жинтэй юм бэ? 这有几斤重呢?
+</p>
+<p>
+Аль хир хүнд юм бэ? 有多重呢？
+</p>
+<p>
+Энэ их хүнд байна. 这个很重。
+</p>
+<p>
+Та үүнийг жигнэж өгнө үү? 您能把这个称一下吗?
+</p>
+<p>
+Надад нэг кило алим (хагас кило нимбэг , зуун грамм цөцгийн тос) өгнө үү?
+</p>
+<p>
+能给我来一公斤苹果 (半公斤柠檬, 一百克奶油) 吗?
+</p>
+<p>
+<b>Багтаамжийн хэмжээ 容量：</b> Литр 公升，хагас литр 半公升，нэг литр 一公升，хоёр литр шар айраг 两公升啤酒，гучин литр шатахуун 三十公升燃料油，нэг шанага сүү 一勺儿牛奶，хоёр хувин тараг 两桶酸奶，нэг тогоо сүү
+一锅奶
+</p>
+<p>
+<b>Өндөр уртын хэмжээ 高度、长度：</b> Таны өндөр хэд вэ ? 您的身高多少？
+</p>
+<p>
+Тэр цамхаг хичнээн метр өндөр вэ? 那座塔楼有多少米高？
+</p>
+<p>
+метр 米 (公尺)，сантиметр 厘米、公分，миллиметр 毫米，дециметр 分米，километр 公里 (千米)，өртөө 站 (三十公里)，нүүдлийн газар (60~90км) 转场距离 (60～90 公里)，саахалтын газар (300 метр орчим) 邻村距离 (300 米左右)
+</p>
+<p>
+<b>Талбайн хэмжээ 面积：</b> ам метр , ㎡平方米，ам км , km² 平方公里，ам даавуу 一方布
+</p>
+<p>
+<b>Эзэлхүүний хэмжээ 体积 </b> шоо метр , m³ 立方米，гурван шоо метр түлээ 三立方米劈柴
+</p>
+<p>
+Дахиад хоёр шил нэмчих. 再加上两瓶。
+</p>
+<p>
+Хэд дээр хэдийг нэмэх үү？几加几？
+</p>
+<p>
+Хэдэн хэсэг хуваах уу？分几块？
+</p>
+<p>
+Өдөрт хэдэн удаа уух уу？一天吃几次？
+</p>
+<p>
+Өдөрт гурван удаа，нэг удаад хоёроос гурван ширхэг ууна. 一天三次，一次吃二至三片。
+</p>
+<p>
+Би ирээд хориод хонож байна.
+</p>
+<p>
+我来了有二十多天了
+</p>
+<p>
+Би ирээд долоо найман өдөр болж байна.
+</p>
+<p>
+我来了有七、八天了
+</p>
+<p>
+Би ирээд хэдхэн цаг болж байна.
+</p>
+<p>
+我来了只有几个小时
+</p>
+<p>
+Танай хэдүүл хаана суучихав？
+</p>
+<p>
+你们几个住在哪儿了？
+</p>
+<p>
+Бид тавуул хамтдаа сууж байна.
+</p>
+<p>
+我们五个人在一起住着（хамтад 一同地共同地）
+</p>
+<p>
+Тав зургаахан цаг явбал хүрчихнэ.
+</p>
+<p>
+走五六个小时就到了
+</p>
+<p>
+Зууны гуч нь миний бараа. 百分之三十是我的货
+</p>
+<p>
+Хорин таван хувь нь минийх. 百分之二十五是我的
+</p>
+<p>
+нэмэх 加，хасах 减，үржүүлэх 乘，хуваах 除; 分, 分配;
+</p>
+<p>
+зургааг үржүүлэх гурав тэнцүү арван найм. 6×3=18
+</p>
+<p>
+Зуун тавийг хуваах тав тэнцүү гуч. 150÷5=30
+</p>
+<p>
+тэнцүү 一样的, 相等的, 完全符合的, (形)。тэнцүү дүн 等数。тэнцүү өнцөг 等角。тэнцүү талт 等边。тэнцэх 相等, 均等, 平衡; 及格; 打平局。(动)
+</p>
+<p>
+өрөөсгөл 奇数, 单数。өрөөсдөх 变奇数, 变单数。сондгой 奇数的, 单数的 (形) тэгш 偶数的, 双数的 (形)。Тэгш буюу сондгой тоо 偶数或奇数
+</p>
+<p>
+хэд хэдээр 一次 (吃、用…) 多少？
+</p>
+<p>
+нэг нэгээр 一个一个的，一次一个
+</p>
+<p>
+хоёр хоёор 两个两个的, 一次两个
+</p>
+<p>
+гурав гурваар 三个三个的, 一次三个
+</p>
+<p>
+Та чихрийг хэд хэдээр нь иддэг вэ?
+</p>
+<p>
+您吃糖, 一次吃几个呢?
+</p>
+<p>
+Энэ жимснүүдийг нэг нэгээр нь ид.
+</p>
+<p>
+一个一个吃这些水果
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<b>дахин 倍, 倍数 </b> (蒙古语表倍数时包括原基数)：өнгөрснийх 2 дахин өссөн болов 增为原来的二倍。Ноднин жилийнхээ 5 дахин нэмэгдэв 比去年增加了四倍。
+</p>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

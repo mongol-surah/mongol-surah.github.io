@@ -1,0 +1,2902 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—词法 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-7"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... part 词法......
+-->
+<h2 id="autosec-8"><span class="sectionnumber">第二部分&nbsp;&#x2003;</span>词法</h2>
+<a id="cyrillic-grammar-autopage-8"></a>
+<a id="cyrillic-grammar-autofile-2"></a>
+<p>
+我们在词法部分里，主要论述蒙古语词的语法分类，各类词在语句中的形态变化和它们的语法意义。
+</p>
+<p>
+蒙古语中的所有的词，从词法的角度，首先可以分为三大类。<b> 第一类是静词类 </b>，它具有静词类的一系列的形态变化。<b> 第二类是动词类 </b>，它具有动词类的一系列的形态变化。<b> 第三类是无变化词类 </b>，这类词
+的绝大部分主要表示某种语法意义。
+</p>
+<p>
+下面分述这三大类及其内部各小类的词法特征。
+</p>
+
+<!-...... chapter 静词类......
+-->
+<h3 id="autosec-9"><span class="sectionnumber">第一章&nbsp;&#x2003;</span>静词类</h3>
+<a id="cyrillic-grammar-autopage-9"></a>
+
+<p>
+静词类有格、数、领属等范畴的变化，表示事物、时间、地点、性质特征、数量等意义。
+</p>
+<p>
+静词类包括名词、形容词、代词、数量词、时位词等五个小类，这些小类有不同程度的格、数、领属等范畴的形态变化外，都还有各小类本身的特殊的形态变化。
+</p>
+
+<!-...... section 名词......
+-->
+<h4 id="autosec-10"><span class="sectionnumber">1.1&#x2003;</span>名词</h4>
+<a id="cyrillic-grammar-autopage-10"></a>
+
+<!-...... subsection 名词及其语法特征......
+-->
+<h5 id="autosec-11"><span class="sectionnumber">1.1.1&#x2003;</span>名词及其语法特征</h5>
+<a id="cyrillic-grammar-autopage-11"></a>
+
+<p>
+表示事物的名称的词叫作名词。一般可回答谁？什么？的问题。这里边包括：тэнгэр 天，газар 地，нар 日，сар 月，салхи 风，бороо 雨，өдөр 白天，шөнө 黑夜，уул 山，мөрөн 江，загас 鱼，шувуу 鸟，өвс 草，мод 树等在自然界存在
+的万物以及自然现象的名称；ажилчин 工人，тариачин 农民，цэрэг 士兵，сурагч 学生，нөхөр 同志，эцэг 父亲，хүү 儿子，ах 兄，дүү 弟等在人类及社会关系的名称；дээл 衣，малгай 帽，тэрэг 车，онгоц 船，ном бичиг 书籍，дуу
+хөгжим 音乐，анги 阶级，улс 国家，хувьсгал 革命，соёл боловсрол 文化，шинжлэх ухаан 科学等人类的物质文化生活过程中，在人类的生产斗争、阶级斗争、科学试验过程中出现的各种事物和现象的名称。
+</p>
+<p>
+此外，在人们思维中当作一种事物来看待，同时具有名词的语法特征的一切词。如表示行为、状态以及某些属性的名称等也都属于名词。如：ажил 工作，байдал 情况，ялалт 胜利，хөдөлгөө 运动，суралцаа 学习，өөрчлөлт 改革，хүч
+力量，зориг 意志，урлаг 艺术，хурдац 速度等。
+</p>
+<p>
+名词的数量非常多，包罗万象。对名词可以从不同的角度进行不同的分类。在蒙古语语法里，下列几种划分，对于说明语法特点有一定的意义。
+</p>
+
+<!-...... subparagraph 实体名词与非实体名词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-12"><span class="sectionnumber">1.1.1.0.0.1&#x2003;</span>实体名词与非实体名词</span>
+<a id="cyrillic-grammar-autopage-12"></a>
+实体名词包括人类和具有形体的其他万物的名称。如：хүн 人，мал 牲畜，будаа 粮食，болд төмөр 钢铁，ус 水，цас 雪等。非实体名词则包括品质、属性、行为、状态以及心理状态的名称。如：хүч 力量，зориг 意志，ухамсар 觉悟，
+оюун ухаан 精神，хөгжилт 发展，эргэлт 转变，найрамдал 和睦，мөлжил 剥削，сэтгэл 心理，санал 意见，баяр 欢喜，зовлон 苦难等。在组词法里，宾状格的实体名词一般构成间接宾语，而非实体名词在这种情况下，一般构成状语。
+如：модоор хийсэн 用木料做的。Зоригоор аашилсан 曾经胡闹过，нөхдөөс суралцана 向同志们学习，чин сэтгэлээс талархана 衷心感谢。前者构成间接宾语，后者构成状语。
+</p>
+
+<!-...... subparagraph 时位名词与非时位名词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-13"><span class="sectionnumber">1.1.1.0.0.2&#x2003;</span>时位名词与非时位名词</span>
+<a id="cyrillic-grammar-autopage-13"></a>
+时位名词是指表示时间地点的名词。如：жил 年，сар 月，өдөр 日，өнөөдөр 今天，маргааш 明天，хавар 春天，зун 夏天，өглөө 早晨，үдэш 晚上，хөдөө 乡村，хот 城市，айл 村，зээл 街等。时位名词 (尤其是时间名词) 后边接动词时，
+一般构成状语，非时位名词后边接动词时，一般可构成主语 (宾语)。如：нэг гариг суралцжээ 学习了一周，маргааш явна 明天出发，Хөх хотоор дайрна 路过呼和浩特，以上三例构成状语。Тэрэг ирлээ 车来了，хүмүүс цугларсан 人们
+集合了，үзэсгэлэн гаргажээ 举行了展览会，以上三例构成主语或宾语。
+</p>
+
+<!-...... subparagraph 可数名词与不可数名词......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-14"><span class="sectionnumber">1.1.1.0.0.3&#x2003;</span>可数名词与不可数名词</span>
+<a id="cyrillic-grammar-autopage-14"></a>
+可数名词在词形变化上一般有单数复数形式，不可数名词一般没有单数复数形式。可数名词包括表示人或事物属于某一类的名词，如：хүн 人，ном 书，ширээ 桌子，сандал 椅子等，还包括表示一群人或好多件东西的总称，如：如：
+бүлгэм 团体，сүрэг 群，нам 党，эвлэл 团等，不可数名词则包括抽象名词、物质名词、专有名词等，如：урам 情绪，сэтгэхүй 思维，хөгжилт 发展，ирээдүй 将来，ус 水，төмөр 铁，хий 空气，давс 盐，Өвөр Монгол 内蒙古，Хөх Нуур
+青海等，可数与不可数的划分是就一般情形说的，也是相对的，有时可以转化。因而不可数名词有时也可以有复数形式，如：монголчууд 蒙古人，амжилтууд 胜利，баярын өдрүүд 欢庆的节日等。
+</p>
+
+<!-...... subparagraph 关于名词的语法特征......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-15"><span class="sectionnumber">1.1.1.0.0.4&#x2003;</span>关于名词的语法特征</span>
+<a id="cyrillic-grammar-autopage-15"></a>
+名词除了有它意义方面的特征外，还有语法方面的特征。名词的词法特征主要表现在：
+</p>
+<p>
+(1) 名词有单数、复数的形式，还有概称形式。
+</p>
+<p>
+(2) 名词有典型的比较完整的格的变化。
+</p>
+<p>
+(3) 名词有领属的不同形式，也就是说在名词后可以附加表示领属的附加成分。
+</p>
+<p>
+名词在句法方面也有其特征。名词的主格形式联结动词时，构成主语或宾语；名词前边不受副词的修饰；蒙古语名词前边只能支配定语，不能支配宾语、状语 (关于这些特征详见以后章节)。
+</p>
+
+<!-...... subsection 名词的数......
+-->
+<h5 id="autosec-16"><span class="sectionnumber">1.1.2&#x2003;</span>名词的数</h5>
+<a id="cyrillic-grammar-autopage-16"></a>
+
+<!-...... subparagraph 蒙古语里数的概念......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-17"><span class="sectionnumber">1.1.2.0.0.1&#x2003;</span>蒙古语里数的概念</span>
+<a id="cyrillic-grammar-autopage-17"></a>
+名词的数，主要是说明该名词是一个呢，还是两个以上的多数。前者叫单数，后者叫复数。在蒙古语里表示名词数量的方式有若干种，如：用附加成分 (或助词)，如：сурагч 学生 +д —сурагчид 学生们；用词的重叠，如：гэр гэр 家家；
+用代词，如：хэдэн өдөр 几天；用数词，如：таван хошуу мал 五种牲畜；用形容词，如：олон хүн 很多的人；也可根据句中前后词的情况得知，如：хашаа дүүрэн хонь 满圈的羊 (一定是多数)；та сонсоцгоо 你们听，等诸如此类。但是
+这许多方式中，只有第一种，或者再加上第二种，才是语法上的名词的数，是通过名词的语法变化表现出来的数，其它则是用词汇手段，或通过句法的前后关系表现的，不是名词本身语法上的数。
+</p>
+
+<!-...... subparagraph 蒙古语的复数附加成分......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-18"><span class="sectionnumber">1.1.2.0.0.2&#x2003;</span>蒙古语的复数附加成分</span>
+<a id="cyrillic-grammar-autopage-18"></a>
+蒙古语名词的数，主要用附加成分表示。名词的词干形式就是单数形式，单数形式上接加各种复数附加成分，就可以得出一系列复数形式。
+</p>
+<p>
+蒙古语里常用的复数附加成分有如下几种：
+</p>
+<p>
+1. нууд нүүд ：加在以元音结尾或以辅音 н 结尾的表示人和事物的名词后边。如：чулуунууд 石头，ширээнүүд 桌子，байгууллаганууд 机关，үйлдвэр-нүүд 工厂，дайсэн-нууд 敌人，эрдэмтэн-нүүд 学者，сонин-нууд 报纸，зочин-нууд
+客人。
+</p>
+<p>
+2. ууд үүд (гууд гүүд)：加在以辅音结尾的表示人和事物的名词后边。如：бичгүүд 书籍，улсууд 国家 (或人们)，явдлууд 事情，айлууд 村，дугуйлангууд 组，хүүхдүүд 儿童们，гэрүүд 屋，намууд 党，сэдвүүд 题目（原由)。
+</p>
+<p>
+上边这两个附加成分，实际上是一种，它们的用处比其它的复数附加成分要广泛。它们合起来可以满足名词数的变化的一般要求。
+</p>
+<p>
+在口语里一般只用［ууд-үүд］的形式。在以长元音、复合元音结尾的词后则变为［гууд гүүд ］，如：үйлдвэрүүд 一些工厂，эрхэмтэнүүд 学者们，хүүхдүүд 儿童们，ширээнүүд 一些桌子，нохойнууд 一些狗。
+</p>
+<p>
+3. нар нэр ：加在表示人物或表示拟人事物的名词之后。一般采用分写 (不连写) 形式。如：ах нар 兄长们，дүү нэр 弟弟们，багш нар 老师们，эмч нар 医生们，авга нар 叔父们，найз нар 朋友们，багш сурагч нар 师生们。
+</p>
+<p>
+这个附加成分有时也起总括词的作用。如：Бат Өлзий нар 巴图、乌勒吉等人，Сэцэн Оюун нар 斯琴、奥云等人。
+</p>
+<p>
+有时这个附加成分还起构词作用。如：эх 母亲 + нэр =эхнэр 妇女。
+</p>
+<p>
+4. чууд чүүд ：加在表示人的属性的形容词以及一些名词 (如民族名称) 之后。这个附加成分既有构成复数的词法作用，同时也有构词作用。所以从词法角度看，它的使用有局限性。мэргэн 聪明—мэргэчүүд 聪明人，тэрслүү 反动
+—тэрслүүчүүд 反动派，баян 富—баячууд 富人，ядуу 贫—ядуучууд 穷人，бага 小 —багачууд 儿童，эмэгтэй 女人—эмэгтэйчүүд 妇女，өвгөн 老头—өвгөчүүд 老人，монгол 蒙古—монголчууд 蒙古民族，уйгар 维吾尔—уйгарчууд 维吾
+尔民族。
+</p>
+<p>
+5. д ：主要接加在以 н (尤其是以 чин) 结尾的名词之后，偶尔也接加在以 р л й 等音结尾的少数名词之后，接加时，前边的语音脱落。个别情况下整个音节脱落。малчин 牧民—малчид 牧民们，тариачин 农民—тариачид 农民们，морь
+马—морьд 几匹马（复数），шувуу 鸟—шувууд 一些鸟，түшмэл 臣—түшмэд 大臣们，нохой 狗—ноход 几只狗，хувцас 衣服—хувцад 衣物，балгас 镇—балгад 一些镇子。
+</p>
+<p>
+如果把附加成分接加在形容词或形动词之后，则既有复数意义，又有构词意义，一般构词意义大于复数意义。其中有的丧失了复数意义，变成了纯构词附加成分。如：сайн 好 +д—сайд 大臣，хөгшин 老 +д—хөгшид 老人，баян 富
++д—баяд 富人，мэдсэн 知道了 +д—мэдэгсэд 知者，үзсэн 看见了 +д—үзэгсэд 观众，олзлогдсон 被俘虏了 +д—олзлогдогсод 俘虏。
+</p>
+<p>
+6. с ：接加在以元音结尾的一部分名词之后，偶尔也接加在以 н л й 等音结尾的少数名词之后。接加时有语音脱落现象。加在形容词上，则构词意义大于复数意义。эх 母亲 +c—эхэс 母，ах 兄 +с—ахас 兄长们，эр 男 +с—эрс 男子，эм
+女 +с—эмс 女人们，үр 种子, 儿女 +с—үрс 子孙，үг 话 +c—үгс 话语，уул 山 +с—уулс 山峦，хүн 人 +с—хүмүүс 人们，хүүхэн +с—хүүхэс 儿童，зүйл 种类 +с—зүйлс 事项，нохой 狗 +с—нохос 一些狗，залуу 年轻 +с—залуус 青年们，
+их 大 +с—ихэс 大人物，дээд 上 +с—дээдэс 祖辈，нялх 幼小 +с —нялхас 幼儿。
+</p>
+<p>
+复数附加成分表
+</p>
+
+<!-...... subparagraph 复数附加成分使用法......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-19"><span class="sectionnumber">1.1.2.0.0.3&#x2003;</span>复数附加成分使用法</span>
+<a id="cyrillic-grammar-autopage-19"></a>
+蒙古语名词虽有单数复数形式，但是并不是所有情况下名词的单复数与实际的单复数完全一致。有时，实际事物是复数，但是蒙古语习惯里却用单数形式表达。在这点上与严格区分单复数的一些语言不同，那么哪些情况下用单数形
+式表达复数呢？
+</p>
+<p>
+(1）从一个名词的定语清楚地知道它是复数时，名词一般不用复数形式。如：гурван хүн 三个人，зуун хонь 一百只羊，олон ном 很多书，цөөн хүн 少数人，арвин мал 很多牲畜，хэдэн тэрэг 几辆车，бүх асуулт 全部问题，зарим
+асуудал 某些问题。
+</p>
+<p>
+(2）从一个名词的支配动词清楚地知道它是复数时，名词可以不用复数形式。如：адуу мал бэлчих 牲畜吃草，хонь овооролдох 羊拥挤，хүн цуглаж байна 人们在集合，зочин тархаж байна 客人在散，сурагч хичээлээ давтаж байна 学生
+们在复习。
+</p>
+<p>
+(3) 从一般常识清楚地知道它是复数时，名词可以不用复数形式。如：гутал худалдан авах 买靴子，бээлий зүүх 戴手套。
+</p>
+<p>
+除上述几种情况外，抽象名词、物质名词、专有名词等不可数名词，或者由于无法计数，或者由于不必要计数，一般不用复数形式。
+</p>
+<p>
+总之，蒙古语名词一般在必要的情况下才使用复数形式。所以蒙古语中使用复数形式的频率不是很高，有时不强调复数时，可以用的地方，也有不用的。如：чи юмаа аваад ир 你把自己的东西拿来，энэ гэрийн ширээ сандлыг хаа
+авчихав? 这屋的桌椅拿到哪里去了？上述两个例句中的“东西”和“桌椅”可能是单数也可能是复数。
+</p>
+<p>
+由于蒙古语“数”的附加成分的使用方面存在上述情况，近些年来有些研究人员提出：蒙古语中与其说有单数、复数的对立，还不如说有复数与不定数的对立。根据这种观点，具有复数附加成分的是复数形式，词干形式则属于不定
+数。不定数可以表示单数，也可以表示复数，当然更可以表示单数复数并不明确的东西。
+</p>
+<p>
+以上谈的是用不用复数形式的问题。但在另一方面还有：可以用一种复数形式的地方，叠用两种复数形式的情况。例如在 д с 等使用范围小而又有一定构词意义的附加成分后，可以再加一个通用的典型的复数附加成分 ууд үүд 。如：
+нөхдүүд 同志们，эрсүүд 男子汉们，эмсүүд 妇女们，баядууд 富人们，ноёдууд 官吏们。
+</p>
+<p>
+(4）以叠词法表示复数。用名词本身的重叠使用，或者用各词的定语的重叠使用，可以表示某种复数意义。它与一般的复数有些不同，名词本身的重叠往往具有“各个”&#x202f;“每个”的意义。如：газар газар хүрэх 到各个地方，
+гэр гэрт орох 进各个屋子，хүн хүнтэй адилгүй 和谁也不一样，уул уулнаас ондоо 与哪个山也不同，анги ангидаа 各自 (分离)，өндөр өндөр уул (一些) 高山，сонин сонин чимээ (一些) 新闻，цагаан цагаан хонь (许多) 白羊，бүдүүн
+бүдүүн мод (许多) 大树。
+</p>
+<p>
+定语的重叠所以能表示复数是因为 өндөр өндөр уул = өндөр уул өндөр уул ，бүдүүн бүдүүн мод = бүдүүн мод бүдүүн мод 。
+</p>
+<p>
+叠词法既可用于不便使用一般复数附加成分的地方，又可以构成一种特殊的语言节律。所以在文艺作品语言中有它自己的作用。
+</p>
+
+<!-...... subsection 名词的概称......
+-->
+<h5 id="autosec-20"><span class="sectionnumber">1.1.3&#x2003;</span>名词的概称</h5>
+<a id="cyrillic-grammar-autopage-20"></a>
+
+<p>
+蒙古语里与复数类似的还有一个概称。如果说叠词法表示的意义比一般复数强烈，那么概称表示的比一般复数模糊一些。概称的作用在于使某个事物的涵义变得比较广泛，使本来指某个具体事物的词，变为可以包括同类或与它密切
+相关的其它事物的词。如：аягаа хураа 把碗收起拾来——аяга маягаа хураа 把碗等东西收拾起来，дээлээ угаая 把衣服洗一洗——дээл мэвэлээ угаая 把衣服等洗一洗。(дээл 衣服)<sup>1</sup>
+</p>
+<p>
+概称的表达方式是，在一个名词 (主体词) 后边再重复一个以“м“辅音为首的同样一个词 (辅助词)。这里也有两种情况：1. 以辅音为首的名词变为概称时，后边的辅助词是把原词的词首辅音换成“м”辅音的形式。2. 以元音为首的名
+词变为概称时，后边的辅助词是在原词的词首加一个“м“辅音的形式。如：
+</p>
+<p>
+уул муул 山，авдар мавдар 箱子，эмч мэмч 医生，ус мус 水，үхэр мүхэр 牛，онгоц монгоц 船，цай май 茶，гутал мутал 靴子，давс мавс 盐，тариа мариа 田地，лонх монх 瓶，нохой мохой 狗，шүлэг мүлэг 诗，бүжиг мүжиг 舞蹈
+</p>
+<p>
+此外，有一些名词，尤其是以“м”为首的名词，变为概称时，也使用一些其它辅音。这些形式具有自己的特征，规律性不强，因而可以当作一个词汇单位处理。如：ах зах 兄长，ахас захас 兄长 (字典里是前辈, 长辈)，малгай жалгай
+帽子，машин жашин 机械，малгай талгай 帽子，малаа талаа 帽子，урам турам 情绪，орон торон 地方，мод шод 木头，хүүхэд шуухад 小孩，юм хүм 东西
+</p>
+<p>
+在一些地区概称形式有别的表达方式，如：用 юу 以及 амтай 等。如：малгай юугаа 帽子等，санал юугаа 意见等，будаа амтай 饭菜，дээл амтай 衣服。这些都是方言现象。
+</p>
+<p>
+概称形式主要在口语里多见。它的作用在于使语言具有灵活性，并有修辞及语音协调作用。但概称往往也带有“贬称”或不够郑重的地方。在正式场合想要避免这种副作用，可用别的说法 (近义词重复) 代替。
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-21"></a>
+<p>
+<sup>1</sup>&nbsp; 在竖写老蒙文中把 дээл 这个词写成 дэвэл , 但发音是 дээл (长音) 衣服)。
+</p>
+
+</div>
+
+<!-...... subsection 名词的格......
+-->
+<h5 id="autosec-22"><span class="sectionnumber">1.1.4&#x2003;</span>名词的格</h5>
+<a id="cyrillic-grammar-autopage-22"></a>
+
+<p>
+蒙古语格的概念。蒙古语的名词，处在词组和句子中时，总是处于某一种格的形式。不是处于这个格，就是处于那个格。格就是用来表示名词和别的词的关系以及它在词组和句子中的功能的。例如：名词可能和别的名词及形容词发
+生关系，也可能和动词发生关系。从它的功能或作用看，也可能充当主语或定语，也可能充当宾语或状语以及其它。蒙古语的格是通过在名词后边接加某种附加成分来表示。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+1）ажилчин иржээ. 工人来了。
+</p>
+<p>
+2）ажилчны багаж. 工人的工具。
+</p>
+<p>
+3）ажилчинд хүргэ. 送往工人 (处)。
+</p>
+<p>
+4）ажилчныг үзэв үү? 看见工人没有？
+</p>
+<p>
+5）ажилчнаар хийлгэ. 请工人做。
+</p>
+<p>
+6）ажилчнаас асуу. 向工人请教。
+</p>
+<p>
+7）ажилчинтай зөвдө. 和工人商量。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+上边几个例句中都有 ажилчин 工人一词。但是所处的格不一样。这点从 ажилчин 一词后边的附加成分也可以看出来。在例 1）中它和动词发生关系，充当主语，处于主格。在 2) 中它和名词发生关系，充当定语，处于属格 (领格)。在
+例 3）中它和动词发生关系，充当间接宾语 (因为还有另外的“把什么”的直接宾语)，处于向位格 (给在格)。在例 4) 中它和动词发生关系，充当直接宾语，处于宾格。在例 5) 6) 7) 中它都和动词发生关系，都充当间接宾语，分别处于
+用让格 (凭借格)、从比格、和同格。
+</p>
+<p>
+变格表
+</p>
+<figure id="autoid-1" class="table ">
+
+<table>
+<tr style="display:none"><th>.</th></tr>
+
+<tr class="tbrule">
+<td class="tdl">No.</td>
+<td class="tdp">
+<p>
+格
+</p>
+</td>
+<td class="tdp">
+<p>
+回答的问题
+</p>
+</td>
+<td class="tdp">
+<p>
+后缀
+</p>
+</td>
+</tr>
+
+<tr class="hline">
+<td class="tdl"> 第一格 </td>
+<td class="tdp">
+<p>
+主格 нэрлэх
+</p>
+</td>
+<td class="tdp">
+<p>
+хэн? юу?
+</p>
+</td>
+<td class="tdp">
+<p>
+=
+</p>
+</td>
+</tr>
+
+<tr class="hline">
+<td class="tdl"> 第二格 </td>
+<td class="tdp">
+<p>
+所属格 харьяалах
+</p>
+</td>
+<td class="tdp">
+<p>
+хэний? юуны?
+</p>
+</td>
+<td class="tdp">
+<p>
+ийн, ын, ий, ы, н
+</p>
+</td>
+</tr>
+
+<tr class="hline">
+<td class="tdl"> 第三格 </td>
+<td class="tdp">
+<p>
+给在格 өгөх орших
+</p>
+</td>
+<td class="tdp">
+<p>
+хэнд? юунд?
+</p>
+</td>
+<td class="tdp">
+<p>
+т, д
+</p>
+</td>
+</tr>
+
+<tr class="hline">
+<td class="tdl"> 第四格 </td>
+<td class="tdp">
+<p>
+把格 заах
+</p>
+</td>
+<td class="tdp">
+<p>
+хэнийг? юуг?
+</p>
+</td>
+<td class="tdp">
+<p>
+ыг, ийг, г
+</p>
+</td>
+</tr>
+
+<tr class="hline">
+<td class="tdl"> 第五格 </td>
+<td class="tdp">
+<p>
+由从格 гарах
+</p>
+</td>
+<td class="tdp">
+<p>
+хэнээс? юунаас?
+</p>
+</td>
+<td class="tdp">
+<p>
+аас, ээс, оос, өөс
+</p>
+</td>
+</tr>
+
+<tr class="hline">
+<td class="tdl"> 第六格 </td>
+<td class="tdp">
+<p>
+用让格 үйлдэх
+</p>
+</td>
+<td class="tdp">
+<p>
+хэнээр? юугаар?
+</p>
+</td>
+<td class="tdp">
+<p>
+аар, ээр, оор, өөр
+</p>
+</td>
+</tr>
+
+<tr class="hline">
+<td class="tdl"> 第七格 </td>
+<td class="tdp">
+<p>
+有同格 хамтрах
+</p>
+</td>
+<td class="tdp">
+<p>
+хэнтэй? юутай?
+</p>
+</td>
+<td class="tdp">
+<p>
+тай, той, тэй
+</p>
+</td>
+</tr>
+
+<tr class="tbrule" aria-hidden="true">
+<td class="tdl"></td>
+<td class="tdp">
+</td>
+<td class="tdp">
+</td>
+<td class="tdp">
+</td>
+</tr>
+</table>
+</figure>
+<p>
+关于变格表的几点说明 (1) 蒙古语中相当一部分名词在变格的时候有时在词干末有 н 音，有时则消失。<sup>2</sup><a id="cyrillic-grammar-autopage-23"></a>。一般处在属格、向位格 (给在格)、从比格时出现 н 音，处在主格、
+宾格、凭借格 (用让格)、和同格时则没有 н 音。这一部分名词可以叫作“可变词干名词”。(2) 关于简化属格。蒙古语的属格在口语里或者是 [ийн ын], 或者是 [ний ны най нэй] (ы ий ай эй 和前面的 н 连在一起)，里边都包括 н 音，由于
+这种情况，在属格的各种意义进一步抽象化的结果产生了一种简化形式的属格，即词末只有一个 н 音的属格。这样一来不但原来的可变词干名词可以有 н 这种简化属格，而且原来的不变词干名词有时也可以有 н 这种简化属格。(3) 在
+口语中，在长元音、复合元音结尾的词后，接加附加成分时，中间出现 г 音<sup>3</sup>。
+</p>
+<p>
+<b> 蒙古语各格的意义和作用 </b>
+</p>
+<p>
+<b> 第一、主格的意义和用处 </b>
+</p>
+<p>
+1. 主格是连接主语和谓语 (或述语) 的主要形式。名词和其它静词充当主语或谓语时一般都用主格形式。如：багш ирэв. 老师来了，энэ бол Баатар нөхөр. 这是巴特尔同志，тэр ном сайн. 那个书好，энэ морь хурдан. 这匹马快
+</p>
+<p>
+2．名词的主格形式也可以连接限定语与被限定语。如：монгол хэл 蒙古语，төмөр зам 铁路，гал улаан 火红，хөө хар 乌黑的 (漆黑)。
+</p>
+<p>
+3．宾语与及物动词之间，有时省略宾格附加成分，因而形式上变得与主格形式一样 (实际意义还是宾格意义)。时位名词也往往用主格形式表达向位格 (给在格) 意义。如：морь унах 骑马，өвс хадах 割草，мал услах 饮牲畜，тариа
+хураах 收庄稼，хот орох 进城，Бээжин хүрэх 到北京，өглөө иржээ 早晨来的，энэ орой явна 今晚走，маргааш хуралтай 明天有会
+</p>
+<p>
+4．以主格为基础，可构成某些后置词结构以及少数时位词结构。如：төмөр шиг 像铁，далай мэт 像海，өдөр тутам 日常，хүн болгон 每人，гэр дотор 屋内，авдар дотор 箱内
+</p>
+<p>
+5．名词的联合关系、同位关系以及呼语都采用主格形式。如：Мөнх Өлзий Буян нар 孟克、乌勒吉、宝音等。багш сурагч. 师生，Мөнх болоод Өлзий хоёр 孟克和乌勒吉二人，Мөнх багш 孟克老师，Өлзий нөхөр 乌勒吉同志，багш аа
+! 老师！Буян 宝音！
+</p>
+<p>
+<b> 第二、属格 (所属格、领格) 的意义和用处 </b>
+</p>
+<p>
+1．属格是连接限定语和被限定语的形式。限定语是属格名词 (包括简化属格)，被限定语一般也是名词，因而它们的关系是名词与名词的一种关系。
+</p>
+<p>
+限定关系的意义比较广泛，它包括：领属、性质、组成部分、来源、质料、用途、时间、处所、从事的活动、涉及的范围以及其它关系，蒙古语属格的附加成分相当于是结构助词“的”。
+</p>
+<p>
+Сургуулийн ном 学校的书，хувьсгалын ашиг тус 革命的利益，нийтийн үйлс 公共事业，тэрэгний хүрд 车轮，дээлийн хормой 衣襟 (衣摆)，Шанхайн машин 上海的机器，модон байшин 木头房子，шувууны буу 鸟枪，өглөөний хоол 早
+餐，Баяновооны төмөр 白云鄂博的铁，аяны хүн 旅行者，аймгийн наадам 盟的那达慕大会，цээжний үг 心腹话，сэтгэлийн баяр 心中的喜事，уулын оргил 山顶，усны эх 水源，ӨвөрМонголын Их Сургууль 内蒙古大学，цагаан
+идээний үйлдвэр 乳品厂，ажлын чөлөөний сургууль 业余学校
+</p>
+<p>
+2．属格名词有时可以限定形容词。这一般是为了表达的需要，把原来的形容词—名词结构倒置成为名词—形容词结构的结果。这时名词成为定语，而形容词则成为被限定语，并且有主体词的性质。如：нарны халуун 太阳的热，
+сарын гэгээн 月亮的明，цасны цагаан 雪的白，уулын өндөр 山的高，усны гүн 水的深，өдрийн сайхан 天气的好，шөнийн урт 夜晚的长
+</p>
+<p>
+3. 在词组及副句里，属格可以是连接主语和谓语的形式。这时，主语采取属格形式。
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-24"></a>
+<p>
+<sup>2</sup>&nbsp; 不稳定 н (字典里有标注)
+</p>
+<p>
+<sup>3</sup>&nbsp; 如：муугаас муу 最坏
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүний ярьсныг та ойлгов уу?
+</p>
+<p>
+您了解他所说的 (事) 吗？
+</p>
+<p>
+Баатарын явсныг та сонсов уу?
+</p>
+<p>
+您听说巴特尔走的事吗？
+</p>
+<p>
+Нөхдийн гаргасан санал бодит байдалтай нийцэж байна.
+</p>
+<p>
+同志们提出的意见合乎实际情况
+</p>
+<p>
+Таны илгээсэн номыг бид олж авчээ.
+</p>
+<p>
+您寄的书我们收到了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4．以属格为基础，可构成时位词结构和某些后置词结构。如：үүдний өмнө 门前，гэрийн ар 屋后，уулын өмнөх 山前的，арлын баруундахи 岛西的，голын цаана 河那边，сургуулийн дэргэд 学校附近，өндөгний хир 蛋那样 (大小)，
+аяганы чинээ 碗那样 (大小)，нөхдийн хамт 和同志们一起，олон түмний төлөө 为群众，ашиг тусын тухай 关于利益
+</p>
+<p>
+5．属格在个别情况下 (后边加 х 或 хан хэн), 可成为构词的基础 (参见构词法)。如：аавынх 父亲的东西，минийх 我的东西，манайхан 我们的人，гадаадынхан 外国人
+</p>
+<p>
+<b> 第三、给在格 (向位格) 的意义和作用 </b>
+</p>
+<p>
+向位格既表示间接宾语和述语之间的关系，也表示状语和述语之间的关系。
+</p>
+<p>
+(1)．表示动作的间接宾语。这里边也有种种不同情况，如：a. 表示离心动词 (如“给”&#x202f;“交”&#x202f;“教”等) 的间接对象，附加成分的意义相当于“于”
+。b. 表示向心动词 (如“加入”&#x202f;“参加”等) 的间接对象，附
+加成分的意义相当于“于”
+。c. 表示静态动词 (如“有”&#x202f;“存在”&#x202f;“适合”等) 的间接对象，附加成分的意义相当于“在…中”,“对…来说”等。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Олонд тархааж өгөх 分配给大家。
+</p>
+<p>
+Албанд тушааж өгөх 交给公家。
+</p>
+<p>
+Нөхөддөө хэлэх 向朋友们说。
+</p>
+<p>
+Олны хэрэгцээнд зориулах 为大家的需要
+</p>
+<p>
+Ард түмэнд үйлчлэх 为人民服务
+</p>
+<p>
+Нөхөддөө найдах 委托给同志们
+</p>
+<p>
+Олон түмэнд ойртох 接近群众
+</p>
+<p>
+Хувьсгалд орох 参加革命。Намд орох 参加党
+</p>
+<p>
+Монгол хэлэнд шинэ үг нэмэгдэж байна.
+</p>
+<p>
+蒙古语中新名词在增加
+</p>
+<p>
+Тэр хүний санаанд нийцнэ. 合乎那个人的心意
+</p>
+<p>
+Танд ихдэв. 对你过大了
+</p>
+<p>
+Түүнд арвин ном байна. 他有很多书
+</p>
+<p>
+Түүнд сэтгэлийн хэрэг байна. 他心里有事
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(2) 向位格 (给在格) 还表示被动态动词的发起者，使动态动词的接受者，它们在语法上也都属于间接宾语。相当于“被 XX”和“使 (让)XX”
+。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+наранд шарагдах 被太阳晒。
+</p>
+<p>
+Тоосонд дарагдах 蒙上了尘土 (被尘土所蒙)
+</p>
+<p>
+Олонд сайшаагдах 被大家称赞
+</p>
+<p>
+Манай цэрэгт дийлэгдэх 被我军打败
+</p>
+<p>
+Мөндөрт цохигдох 被雹子打
+</p>
+<p>
+Мэргэн автах 被聪明所误
+</p>
+<p>
+Сурагчдад уншуулах 让学生们读
+</p>
+<p>
+Олонд танилцуулах 给大家介绍
+</p>
+<p>
+Хүүхэддээ идүүлэх 让孩子吃
+</p>
+<p>
+Чамд үзүүлэх 让你看
+</p>
+<p>
+Нийтэд хэрэглүүлэх 让大家使用
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(3) 表示形容词述语的间接宾语. 大部分相当于“对 XX”
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ажилд хэрэгтэй 对工作有用
+</p>
+<p>
+Олонд тустай 对大家有好处
+</p>
+<p>
+Хувьсгалд ашигтай 对革命有利
+</p>
+<p>
+Уран сайханд дуртай 对文艺爱好
+</p>
+<p>
+Миний сэтгэлд зохимжгүй 对我心意不合
+</p>
+<p>
+Ажилд сурамгай 对工作钻研
+</p>
+<p>
+Манай ажилд саналтай 对我们的工作有意见
+</p>
+<p>
+Энэ хүн ном бичигтээ сайн 此人学问很好
+</p>
+<p>
+Тэр хүн манд их эелдэг 那人对我们很和气
+</p>
+<p>
+Түүнд зоостой 他有钱
+</p>
+<p>
+Түүнд арвин номтой 他有很多书
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）向位格可以表示原因、依据、条件等，这些都分别构成状语。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би энэ хэрэгт ирэв 我为此事而来
+</p>
+<p>
+Тэр албаны учирт гадагш гарав
+</p>
+<p>
+他为公事出差了
+</p>
+<p>
+Хүчиндээ эрдэх 倚仗自己的力量
+</p>
+<p>
+Мориндоо бардах 对自己的马自负 (自恃)
+</p>
+<p>
+Энэ хэргийн учир шалтгаан таны биед байхгүй
+</p>
+<p>
+这事情的原因不在你身上
+</p>
+<p>
+Хариуцлага нь чамд байна 责任在你
+</p>
+<p>
+Сайн морь эмээлд үгүй, сайхан зүс дээлд үгүй
+</p>
+<p>
+马好不在鞍子，貌美不在衣饰
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（5）向位格可以表示行为进行的时间及期间，即表示时间状语。相当于“在 XX(时间)”“在 XX(期间)”。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Эртэд гарсан хэрэг 早先发生的事情
+</p>
+<p>
+Найман цагт явжээ 八点走了
+</p>
+<p>
+Нар гарах үед хүрчээ 太阳出来时到达的
+</p>
+<p>
+Залуудаа малчин байжээ 年青时是牧民
+</p>
+<p>
+Жилд нэг удаа харина 一年回去一次
+</p>
+<p>
+Сард хоёр удаа очно 一个月去两次
+</p>
+<p>
+Өдөртөө очоод ирнэ 当天去回来
+</p>
+<p>
+Жилдээ зав чөлөө гарахгүй 整年没有闲暇
+</p>
+<p>
+Насандаа хийж барахгүй 一辈子做不完
+</p>
+<p>
+Хугацаандаа хийж барна. 在期限内作完
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（6）向位格可以表示行为的目标，动作的趋向地点，发生地点，行为进行的环境，即一种地点状语。相当于“到 XX(地方)”“在 XX(地方)”。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бэлчээрт гарах 到牧场去。тогоонд хийх 放入锅里。
+</p>
+<p>
+гэрт орох 进入屋内。гадаадад томилох 派到国外。
+</p>
+<p>
+гэрт нь хариулах 让他回家。замд нь оруулах 让他上路。
+</p>
+<p>
+гэртээ байна 在家里。авдартаа хадгална 收藏在箱子里。
+</p>
+<p>
+гадаадад сууна 住在国外。сургуульд багшлана 在学校教学。
+</p>
+<p>
+энэ газарт мод сайн ургана 这地方树长得好。
+</p>
+<p>
+Бээжинд төрөөд малжих оронд өсчээ 出生在北京，成长在牧区。
+</p>
+<p>
+чи энэ хавьд намайг хүлээж бай 你在这附近等我。
+</p>
+<p>
+одон гэрэлд бүрэг бараг үзэгдэнэ 在星光下影影绰绰看见<sup>4</sup>。
+</p>
+<p>
+саранд үзнэ 在月光下看。наранд сууна 坐在有阳光的地方。
+</p>
+<p>
+цас бороонд явна 在雨雪里行走
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-25"></a>
+<p>
+<sup>4</sup>&nbsp;(бүрэг бараг 影影绰绰)
+</p>
+
+</div>
+</div>
+<p>
+（7）向位格还可以表示包含行为意义的形容词述语的时间状语。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+оройн найман цагт үдэшлэгтэй 晚上八点有晚会。үдийн хойно хоёр цагт хуралтай 午后两点有会议。жилдээ яв яаруу 整年很忙。өдөртөө чөлөөгүй 整天没有空闲时间
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（8）向位格还可以表示包含存在意义的形容词述语的地点状语。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+энэ голд загастай 这河里有鱼。тэр том нуурт загас нэн арвин 那大湖里鱼更多。тэр уулын ард их модтой 那山背面树很多。энэ ууланд мод цөөн 这山上树很少
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 第四、宾格的意义和用处......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-26"><span class="sectionnumber">1.1.4.0.0.1&#x2003;</span>第四、宾格的意义和用处</span>
+<a id="cyrillic-grammar-autopage-26"></a>
+
+</p>
+<p>
+（1）宾格是连接直接宾语和及物动词的主要形式。蒙古语宾格附加成分相当于介词“把”，而蒙古语宾格附加成分是名词的后置成分，蒙古语直接宾语的宾格附加成分有时可以省略。
+</p>
+<p>
+(a) 泛指一般的事物时，不带宾格附加成分，专指特定的事物时要带宾格附加成分。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би морь унасан. 我骑马了
+</p>
+<p>
+Би энэ морийг унасан. 我骑了这匹马
+</p>
+<p>
+Та очиж хүн дууд. 您去叫人
+</p>
+<p>
+Та очиж тэр хүнийг дууд. 您去叫那个人
+</p>
+<p>
+Маргааш арван хүн явуулъя. 明天派十人去
+</p>
+<p>
+Маргааш Баян , Өлзий , Далай гурвуулыг явуулъя.
+</p>
+<p>
+明天派巴音、乌勒吉、达赖三人去
+</p>
+<p>
+За , цай уу. 喂，喝茶
+</p>
+<p>
+За , тэр цайг та уу. 喂，那茶请您喝
+</p>
+<p>
+Би нэг бийр хэрэглэе. 我用一下笔
+</p>
+<p>
+Би бийрийг чинь хэрэглэе. 我用一下你的笔
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+特定事物包括：专用名词、亲属名称、人称代词、指示代词；以及以这几类词为定语的名词；带有领属附加成分 (минь чинь нь) 的名词; 其它从前后词可以看出它是指特定事物的名词等。
+</p>
+<p>
+(b) 为了强调宾语把宾语提到前面去，从而在宾语和及物动词之间加进别的词时，宾格的附加成分不能省略。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би суваг малтая. 我挖渠吧
+</p>
+<p>
+Сувгийг би малтая. 渠由我来挖吧
+</p>
+<p>
+Та ус зал. 您引水
+</p>
+<p>
+Усыг та зал. 水您去引
+</p>
+<p>
+Түүнээр хичээл заалга. 让他教学
+</p>
+<p>
+Хичээлийг түүнээр заалга. 教学让他来作
+</p>
+<p>
+Нэлээд удтал морь унасангүй.
+</p>
+<p>
+很长时间没有骑马
+</p>
+<p>
+Морийг нэлээд удтал унасангүй.
+</p>
+<p>
+马很长时间没有骑了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（c) 蒙古语里有时及物动词前边的宾格名词有可能误认为是主格，这种情况下为了明确起见一般宾格附加成分不省略。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Өөр хүн хэлж байна. 别人说呢
+</p>
+<p>
+Өөр хүнийг хэлж байна. 说别人呢
+</p>
+<p>
+Шинэ сурагч угтана. 新学生迎接
+</p>
+<p>
+Шинэ сурагчийг угтана. 迎接新学生
+</p>
+<p>
+Цэргийн нөхөр асууж байна. 军队同志问呢
+</p>
+<p>
+Цэргийн нөхрийг асууж байна. 问军队同志
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(2）在词组及副句中，宾格可以成为连接主语和谓语的形式。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Баатарыг ирэхэд Буянт явчихжээ.
+</p>
+<p>
+巴特尔来的时候宝音走了
+</p>
+<p>
+Усыг буцлахад нь үүнийг чана.
+</p>
+<p>
+水开的时候煮这个
+</p>
+<p>
+Чамайг буцаж иртэл би энд байз байя.
+</p>
+<p>
+一直到你回来我在这里等着
+</p>
+<p>
+Намайг мэнд хүргэж байна гэж нөхдөд дамжуулж өгөх болов уу.
+</p>
+<p>
+请给同志们转告一下我在问候他们
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）在使动结构中，使动词的宾语，即原动词的实际主语，采用宾格形式。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Олон хүнийг ачааны машинд суулгасан.
+</p>
+<p>
+使很多人坐上大卡车
+</p>
+<p>
+Ээж намайг орон дээр хэвтүүлэв.
+</p>
+<p>
+母亲使我躺在床上
+</p>
+<p>
+Зоригтныг Бээжинд явуулъя.
+</p>
+<p>
+把卓力克图派到北京去
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 第五、凭借格 (用让格) 的意义和用处......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-27"><span class="sectionnumber">1.1.4.0.0.2&#x2003;</span>第五、凭借格 (用让格) 的意义和用处</span>
+<a id="cyrillic-grammar-autopage-27"></a>
+
+</p>
+<p>
+凭借格既可以表示间接宾语，也可以表示状语。
+</p>
+<p>
+（1）表示动作所凭借的事物，相当于“用…”“以…”，构成间接宾语。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Мориор явах 骑马去
+</p>
+<p>
+Модоор хийх 用木头做
+</p>
+<p>
+Тэргээр хүргэх 用车送
+</p>
+<p>
+Цаасаар баглах 用纸包
+</p>
+<p>
+Гараар барих 用手抓
+</p>
+<p>
+Дээсээр татах 用绳子拉
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）表示使动动作所凭借的人和事物，即行为的逻辑主语，语法上的间接对象。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хүнээр хийлгэх 让人做
+</p>
+<p>
+Түүнээр хэлүүлэх 让他说
+</p>
+<p>
+Чамаар уншуулах 让你念
+</p>
+<p>
+Тэргээр тээлгэх 用车拉
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）表示行为的内容，即表示“作为”&#x202f;“认为”这类词的对象 (间接宾语)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Төлөөлөгчөөр сонгох 选为代表
+</p>
+<p>
+Багшаар ажиллах 当老师
+</p>
+<p>
+Эрдэнээр үзэх 当作宝贝
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）表示形容词述语的主语，属于一种主述关系。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+мөрөөрөө бариг 肩窄 хүнээр сайн 人缘好 эрдмээр тэгш 技能全 мэдлээр дутуу 知识缺乏. уул усаар элбэг 山水多 нутаг дэвсгэрээр уудам 土地广大
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（5）凭借格可以表示行为的方式方法、手段、原因、目标，这些都构成一种状语。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Жагсаалаар явах 列队走
+</p>
+<p>
+дугуйлангаар ярилцах 小组讨论
+</p>
+<p>
+цээжээр бодох 心算 чадлын хирээр хийх 尽其所能
+</p>
+<p>
+их дуугаар бархирах 大声喊叫.
+</p>
+<p>
+хөдөлмөрийн хүчээр амьдрах 靠劳动力生活
+</p>
+<p>
+монголоор орчуулах 用蒙古语翻译
+</p>
+<p>
+албаны хэргээр явах 因公出差 <sup>5</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-28"></a>
+<p>
+<sup>5</sup>&nbsp;дугуйлан(г) 小组
+</p>
+
+</div>
+</div>
+<p>
+（6）凭借格可以表示进行动作的时间范围，时间条件，或整个期间。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+зунаар хөдөө явах 夏天下乡 үдийн үеэр ир 中午来吧 шөнөөр ажиллаж өдрөөр амарна 夜间工作白天休息 сараар явах 走一个月 хоногоор суух 住一宿
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（7）凭借格可以表示行为进行的空间，空间条件，或某一空间范围内的整体，构成一种状语。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хөдөөгөөр явах 下乡 гадаад улсаар аялах 国外旅行 уулаар тойрох 到山上走一走 хажуугаар гарах 从傍边走过 хөвөөгөөр өнгөрөх 沿着边沿过去 агаараар нисэх 航空 талаар дүүрэх 遍野 гэрээрээ очих 全家去 хошуугаараа нүүх 全旗游动
+улсаараа мэдэх 全国都知道
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 第六、从比格的意义和用处......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-29"><span class="sectionnumber">1.1.4.0.0.3&#x2003;</span>第六、从比格的意义和用处</span>
+<a id="cyrillic-grammar-autopage-29"></a>
+
+</p>
+<p>
+从比格在许多方面与向位格 (给在格) 相对应，从比格也和向位格 (给在格) 一样，既表示间接宾语，也表示状语。
+</p>
+<p>
+（1）表示动作的间接宾语。这里边包括：(a）表示向心动作 (如“要”&#x202f;“学”&#x202f;“问”) 的间接对象，附加成分的意义相当于“和”&#x202f;“向”
+；(b) 表示离心动作 (如“分离”&#x202f;“回避”&#x202f;“背离”
+等) 的间接对象，附加成分的意义相当于“从”；(c) 表示区别、分别等意义的行为的间接对象 (即关系对象)，附加成分的意义相当于“从”等。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> түүнээс авах 从他要，бусад байгууллагаас зээлэх 从别的单位借，олон түмнээс суралцах 向群众学习，багшаас асуух 和老师问，замын хүнээс сураглах 向走路的人打听
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> олон түмнээс салах 脱离群众，хижгээс сэргийлэх 防疫，шалгалтаас зүрхших 怕考试，хүнээс ичих 见人羞怯，юмнаас үргэх 见什么东西惊跑
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>3</span> хонийг ямаанаас салгах 把绵羊与山羊分开，харыг цагаанаас ялгах 区分黑白
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）从比格可以表示全体与部分的种种关系。这也是一种间接宾语。这里边包括：(a) 表示把握意义行为的着手部位 (整体的一个部位)；(b) 表示使用意义行为的着手部分 (全体的一个部分)；(c) 表示某类事物中的某种事物等，大致相
+当于“从…”
+。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span>гараас нь барих 抓他的手，сүүлээс нь татах 拉它的尾巴，ханцуйгаас чангаах 拉紧袖子，тэрэгнээс уях 拴在车上
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span>будаанаас нь идэх 吃饭，ногооноос нь зуух 就菜，ээзгий хурууднаас нь ав 取奶食
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>3</span>идэхээс будаатай 有吃的粮食，өмсөхөөс хувцастай 有穿的衣服，түлэхээс түлээтэй 有烧的柴
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）从比格名词可用在形容词及时位词前边表示比较的对象，这也是一种间接宾语，相当于“比……”
+。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+уулнаас өндөр 比山高，далайнаас гүн 比海深，болдоос хатуу 比钢硬，цаснаас цагаан 比雪白，үүнээс дээр 比这个好，түүнээс хойш 从那以后
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）从比格有时表示行为的发起者，即行为的主体。相当于“由谁谁”。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+багшаас заажээ 老师教的，багшаас хэлсэн нь 老师说，удирдлагаас тогтоожээ 领导决定的，сургуулиас өгөв 学校给的，олон түмнээс санал гаргажээ 群众提出了意见
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（5）从比格可以表示引起行为的原因，这构成一种状语。相当于“由于 XX”。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+архинаас балрав 因喝酒而神智不清，тамхинаас ханиад ихдэв 因吸烟而咳嗽加重，чиний үгнээс мэдлээ 从你话里知道的，ийм учраас би очих хэрэгтэй 由于这样我需要去，амжилтаас толгой нь эргэх 胜利冲昏了头脑
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（6）从比格可以表示时间的起点，即行为开始的时间 (状语)。相当于“从……时间”。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хэзээнээс 从什么时候？ирэх гаригаас 从下星期，маргаашаас суралцана 从明天学习，өглөөнөөс эхэлж бороо оров 从早晨开始下雨
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（7）从比格可以表示空间的起点，即行为开始的地点，行为开始的方向 (状语)。相当于“从……地点”。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хөх хотоос иржээ 从呼和浩特来，гэрээс гарах 从家出去，уулнаас буух 从山上下来，хойноос нь нэхэх 从后边赶，зүүн зүгээс салхилах 从东边刮风，өмнөөс ирлээ 从南方来的，дээрээс унажээ 从上边掉的，Улаан хотоос олсон 从乌兰浩
+特得到的，гэрээс эрэх 从家里找
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（8）从比格还可以表示包含行为意义的形容词述语的时间起点 (状语)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+найман цагаас хуралтай 从八点有会，долоон цагаас үдэшлэгтэй 从七点有晚会
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（9）从比格还可以表示包含行为意义的形容词述语的开始方向 (状语)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хойноос салхитай 从北边有风，баруунтайгаас жавартай 从西边有风
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 第七、和同格的意义和用处......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-30"><span class="sectionnumber">1.1.4.0.0.4&#x2003;</span>第七、和同格的意义和用处</span>
+<a id="cyrillic-grammar-autopage-30"></a>
+
+</p>
+<p>
+和同格主要表示间接宾语和动词之间的关系。
+</p>
+<p>
+（1）表示共同一起动作和相互动作 (互动态动词) 的对象。这个对象逻辑上也是主语，但它处在次要的、被动的地位，因而语法上属于一种间接宾语。相当于“和谁谁”&#x202f;“同谁谁”。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Та хэнтэй ирэв ? 您和谁一起来的？
+</p>
+<p>
+Би Баатартай хот орно. 我和巴特尔一起进城
+</p>
+<p>
+Би тантай ярилцах зүйл байна.
+</p>
+<p>
+我和您有事要商量
+</p>
+<p>
+Энэ хэргийг Баатартай зөвдвөл дээр.
+</p>
+<p>
+这事和巴特尔商量为好
+</p>
+<p>
+Баатар нөхөр Баттай барилдаж байна.
+</p>
+<p>
+巴特尔同志和巴图摔跤呢
+</p>
+<p>
+Зам дээр Өлзийтэй тааралджээ.
+</p>
+<p>
+道上遇见了乌勒吉同志
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）表示具有结合、接触、抵触等意义的动词的间接对象，相当于“与什么”。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Олонтой ойртох 接近群众，Тариачинтай нөхөрлөх 与农民交朋友，олонтой таарах 和群众关系好，бусадтай холбогдох 与别人有牵连，түүнтэй тэнцэх 与它匹敌，хүнтэй халдах 侵犯别人
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）和同格常和 хамт (一起), адил (一样) 等后置词结合成后置结构一起使用。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр мантай хамт суралцаж байна
+</p>
+<p>
+他和我们一起学习
+</p>
+<p>
+Бид түүнтэй хамт явна. 我们和他一起走
+</p>
+<p>
+Тэр хүн хүүтэйгээ цуг иржээ.
+</p>
+<p>
+他与他儿子一起来的
+</p>
+<p>
+Энэ газар өөр газартай адилгүй.
+</p>
+<p>
+这地方与别的地方不一样
+</p>
+<p>
+Хөдөө нутаг байж байгаад хот газартай адил.
+</p>
+<p>
+说是乡村，可是与城市一样
+</p>
+<p>
+Энэ тэрэг тэр тэрэгтэй өөр ч үгүй
+</p>
+<p>
+这个车与那个车没有什么不同
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+蒙古语中作定语的“тай”~“тэй”，往往也被认为是“和同格”，但这种“тай~тэй”的用法与一般的“格”有很多的不同之处。它除了能作定语外，还常常充当述语。如：морьтой хүн 有马的人（与 морьгүй хүн 没有马的人相对应）
+түүнд морьтой 他有马（与 түүнд морьгүй 他没马相对应）тэр хүн морьтой болжээ 那个人有马了（与 тэр хүн морьгүй болжээ 那个人没马了相对应）
+</p>
+<p>
+这种表示“具有”意义的“тай~тэй”，可以看作是构成形容词的一种附加成分。
+</p>
+
+<!-...... subparagraph 第八、联合格、“双重格”......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-31"><span class="sectionnumber">1.1.4.0.0.5&#x2003;</span>第八、联合格、“双重格”</span>
+<a id="cyrillic-grammar-autopage-31"></a>
+
+</p>
+<p>
+联合格在过去的书面语言中比较常见，现在用的比较少，在口语里有些地区常使用，有些地区很少使用。它的书面语的形式是 лугаа , лүгээ (和, 与, 同), 口语里的说法是 [ læ] [ lә:]。不用联合格的地方，它的一般意义用 тай тэй (表示人
+或物时) 或 д т (表示时间时) 来表达。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Над лугаа адилтгавал. 和我比较
+</p>
+<p>
+Надтай адилтгавал. 和我比较
+</p>
+<p>
+Чам лугаа хэлэлцэхгүй. 不和你谈论
+</p>
+<p>
+Чамтай хэлэлцэхгүй. 不和你谈论
+</p>
+<p>
+Та үд лүгээ ир. 您中午来吧
+</p>
+<p>
+Та үдэд ир. 您中午来吧
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+近来在翻译当中，由于表达需要，有时还要用 лугаа лүгээ。这对增强蒙古语的表达能力是有积极意义的。Ажилчин тариачин лугаагийн холбоогоо нягтруулах 加强 (密切) 与工农的联系。Ах дүү үндэстэн лүгээгийн бүлгэмдэлийг
+чангатгах 加强与兄弟民族的团结。<sup>6</sup>
+</p>
+<p>
+关于“双重格”
+。从附加成分的形式看蒙古语中有三种双重格。即：1、以和同格为基础的 тайд тэйд тайгаас тэйгээс …；2、以属格为基础的 найд нэйд найгаас …；3、以向位格为基础的 тээс 。但是严格说来都不是真正的双重格。
+</p>
+<p>
+首先，以向位格为基础的只有一个 тээс , 而且主要是用在 гэр(家, 屋) 这一词上, 实际上 гэрт 有了“家里”这样一个词汇意义。其次，所谓和同格为基础的，实际上不是以真正的和同格 (见前述和同格的说明) 为基础，而是以构成形容词
+的附加成分 тай тэй 为基础。морьтойд , морьтойгоос 的意义为“给有马的”，
+“从有马的“等。如果是 салхитайд , салхитайгаас , 则有“在有风的情况下”
+，
+“由于有风”等意义。最后，以属格为基础的 найд найгаас 的 най нэй ，实际上
+也有一种构词作用，这种构词作用后边没有格的后缀时不够明显，加上格的后缀就变得明显。
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-32"></a>
+<p>
+<sup>6</sup>&nbsp;хэн лүгээ 和谁，юу лугаа 和什么，ах лугаа 和哥哥，дүү лүгээ 同弟弟
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Танайд очсон 到你们那里去了。
+</p>
+<p>
+Танайгаас явсан 从你们那里走了。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<figure id="autoid-2" class="table ">
+
+<table>
+<tr style="display:none"><th>.</th></tr>
+
+<tr class="hline">
+<td class="tdl tvertbarr" style="border-right: 1px solid black"> 格 </td>
+<td class="tdl tvertbarr" style="border-right: 1px solid black"> 关系 </td>
+<td class="tdc tvertbarr" style="border-right: 1px solid black"> 功能 </td>
+<td class="tdc"> 主要功能 </td>
+</tr>
+
+<tr class="hline">
+<td rowspan="3" class="tdl tvertbarr" style="vertical-align:middle; border-right: 1px solid black"> 一、主格 </td>
+<td class="tdl tvertbarr" style="border-right: 1px solid black"> 名—名、形、动 </td>
+<td class="tdc tvertbarr" style="border-right: 1px solid black"> 主语 </td>
+<td rowspan="3" class="tdc" style="vertical-align:middle"> 主语 </td>
+</tr>
+
+<tr>
+<td class="tdl tdrule tvertbarr" style="border-right: 1px solid black"> 名—名、形 </td>
+<td class="tdc tdrule tvertbarr" style="border-right: 1px solid black"> 定语 </td>
+</tr>
+
+<tr>
+<td class="tdl tdrule tvertbarr" style="border-right: 1px solid black"> 名-名 </td>
+<td class="tdc tdrule tvertbarr" style="border-right: 1px solid black">（联合关系，同位关系）
+</td>
+</tr>
+
+<tr class="hline">
+<td rowspan="2" class="tdl tvertbarr" style="vertical-align:middle; border-right: 1px solid black"> 二、领格 </td>
+<td class="tdl tvertbarr" style="border-right: 1px solid black"> 名—名、形 </td>
+<td class="tdc tvertbarr" style="border-right: 1px solid black"> 定语 </td>
+<td rowspan="2" class="tdc" style="vertical-align:middle"> 定语 </td>
+</tr>
+
+<tr>
+<td class="tdl tdrule tvertbarr" style="border-right: 1px solid black"> 名—动 </td>
+<td class="tdc tdrule tvertbarr" style="border-right: 1px solid black">（副句）主语 </td>
+</tr>
+
+<tr class="hline">
+<td rowspan="2" class="tdl tvertbarr" style="vertical-align:middle; border-right: 1px solid black"> 三、向位格 </td>
+<td class="tdl tvertbarr" style="border-right: 1px solid black"> 名—动、形 </td>
+<td class="tdc tvertbarr" style="border-right: 1px solid black"> 间接宾语 </td>
+<td class="tdc"> 间接宾语 </td>
+</tr>
+
+<tr>
+<td class="tdl tdrule tvertbarr" style="border-right: 1px solid black"> 名—动、形 </td>
+<td class="tdc tdrule tvertbarr" style="border-right: 1px solid black"> 状语 </td>
+<td class="tdc"> 状语 </td>
+</tr>
+
+<tr class="hline">
+<td rowspan="2" class="tdl tvertbarr" style="vertical-align:middle; border-right: 1px solid black"> 四、宾格 </td>
+<td class="tdl tvertbarr" style="border-right: 1px solid black"> 名—动 </td>
+<td class="tdc tvertbarr" style="border-right: 1px solid black"> 直接宾语 </td>
+<td rowspan="2" class="tdc" style="vertical-align:middle"> 直接宾语 </td>
+</tr>
+
+<tr>
+<td class="tdl tdrule tvertbarr" style="border-right: 1px solid black"> 名—动 </td>
+<td class="tdc tdrule tvertbarr" style="border-right: 1px solid black">（副句）主语 </td>
+</tr>
+
+<tr class="hline">
+<td rowspan="3" class="tdl tvertbarr" style="vertical-align:middle; border-right: 1px solid black"> 五、凭借格 </td>
+<td class="tdl tvertbarr" style="border-right: 1px solid black"> 名—动 </td>
+<td class="tdc tvertbarr" style="border-right: 1px solid black"> 间接宾语 </td>
+<td rowspan="3" class="tdc" style="vertical-align:middle"><br />
+
+<div class="minipage" style="vertical-align:bottom ; justify-content:flex-start ; "><br />
+<a id="cyrillic-grammar-autopage-34"></a><br />
+间接宾语 <br />
+状语
+</p>
+<br />
+</div><br />
+</td>
+</tr>
+
+<tr>
+<td class="tdl tdrule tvertbarr" style="border-right: 1px solid black"> 名—形 </td>
+<td class="tdc tdrule tvertbarr" style="border-right: 1px solid black"> 状语 </td>
+</tr>
+
+<tr>
+<td class="tdl tdrule tvertbarr" style="border-right: 1px solid black"> 名—形 </td>
+<td class="tdc tdrule tvertbarr" style="border-right: 1px solid black"> 主语 </td>
+</tr>
+
+<tr class="hline">
+<td rowspan="3" class="tdl tvertbarr" style="vertical-align:middle; border-right: 1px solid black"> 六、从比格 </td>
+<td class="tdl tvertbarr" style="border-right: 1px solid black"> 名—动、形 </td>
+<td class="tdc tvertbarr" style="border-right: 1px solid black"> 间接宾语 </td>
+<td rowspan="3" class="tdc" style="vertical-align:middle"><br />
+
+<div class="minipage" style="vertical-align:bottom ; justify-content:flex-start ; "><br />
+<a id="cyrillic-grammar-autopage-35"></a><br />
+间接宾语 <br />
+状语
+</p>
+<br />
+</div><br />
+</td>
+</tr>
+
+<tr>
+<td class="tdl tdrule tvertbarr" style="border-right: 1px solid black"> 名—动、形 </td>
+<td class="tdc tdrule tvertbarr" style="border-right: 1px solid black"> 状语 </td>
+</tr>
+
+<tr>
+<td class="tdl tdrule tvertbarr" style="border-right: 1px solid black"> 名—动 </td>
+<td class="tdc tdrule tvertbarr" style="border-right: 1px solid black"> 主语 </td>
+</tr>
+
+<tr class="hline">
+<td class="tdl tvertbarr" style="border-right: 1px solid black"> 七、和同格 </td>
+<td class="tdl tvertbarr" style="border-right: 1px solid black"> 名—动 </td>
+<td class="tdc tvertbarr" style="border-right: 1px solid black"> 间接宾语 </td>
+<td class="tdc"> 间接宾语 </td>
+</tr>
+
+<tr class="hline" aria-hidden="true">
+<td class="tdl"></td>
+<td class="tdl"></td>
+<td class="tdc"></td>
+<td class="tdc"></td>
+</tr>
+</table>
+
+<div class="figurecaption">
+
+<p>
+表 1.2:&nbsp;蒙语各格主要功能表
+</p>
+</div>
+</figure>
+
+<!-...... subsection 名词的领属......
+-->
+<h5 id="autosec-36"><span class="sectionnumber">1.1.5&#x2003;</span>名词的领属</h5>
+<a id="cyrillic-grammar-autopage-36"></a>
+
+<p>
+领属是指一个事物属于谁。在蒙古语里常常在一个名词下边接加某种附加成分，来说明该名词所表达的事物属于谁的，这种附加成分叫领属附加成分。
+</p>
+<p>
+蒙古语的领属可以分为两类：人称领属与反身领属。人称领属说明的是，该事物属于第一人称 (我)、第二人称 (你) 或第三人称 (他) 的哪一个人称。反身领属说明的是，该事物属于句中主体词自己。
+</p>
+
+<!-...... subparagraph 1. 人称领属......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-37"><span class="sectionnumber">1.1.5.0.0.1&#x2003;</span>1. 人称领属</span>
+<a id="cyrillic-grammar-autopage-37"></a>
+人称领属的附加成分是 минь , чинь , нь , 分别表示第一人称领属，第二人称领属、第三人称领属。这些附加成分原来是由人称代词的所属格 миний —我的，чиний —你的，үүний —他的，演变而来的。另外还有较少使用的 маань тань
+是由 манай —我们的，танай (таны) 你们的，演变而来的。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ах чинь 你的哥哥
+</p>
+<p>
+ахын чинь 你哥哥的
+</p>
+<p>
+ахыг чинь 把你哥哥
+</p>
+<p>
+ахад чинь 给你哥哥
+</p>
+<p>
+ахаар чинь 让你哥哥
+</p>
+<p>
+ахаас чинь 从你哥哥
+</p>
+<p>
+ахтай чинь 和你哥哥
+</p>
+<p>
+ажил минь (我的) 工作
+</p>
+<p>
+ажлын минь (我) 工作的
+</p>
+<p>
+ажилд минь 给 (我) 工作
+</p>
+<p>
+ажил маань (我们的) 工作
+</p>
+<p>
+ажил тань (你们的) 工作
+</p>
+<p>
+хүү нь 他儿子
+</p>
+<p>
+хүүгийн нь 他儿子的<sup>7</sup>
+</p>
+<p>
+хүүг нь 把他儿子，
+</p>
+<p>
+хүүд нь 给他儿子，
+</p>
+<p>
+хүүгээр нь 让他儿子，
+</p>
+<p>
+хүүгээс нь 从他儿子，
+</p>
+<p>
+хүүтэй нь 和他儿子
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-38"></a>
+<p>
+<sup>7</sup>&nbsp; 第三人称领属附加成分 нь 被接在属格后边时，中间出现一个 х (h) 音 (hini )。
+</p>
+
+</div>
+</div>
+<p>
+有时，人称领属附加成分 нь , чинь 并不表示它原来的人称领属意义，而主要充当句中主语的标志或句子的逻辑重音。在这种情况下可以出现与它原来的领属意义不相适应的情况。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Найм нь ирээд хоёр нь ирсэнгүй
+</p>
+<p>
+八个来了，二个没有来。
+</p>
+<p>
+Дараа өдөр нь тунгалаг сайхан өдөр
+</p>
+<p>
+第二天天气很好
+</p>
+<p>
+Өнгөний нь сайхан гэдэг нь хэрэг ээ
+</p>
+<p>
+颜色特别好看
+</p>
+<p>
+Сая сурч байгаа явдал чинь горьгүй шүү
+</p>
+<p>
+因为刚学习，还不成啊
+</p>
+<p>
+Та чинь яагаад оройтчихов ? 您为什么迟了？
+</p>
+<p>
+Би чинь мартаад явуулчихсан шүү 我忘掉了
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 2. 反身领属......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-39"><span class="sectionnumber">1.1.5.0.0.2&#x2003;</span>2. 反身领属</span>
+<a id="cyrillic-grammar-autopage-39"></a>
+反身领属的附加成分内蒙古的是 аан ээн оон өөн , 蒙古国的是 аа ээ оо өө , (写法及发音略有不同) 。意义为“自己的“。反身领属附加成分可以用在主格以外的其它各格。
+</p>
+<p>
+
+<a href="./media/image3.jpg" target="_blank" ><img
+src="./media/image3.jpg"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+<p>
+说明：所属格反身，先加 х 再加 аа ээ。миний + х + ээ—минийхээ
+</p>
+<p>
+
+<a href="./media/image4.jpeg" target="_blank" ><img
+src="./media/image4.jpeg"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+<p>
+
+<a href="./media/image5.jpeg" target="_blank" ><img
+src="./media/image5.jpeg"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+<p>
+
+<a href="./media/image6.png" target="_blank" ><img
+src="./media/image6.png"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+<p>
+名词宾格 ыг ийг 后接 минь чинь нь 时，宾格附加成分 ыг ийг 变为 ы, ий ，如：номыг чинь = номы чинь
+</p>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

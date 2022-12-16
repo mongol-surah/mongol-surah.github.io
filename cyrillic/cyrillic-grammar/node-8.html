@@ -1,0 +1,4420 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—动词词尾形态 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-111"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... section 动词词尾形态......
+-->
+<h4 id="autosec-112"><span class="sectionnumber">2.2&#x2003;</span>动词词尾形态</h4>
+<a id="cyrillic-grammar-autopage-112"></a>
+<a id="cyrillic-grammar-autofile-8"></a>
+
+<!-...... subsection 式动词......
+-->
+<h5 id="autosec-113"><span class="sectionnumber">2.2.1&#x2003;</span>式动词</h5>
+<a id="cyrillic-grammar-autopage-113"></a>
+
+<p>
+式是动词的一个很重要的语法范畴。它是表示说话者如何对待行为与客观事物之间的关系的一种范畴。蒙古语动词的式又分为祈使式与陈述式。祈使式具有人称范畴，陈述式则具有时间范畴。式动词是结束式谓语的主要形式。
+</p>
+
+<!-...... subsubsection 祈使式及人称范畴......
+-->
+<h6 id="autosec-114"><span class="sectionnumber">2.2.1.1&#x2003;</span>祈使式及人称范畴</h6>
+<a id="cyrillic-grammar-autopage-114"></a>
+
+<p>
+一般地说，祈使式是包含了人们主观愿望和意志的动词形式。这种情况决定该行为必然同第一人称、第二人称或第三人称以及客观环境相联系。因此，祈使式的意义可以联系人称差别来分别加以研究。
+</p>
+<p>
+(1) 与第一人称有关的有 -я -е -ё 和 сугай сүгэй，它们都表示第一人称的意愿。-я -е -ё 用得很普遍，сугай сүгэй 多用于旧书面语中，现代书面语中表示文言语体时，也可以使用。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Цай буцалгаж ууя. (我们) 烧茶喝吧！
+</p>
+<p>
+Би нэг шөл гаргая гэсэн юм аа. 我想做个汤
+</p>
+<p>
+Би чамайг туслая даа. 我帮助你吧！
+</p>
+<p>
+Бид бүгдээрээ явцгаая. 我们大家走吧．
+</p>
+<p>
+Би үүнийг өгье үү, байя уу?
+</p>
+<p>
+我把这个给不给？(祈使式很少用疑问)
+</p>
+<p>
+Би чамд нэг арга зааж өгсүгэй.
+</p>
+<p>
+我告诉你一个办法
+</p>
+<p>
+Хувьсгалт удамшлыг бадруулсугай.
+</p>
+<p>
+要发扬革命传统<sup>1</sup>
+</p>
+<p>
+Бид хамтаар үзсүгэй. 我们一同看吧。
+</p>
+<p>
+第一人称意愿式可以用在第二人称和第三人称。这时它表示催促第二、第三人称下决心的意思。
+</p>
+<p>
+Чи хурдан очиё доо. 你倒快去呀.
+</p>
+<p>
+Одоо тэр нэг явъя даа. 这回他该去一下吧
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-115"></a>
+<p>
+<sup>1</sup>&nbsp;удамшил 遗传
+</p>
+
+</div>
+</div>
+<p>
+(2) 与第二人称有关的有 <b>：</b> 词干，гтун гтүн , аарай ээрэй , аач ээч 等形式。词干形式表示直接命令，如果后接语气词，可构成含有不同意义色彩的形式。гтун гтүн 是表示号召的形式，主要用在书面语。аарай ээрэй (口语元音
+后 гаарай гээрэй гоорой гөөрэй ), 辅音后 аарай ээрэй оорой өөрэй 表示对对方的希望和意愿，是由方言吸收的形式。аач ээч (口语元音后 гаач гээч гооч гөөч ), 辅音后 аач ээч ооч өөч 表示对对方的要求和请求，是由方言吸收的形式，有
+的土语里用 (口语元音后 гааш гээш) , 辅音后 ааш ээш 表示这个意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чи хурдан яв. 你快走
+</p>
+<p>
+Сайхан ярилц даа. 好好谈吧
+</p>
+<p>
+Тэгвэл түүнийгээ хурдхан хэлчих дээ.
+</p>
+<p>
+那你快把它说出来
+</p>
+<p>
+Нүүр энэ тэрээ угаачих даа. 把脸什么洗一洗吧!
+</p>
+<p>
+Бүх дэлхийн үгээгүйчүүд холбоолгтун (нэгдэгтүн).
+</p>
+<p>
+全世界无产者联合起来！
+</p>
+<p>
+Ажлын байдалаа цаг тухай мэдүүлэгтүн.
+</p>
+<p>
+要随时报告工作情况
+</p>
+<p>
+Ажлын үүргээ амжилттайгаар биелүүлэхийн төлөө тэмцэгтүн.
+</p>
+<p>
+为了胜利完成工作任务而斗争！
+</p>
+<p>
+Уучлаарай. 请原谅！
+</p>
+<p>
+Замдаа сайн яваарай. 一路平安！
+</p>
+<p>
+Дүү минь чи миний үгэнд ороорой.
+</p>
+<p>
+弟弟呀, 希望你听我的话！
+</p>
+<p>
+Бушуу яваач даа. 快走吧！
+</p>
+<p>
+Хүү минь цайгаа уугаач даа. 儿呀, 你快喝茶呀!
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+对第二人称的希望也可用其它形式表示：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Даруйхан хариу захидал ирүүлэх болов уу.
+</p>
+<p>
+请快点回信！
+</p>
+<p>
+Ах дүүгийн мэндчилэлийг хүлээж авна уу
+</p>
+<p>
+请接受兄弟般的问候！
+</p>
+<p>
+Гуниран байхыг нь гутруулахгүй болгоно уу.
+</p>
+<p>
+请不要让他灰心丧气。(гуних=гунирах 悲叹悲伤沮丧泄气) (гутрах 羞惭; 苦闷, 情绪低落, 痛心)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）与第三人称或与客观环境有关的有：г тугай түгэй, аасай ээсэй, уузай үүзэй 等。г 表示对第三者的允许，有时说成 гай гэй , 有些地区还有一个不耐烦地允许形式 майч мэйч 。тугай түгэй 表示祝愿。这种祝愿形式与号召 гтун гтүн
+不一样，不能混淆。аасай ээсэй оосой өөсэй 表示希望、但愿。уузай үүзэй 表示某种顾虑，要小心谨慎，别发生这样的事。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэд хийхээрээ хийж байг. 他们做就做着吧。
+</p>
+<p>
+Хүүхэд уйлбал уйлаг. 孩子哭就哭吧。
+</p>
+<p>
+Тэр хүү үгэнд орохгүй , явбал явмайч.
+</p>
+<p>
+那个孩子不听话，走就走吧！
+</p>
+<p>
+Урт насалж удаан жаргах болтугай! 祝长寿幸福
+</p>
+<p>
+Энх тайван мандтугай ! 和平万岁！
+</p>
+<p>
+Хүү минь хурдхан харьж ирээсэй !
+</p>
+<p>
+但愿我儿子快点回来！
+</p>
+<p>
+Хүү минь ухаан ороосой. 希望我儿子长智慧!
+</p>
+<p>
+Цагаас хоцрох болуузай. 恐怕会迟到。
+</p>
+<p>
+Таныг мордуузай хэмээн би яаран ирэв.
+</p>
+<p>
+我怕您出发，因此赶忙而来。(хэмээн =гэж)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+第三人称的一些形式可以用在第一人称、第二人称表示某种客观的行为、动作。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би согтвол согтог чамд ямар хамаатай буй!(бэ)
+</p>
+<p>
+我醉就醉，和你有什么关系！
+</p>
+<p>
+Өвдвөл өвдөг , шорондоо. 痛就痛，活该！
+</p>
+<p>
+Урт наслатугай , удаан жаргатугай!
+</p>
+<p>
+祝长寿，祝长久享福！
+</p>
+<p>
+(回答）тийм болтугай! 但愿如此！
+</p>
+</li>
+</ul>
+</div>
+</div>
+<figure id="autoid-4" class="table ">
+
+<table>
+<tr style="display:none"><th>.</th></tr>
+
+<tr class="hline">
+<td class="tdm tvertbarr" style="border-right: 1px solid black">
+<p>
+式
+</p>
+</td>
+<td class="tdm tvertbarr" style="border-right: 1px solid black">
+<p>
+人称
+</p>
+</td>
+<td class="tdm tvertbarr" style="border-right: 1px solid black">
+<p>
+后缀
+</p>
+</td>
+<td class="tdm">
+<p>
+举例
+</p>
+</td>
+</tr>
+
+<tr class="hline">
+<td class="tdm tvertbarr" style="border-right: 1px solid black">
+<p>
+命令式
+</p>
+</td>
+<td class="tdm tvertbarr" style="border-right: 1px solid black">
+<p>
+第二人称
+</p>
+</td>
+<td class="tdm tvertbarr" style="border-right: 1px solid black">
+<p>
+-гтун, -гтүн, -аарай, -ээрэй, -оорой, -өөрэй -аач, -ээч -ооч, -өөч
+</p>
+</td>
+<td class="tdm">
+<p>
+яв, оч, явагтун, үзэгтүн, яваарай, үзээрэй, яваач, үз, ол, очигтун, ологтун, очоорой, олоорой, очооч, үзээч, олооч
+</p>
+</td>
+</tr>
+
+<tr class="hline">
+<td rowspan="2" class="tdm tvertbarr" style="vertical-align:middle; border-right: 1px solid black"> 希望式 </td>
+<td class="tdm tvertbarr" style="border-right: 1px solid black">
+<p>
+第一人称
+</p>
+</td>
+<td class="tdm tvertbarr" style="border-right: 1px solid black">
+<p>
+-я, -ё, -е, -сугай, -сүгэй
+</p>
+</td>
+<td class="tdm">
+<p>
+явъя, очъё, үзъе, олъё, явсугай, очсугай, үзсүгэй, олсугай
+</p>
+</td>
+</tr>
+
+<tr>
+<td class="tdm tdrule tvertbarr" style="border-right: 1px solid black">
+<p>
+第三人称
+</p>
+</td>
+<td class="tdm tdrule tvertbarr" style="border-right: 1px solid black">
+<p>
+-аасай, -ээсэй, -оосой, -өөсэй, -тугай, -түгэй, -г
+</p>
+</td>
+<td class="tdm tdrule">
+<p>
+яваасай, очоорой, үзээсэй, олоосой, явтугай, олтугай, , үзтүгэй, яваг, очиг, үзэг, олог
+</p>
+</td>
+</tr>
+
+<tr class="hline">
+<td class="tdm tvertbarr" style="border-right: 1px solid black">
+<p>
+提醒式
+</p>
+</td>
+<td class="tdm tvertbarr" style="border-right: 1px solid black">
+<p>
+第二第三人称
+</p>
+</td>
+<td class="tdm tvertbarr" style="border-right: 1px solid black">
+<p>
+-уузай, -үүзэй
+</p>
+</td>
+<td class="tdm">
+<p>
+явуузай, очуузай, үзүүзэй, олуузай
+</p>
+</td>
+</tr>
+
+<tr class="hline" aria-hidden="true">
+<td class="tdm">
+</td>
+<td class="tdm">
+</td>
+<td class="tdm">
+</td>
+<td class="tdm">
+</td>
+</tr>
+</table>
+
+<div class="figurecaption">
+
+<p>
+表 2.1:&nbsp;动词希望命令式的变化表
+</p>
+</div>
+</figure>
+<p>
+(4) 复合形式的祈使式：л, лга (лага), лгэ (лэг) , лт ＋ тай тэй , үгүй. 它们在肯定时表示“应该”、“会”，在否定时表示“不要”
+“不必”
+，有的可用于三个人称，有的主要用于第二、第三人称。
+</p>
+<p>
+Л лга(лага) лгэ лт 都是一种从动词构成名词的附加成分，所以都是一种名词形式。在这些名词形式后接加 лах 或 рах 时，这些名词形式就丧失名词性，而恢复动词性，突出的是又变得能够支配宾格名词。而且在意义上又产生“应
+该”“会”
+、
+“不必”
+“不要”等表示说话者主观态度的祈使式的意义。所以我们可把它们列入祈使式里，看作是一种复合形式的祈使式。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Миний үгийг авалтай бишүү?
+</p>
+<p>
+我的话是应该采纳的吧？
+</p>
+<p>
+Үүнийг ухаж мэдэлтэй үү. 这是应该理解的
+</p>
+<p>
+Будаагаа идэлгүйгээр гараад явчихсан.
+</p>
+<p>
+没吃饭就走出去了
+</p>
+<p>
+Тэр хүн өөрөө ирэлгүй дээ. 那个人自己会来的
+</p>
+<p>
+Өгөх дургүй бол авлагагүй. (比 бүү ав 语气缓和一些) 不愿给就别要了
+</p>
+<p>
+Тэр хүн хэнээс ч илүү авчаад бас авалгатай.
+</p>
+<p>
+那个人比谁要得都多, 还想要
+</p>
+<p>
+Чи цаашаа явалтгүй , наашаа ир. (нутаг аялгуу)
+</p>
+<p>
+你别往那边走了，往这边来。（方言土语)<sup>2</sup><a id="cyrillic-grammar-autopage-116"></a>
+</p>
+<p>
+Чи үүнийг идэлтгүй , түүнийг ид .
+</p>
+<p>
+你别吃这个，吃那个。（方言土语)
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-117"></a>
+<p>
+<sup>2</sup>&nbsp;【чанагш =цааш 向那边, 朝那边】
+</p>
+
+</div>
+</div>
+<p>
+ир- 来，按上述后缀变化，则是 ирэлтэй 该来, ирэлтгүй 不必来的，ирэлгүй дээ 会来的，ирүүлэлгүй дээ 会让来的，ирчихэлгүй дээ 也许会来的，ирэлгэтэй 怎么又来，ирэлгэгүй 不用来，ирцгээлгэгүй 大伙儿别来了等。
+</p>
+<p>
+在蒙古语中也有在以 л、лга(лага)、лгэ、лт 结尾的名词后接加 тай тэй үгүй 而依然保留静词性 (形容词性) 的例子：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн чинь мэдэлгүй хүн байна даа.
+</p>
+<p>
+那个人原来是个无知的人 (静词性）
+</p>
+<p>
+Энэ явдлыг тэр хүн мэдэлгүй дээ.
+</p>
+<p>
+那个人会知道这件事的 (动词性)
+</p>
+<p>
+Энэ гэрт оролгогүй. 这个屋子别进去了 (动词形)
+</p>
+<p>
+Энэ өдөр ямар ч орлогогүй.
+</p>
+<p>
+今天什么收入也没有 (静词形)
+</p>
+<p>
+Тэр хүн чадалгүй (хүн юм).
+</p>
+<p>
+那个人是无能的人 (静词性)
+</p>
+<p>
+Тэр хүн өөрөө чадалгүй дээ.
+</p>
+<p>
+那个人自己会的 (动词性)
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 陈述式及时间范畴......
+-->
+<h6 id="autosec-118"><span class="sectionnumber">2.2.1.2&#x2003;</span>陈述式及时间范畴</h6>
+<a id="cyrillic-grammar-autopage-118"></a>
+
+<p>
+陈述式是将行为、动作按照客观方式加以叙述的一种形式。它的某些形式有时使人觉得好像含有主观意义，但这是由该句子的具体条件所决定的，而不是由于这些形式本身产生的。蒙古语的陈述式有时间差别，一般可分为过去时、
+现在时、未来时，但是附加成分和语法意义之间的关系不是简单的一对一的关系。
+</p>
+<p>
+（1）表示过去时的 ж ч ，жээ чээ , в 。ж ч ，жээ чээ 表示一般过去时。жээ чээ 是句末结束形式。ж (ч) 是后边接加别的语气词或连接动词的形式。в 也是过去时，在口语里 в 用得很少，只有在疑问、讲故事传说或依次叙述行为时才用
+这个形式。в 在口语里也有结束形式的 [-в аа, в ээ, в оо, в өө] 和非结束形式 [в]。<sup>3</sup>
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-119"></a>
+<p>
+<sup>3</sup>&nbsp; 陈述式过去时后缀 в 多用于书面语；口语中用的较少，多用于疑问, 询问
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Намайг очиход тэнд арвин хүн байжээ.
+</p>
+<p>
+我去的时候那里有很多人
+</p>
+<p>
+Тэр хүн манд хэлж өгчээ. 那个人告诉我们的
+</p>
+<p>
+Тэр хүн чухам явсан юм уу, үгүй юм уу? Явжээ, явж.
+</p>
+<p>
+那个人到底走了没有？走了走了．
+</p>
+<p>
+Тэр хүн нэгэнт явчихж шүү. 那个人已经走了
+</p>
+<p>
+Маншуурсандаа унтсан байж гэнэ.
+</p>
+<p>
+说是由于吃得饱睡着了（мансуурах=маншуурах 昏沉, 迷糊, 昏睡)
+</p>
+<p>
+Би тэр үед түүний хэлэхийг итгэсэнгүй байж билээ.
+</p>
+<p>
+我在那时候没有相信他说的话。
+</p>
+<p>
+Ганцаараа ирэв үү, хоёул ирэв үү?
+</p>
+<p>
+一个人来的？两个人来的？
+</p>
+<p>
+Би энэ жил өвс хадав аа, түлэг тээв ээ.
+</p>
+<p>
+我今年割草啦，拉柴啦。(тээх 运输搬运)
+</p>
+<p>
+Чи малыг юунд хөөв ? 你为什么赶了牲畜？
+</p>
+<p>
+Тэр хүн хаа очив ? 那人到哪里去了？
+</p>
+<p>
+Би чамд чингэж хэлэв үү? 我对你那样说了吗?
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）表示现在将来时的 на нэ 。口语形式 н (结束式、非结束式都可以用) 和 на нэ (结束式)。на нэ 既可以表示现在，又可以表示将来。那么究竟哪些情况下表示现在，哪些情况下表示将来呢？
+</p>
+<p>
+1) 在下列情况下表示现在时：&lt;1&gt; 用在具有持续性的动词上，一般表示现在时，如：байна 有，дутна 缺乏，мэднэ 知道，хүснэ 希望，санана 想。&lt;2&gt; 在表示任何时候都是如此的事理的句子中，表示扩展的现在时。
+&lt;3&gt; 从上下文看表示现在时的句子中。这里指的现在时意味着：说话时正在进行的行为；包括说话时间在内的某一单位时间内进行着的行为 (这单位时间可长可短，一小时, 一年等) ；在某一段时间内已经变成了习惯以及形成了
+规律性的行为等。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хэргийг би мэднэ. 那件事我知道
+</p>
+<p>
+Эрмэлзвэл бүтээнэ , эргэлзвэл бутраана.
+</p>
+<p>
+希望使人成功, 犹豫使人失败 (бутрах 碎开分散崩溃)
+</p>
+<p>
+Шөнө өнгөрвөл өдөр болно. 黑夜过去, 白天就来
+</p>
+<p>
+Энэ бүхэн нь түүний сэтгэлд орж ирнэ.
+</p>
+<p>
+这一切浮现在他心里
+</p>
+<p>
+Нисэх онгоцны далд орсон тэр зүгийг хүмүүс нам ширтэж зогсоно.
+</p>
+<p>
+人们不声不响地注视着飞机隐去的那个方向
+</p>
+<p>
+Бид үдээс өмнө хичээл сонсоно. 我们在午前上课
+</p>
+<p>
+Өвөр Монголд малжих орон байна , тариалах орон байна , бас их их аж үйлдвэр байна.
+</p>
+<p>
+内蒙古有牧区, 有农区, 还有一些大的工业企业
+</p>
+<p>
+Энэ өдөр би амарна. 今天我休息
+</p>
+<p>
+Энэ жил би энд сууна , өөр хаа ч очих төлөвлөгөөгүй.
+</p>
+<p>
+今年我住在这里，别的哪里也不打算去
+</p>
+<p>
+Тэр хүн уулзмагц асууна. 他碰见以后马上就问
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+把过去的事情，从过程方面如实描写时，为了生动起见常常使用现在时。上例中的 Энэ бүхэн нь түүний сэтгэлд орж ирнэ. Нисэх онгоцны далд орсон тэр зүгийг хүмүүс нам ширтэж зогсоно. 两句，如果用在小说里，就属于这种情况。
+</p>
+<p>
+На нэ 尽管可以表示现在时，但它终究不是专门表示现在时的，而且进行体的色彩不够强烈。为了补救这点，在真正的现在进行的行为上却多用 -ж(ч) байна 的形式 (详见助动词 байх 的用法)。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Байз байз , та хоёр эндүүрч байна биз?
+</p>
+<p>
+等一等，你俩误会了吧？
+</p>
+<p>
+Би чамайг явчихсан гэж бодож байна шүү.
+</p>
+<p>
+我还以为你已经走了呢
+</p>
+<p>
+Тэд чинь тэнд худаг малтана гэж бэлтгэж байна шүү.
+</p>
+<p>
+他们正准备在那里挖井呢
+</p>
+<p>
+Төвөгтэй гэж татгалзаж байна үү?
+</p>
+<p>
+以为麻烦而在犹豫吗？
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2) 在下列情况下表示将来时：<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 从上下文看表示将来时的句子中，<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> 从上下文看现在时将来时不明显的地方，一般也是表示将来时，<span
+class="textcircled"
+style="border: 1px solid black"
+>3</span> на нэ 形式在单独使用时，一般也是表示将来时。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Маргааш би очно. 明天我去
+</p>
+<p>
+Хойтын жил хөдөө бууна. 明年下乡
+</p>
+<p>
+Би нэг юмаа бичнэ. 我写个东西
+</p>
+<p>
+Та үг хэлнэ. 您讲话
+</p>
+<p>
+Тэр хүн бас явна. 他也去
+</p>
+<p>
+сууна 坐，уншина 读，орно 进入，гарна 出
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）表示行为的开始或结束的形式 лаа лээ лоо лөө 。лаа лээ 这个形式的用法比较复杂，它具有自己的独特性。因此过去语法书上的说法也很不一致。我们把它的基本用法归纳为下列四项：1) 表示将要开始的行为；2) 表示刚开始的行
+为；3) 表示将要结束的行为；4) 表示刚结束的或已经结束的 (已经发生的) 行为。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би одоо явлаа. 我现在就要走了
+</p>
+<p>
+Одоо бороо орлоо, гадаа дэлгэсэн юмаа оруул .
+</p>
+<p>
+现在就要下雨了，把晒在外面的东西拿进来！
+</p>
+<p>
+Багийн дарга гадна гарах гээд үүд рүү явлаа.
+</p>
+<p>
+巴嘎长想要出去而走向门口
+</p>
+<p>
+Малдаа буурцаг өгөх гээд хот зүгээ гүйлээ.
+</p>
+<p>
+想要给牲口喂豆子，跑向家里
+</p>
+<p>
+Хүрзээ барьсаар , хурдан хурдан алхсаар хүрч ирлээ.
+</p>
+<p>
+拿着锹，迈着快步走来
+</p>
+<p>
+Гангамаа хонио эргүүлсээр хотондоо орж ирлээ.
+</p>
+<p>
+钢嘎玛赶着羊走进自己的院子里来了
+</p>
+<p>
+Сайн амарлаа, сайн идэж сайн уулаа, одоо замаа хөөнө.
+</p>
+<p>
+休息得好, 吃得喝得好, 现在要赶路了。
+</p>
+<p>
+Гангамаа, чи төөрлөө шүү. 钢嘎玛, 你迷失方向了
+</p>
+<p>
+Гурван хонио сүйдлээ. 损失了三只羊
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+лаа лээ 的使用情况大致有上述四种，在具体句子里究竟被用作哪一种意义，这要由动词的词汇意义和语言环境来决定。例如：мэдлээ 知道啦，байлаа 有来着，дутлаа 缺了等词由于其词汇意义，一般表示属于已经结束的或已经发生的
+行为。явлаа 走啦，очлоо 去啦，гарлаа 出去啦等行为因为只能看见其开端，所以大都属于 1)-2) 两者之一。ирлээ 来啦，хүрлээ 到啦，орлоо 进去啦等行为因为只能看见其末端，所以大都属于 3)-4) 两者之一。уналаа 掉啦，бичлээ 写啦，
+хийлээ 做啦……等等都有“将要”或“刚才”两种意义。因此这个附加成分除了 мэдлээ , байлаа 等少数动词以外，如果句子上下文不够清楚，它的涵义就不能最后确定。如：нар гарлаа ( 太阳出来啦. ) 可指：
+“太阳将要出”
+，
+“太阳刚出
+来”，以及与这些相近的过渡的种种阶段。тэр хүн гэртээ орлоо ( 那个人进自己的屋子啦。) 可指：
+“将要进去”
+，
+“刚进去”以及与这些相近的过渡的种种阶段。ширээнээс уналаа (从桌子上掉啦.) 可指：
+“要掉”
+“刚掉”以及与这些相近
+的过渡的种种阶段。可是在下列句子中，由于上下文的衬托，涵义就比较确切：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хурдан бос , удахгүй нар гарлаа.
+</p>
+<p>
+快起床，很快太阳就要出来了。
+</p>
+<p>
+нар нэгэнт гарлаа , сайхан өдөр боллоо.
+</p>
+<p>
+太阳已经出来了，是个好天气。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+根据上述情况可以看出 лаа лээ 所表示的主要不是一般的现在时、过去时、将来时，而是表示“将要”或“刚刚”以及与它们相近的种种过渡情况。所以，前边归纳的将要开始、刚刚开始、将要结束、刚刚结束等阶段还可以归纳为：
+将要、刚才这样两个主要阶段。这两个阶段可以进一步抽象化为临界时，从动词本身看，可称为临界体。
+</p>
+<p>
+由于 лаа лээ 的上述特点，它具有很大的描写能力，因而在文学语言里使用的比较频繁。可是这样一来人们有时把它当作一般过去时形式而与 жээ чээ 混用。这种滥用对于文学语言的丰富和精确化是没有益处的。
+</p>
+
+<!-...... subsection 副动词......
+-->
+<h5 id="autosec-120"><span class="sectionnumber">2.2.2&#x2003;</span>副动词</h5>
+<a id="cyrillic-grammar-autopage-120"></a>
+
+<!-...... subsubsection 副动词及其分类......
+-->
+<h6 id="autosec-121"><span class="sectionnumber">2.2.2.1&#x2003;</span>副动词及其分类</h6>
+<a id="cyrillic-grammar-autopage-121"></a>
+
+<p>
+副动词是动词的连接形式，相当于静词类的格的形式。静词类的格的形式后边连接的是动词和静词，但副动词后边连接的却只是动词。
+</p>
+<p>
+副动词是连接形式，所以，它不能充当主句或独立句的述语，它是典型的非结束式。与此相比，式动词是典型的结束式。而形动词兼有两者的性质。形动词作非结束式用时，与静词一样，后边既可以连接动词 (作为状语)，也可以连接
+静词 (作为定语)。形动词后边连接动词时 (一般通过某种格)，它所起的作用与副动词的作用一样。由于这个缘故，形动词的某些连接形式与副动词的界限不清。如：…
+</p>
+<p>
+副动词作为动词具有态和体的变化，前边能支配宾格名词，前边可以受形容词、副词的修饰。这些方面与其它动词形式是共同的。副动词的特点主要在于它的连接性。副动词可按其连接法的特点分为三类。
+</p>
+<p>
+第一类：单纯连接副动词
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 并列副动词 ж ч
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> 先行副动词 (也叫分离副动词) аад ээд оод өөд
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>3</span> 共同副动词 (也叫联合副动词) н
+</p>
+<p>
+第二类：制约连接副动词
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 立刻副动词 магц мэгц могц мөгц
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>2</span> 跟随副动词 хлаар хлээр хлоор хлөөр
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>3</span> 前提副动词 маанжин мээнжин（маан мээн）
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>4</span> 假定副动词 вал вэл \ бал бэл (хул хүл)
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>5</span> 让步副动词 вч (вчиг)
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>6</span> 界限副动词 (迎接副动词) тал тэл тол төл
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>7</span> 目的副动词 хаар хээр хоор хөөр
+</p>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>8</span> 趁机副动词 нгаа нгээ нгоо нгөө
+</p>
+<p>
+第三类：混合连接副动词
+</p>
+<p>
+延续副动词：саар сээр соор сөөр
+</p>
+
+<!-...... subsubsection 各类副动词的语法特征......
+-->
+<h6 id="autosec-122"><span class="sectionnumber">2.2.2.2&#x2003;</span>各类副动词的语法特征</h6>
+<a id="cyrillic-grammar-autopage-122"></a>
+
+<p>
+副动词除有上述一般的共同特点外，各类副动词都有其本身的特点。
+</p>
+<p>
+(A）单纯连接副动词
+</p>
+<p>
+单纯连接副动词的特点是：1) 连接普通动词与助动词。一般情况下，助动词在后边，个别情况下助动词可以在前边。以 ж ч 连接的这种词组起一个词的作用，在句子里只有后边的词有语法变化。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+явж байна 走着，хэлж байна 说着
+</p>
+<p>
+ирээд байна 来了，очоод байна 去了
+</p>
+<p>
+хийж эхлэх 开始做
+</p>
+<p>
+уншиж буусах 读完
+</p>
+<p>
+хэлж чадах 会说，таниад авах 认出
+</p>
+<p>
+үзэж өгөх 给看，идэж болох 可吃
+</p>
+<p>
+үзэж гарах 认出，олж сонсох 听得见
+</p>
+<p>
+олж үзэх 看得见 эхэлж хийх 开始做
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(关于-ж (ч) байна 与-аад (ээд) байна 的区别见助动词 бай-部分，在这类组合里一般不用 н 形式）
+</p>
+<p>
+2）以副动词形式重复同一个动词可表示体的意义。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+идэж идээд 吃了又吃
+</p>
+<p>
+авч аваад 拿了又拿
+</p>
+<p>
+хэлээд хэлээд 说了又说
+</p>
+<p>
+бичээд бичээд 写了又写
+</p>
+<p>
+үзэн үзэн 看了又看
+</p>
+<p>
+санан санан 想了又想
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）连接独立的两个动词。被连接的动词既可以彼此并列，也可以一个修饰另一个。在时间上可以彼此相同，也可以有先有后。这里 аад ээд 附加成分能表示前一个行为完成之后，后一个行为开始的意义，即某种完成体的意义。但在平
+常 ж (ч) 与 аад ээд 的区别不太明显。н 主要用在书面语里，口语里使用频率较少，一般在重复同一动作时或者表示立刻的意义时才使用。而且有时变为另一类词 (如 барин 马上，харин 反而, 却. байн байн 时而……)
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сонсож сууна 坐着听，идэж ууна 吃喝，өлсөж даарна 挨饿受冻，эргүүлж үзнэ 翻着看，харж хэвтнэ 躺着看，хэвтэж бодно 躺着想，ирж хэлжээ 来说了，хэлж ирүүлжээ (托人) 来转告了，авч явна 带着走，аваад явна 拿了走，ирээд
+хэлжээ 来之后说的，хэлээд иржээ 说了之后来的，нисэн одов 飞去了，бүтээн байгуулах 建设，бодон бодон уур хүрнэ 想着想着就生气。харан харан гайхна 看了又看觉得奇怪。тэр хүүхэд аван үмхчихлээ 那个小孩拿过去就放到嘴里。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4）连接独立动词的基础上连接以动词为主的词组以及以动词为述语的分句。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хувцсаа өмсөөд гэрээсээ гарчээ
+</p>
+<p>
+穿好衣服走出了房间
+</p>
+<p>
+Модны сүүдэрт очиж бичиг үзэж суужээ.
+</p>
+<p>
+到树荫下坐着看书了
+</p>
+<p>
+Сурагчид цуглараад багшаас үг ярьжээ
+</p>
+<p>
+学生集合起来，老师讲了话
+</p>
+<p>
+Тэнгэр дуугараад бороо оров 打雷下雨了
+</p>
+<p>
+Нэг нь уншиж нөгөө нь тэмдэглэж авчээ.
+</p>
+<p>
+一个读另一个作了记录
+</p>
+<p>
+Чамайг үзээд тэр сая санаа амар болжээ.
+</p>
+<p>
+见到你以后他才放心
+</p>
+<p>
+Түүний хэлэхийг сонсоод би инээд хүрчээ.
+</p>
+<p>
+我听他说以后发笑
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（B）制约连接副动词
+</p>
+<p>
+制约连接副动词可以表示后边的主要动词的种种条件，也就是说它们充当后边动词的动词性状语，动词性状语词组和成分句。这类副动词形式不能连接普通动词与助动词。
+</p>
+<p>
+1）立刻副动词 магц мэгц , 表示前一个动作发生后很快发生后一个动作。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ирмэгц хэлсэн. 一来就说了。
+</p>
+<p>
+Хонх дуугармагц хичээл эхлэв. 一打铃就上课了
+</p>
+<p>
+Би түүнийг үзмэгц таньсан. 我一看便认出了他
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+同样意义还可以用下列方式表达：
+</p>
+<p>
+
+<a href="./media/image11.png" target="_blank" ><img
+src="./media/image11.png"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би тэр хүнийг үзсээр таньчихжээ
+</p>
+<p>
+Би тэр хүнийг үзэн таньчихжээ
+</p>
+<p>
+Би тэр хүнийг үзэмэгц таньчихжээ
+</p>
+<p>
+Би тэр хүнийг үзэнгүүт таньчихжээ
+</p>
+<p>
+Би тэр хүнийг үзлээ (гэсээр, гэтэл) таньчихжээ
+</p>
+<p>
+Би тэр хүнийг үзэв (гэсээр, гэтэл) таньчихжээ
+</p>
+<p>
+Би тэр хүнийг үзэх нь ч тэр таньчихжээ.
+</p>
+<p>
+Би тэр хүнийг үзсэн даруй таньчихжээ
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2) 跟随副动词 хлаар хлээр。表示在前一个动作发生的时间和条件下发生后一个动作。хлаараа хлээрээ, хлаа хлээ 则有“临 XX 时候”的意义 (与趁机副动词相近)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чамайг хэлэхлээр сая мэджээ. 你说，我才知道
+</p>
+<p>
+Түүнийг хэлэхлээр сая мэдлээ. 他说 (我) 才知道
+</p>
+<p>
+Чанаад идэхлээр их сайн. 煮着吃很好吃
+</p>
+<p>
+Очоод үзэхлээр үнэхээр тийм. 去一看果真那样
+</p>
+<p>
+Явахлаараа аваад яв. 临走时 (你) 拿走吧
+</p>
+<p>
+Ирэхлээрээ аваад ир. 临来时 (你) 拿来吧
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）前提副动词 манжин сая 。前一个动作是后一个动作的前提，有了前一个动作才能有后一个动作。后边一般有个 сая (才）呼应。【这种副动词，与蒙古国的写法是否一致?】
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Сурманжин (сая) чадна. 学习之后才会
+</p>
+<p>
+Чи хэлмэнжин би сая мэдлээ. 你说了, 我才知道
+</p>
+<p>
+Чингэмэнжин хэрэг сая бүтэх юм.
+</p>
+<p>
+只有那样，事情才成功
+</p>
+<p>
+Ингэмэнжин сая таарна. 这样才对
+</p>
+<p>
+Энэ ажлын чухал чанарыг бүгдээрээ зөв ойлгомонжин сая сайхан хийж чадна.
+</p>
+<p>
+只有大家正确理解这件工作的重要性, 才能做好 (这件工作)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4）假定副动词 (条件副动词) вал вэл \ бал бэл 。表示前一个动作是假设的动作或者是后一个动作的前提条件。否定的假定意义用 -хгүй бол , -гүй бол 表示。与此相连，假定的意义还可以用 -сан бол , -сэн бол ,-сангүй бол , -сэнгүй бол ,
+-сан юм бол , -сэн юм бол , -сангүй юм бол , -сэнгүй юм бол , -х юм бол , -хгүй юм бол 等等方式表达。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Авбал өгнө. 如果要就给
+</p>
+<p>
+Хэдий илүү чармайвал төдий илүү амжилт гаргаж чадна.
+</p>
+<p>
+愈努力愈能做出成绩
+</p>
+<p>
+Байвал аваад ир , үгүй бол байчих. .
+</p>
+<p>
+有的话就拿来，没有就算了
+</p>
+<p>
+Маргааш бороо орвол явлагагүй.
+</p>
+<p>
+明天下雨的话, 就不要走了 (явдал=явлага)
+</p>
+<p>
+Чөлөө тавивал гэртээ харина гэнэ.
+</p>
+<p>
+说是如果放假，他就回家
+</p>
+<p>
+Манай тэдгээр шүлэгийг хойш санаваас үнэнээр ичиж үхэх болой.
+</p>
+<p>
+我们作的那些诗，后来回想起来真是羞死人
+</p>
+<p>
+Чи муу санасангүй бол болчихжээ.
+</p>
+<p>
+如果你没有抱怨那就行了
+</p>
+<p>
+假定副动词后边接加语气词 аа ээ , даа дээ 后可充当结束式谓语，表示感叹的意义。如：
+</p>
+<p>
+Би бас очсон бол даа. 我也去了多好！
+</p>
+<p>
+Надад бас нэг өгвөл аа. 也给我一个多好！
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+5）让步副动词 вч . 表示让步和即使的意义。在否定句中表示即使前一个动作实现了，后一个动作也不能实现。让步副动词的意义也可用 -хгүй боловч , -сангүй(-сэнгүй) боловч , -лаа (лээ) гээд , -лаа ч гэсэн 等表示。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Өгөвч авахгүй. 给也不要
+</p>
+<p>
+Чамайг хэлэвч хийнэ , хэлэхгүй боловч хийнэ.
+</p>
+<p>
+你说，我也做，你不说，我也做。
+</p>
+<p>
+Хэн хэлэвч би явахгүй. 谁说我也不去
+</p>
+<p>
+Тэр явлаа гээд горьгүй юм ээ. 他去了也是无用
+</p>
+<p>
+Нуувч нуруу нь ил, далдлавч дул нь ил.
+</p>
+<p>
+大意为: 欲盖弥彰. ( зүйр үг 成语)
+</p>
+<p>
+Хэн хэлэвч сонсохгүй зөрүү юм ээ.
+</p>
+<p>
+谁说也不听的倔脾气
+</p>
+<p>
+Энэ өдөр дуусахгүй боловч болно. 今天不完也行
+</p>
+<p>
+Тэр явлаа ч гэсэн горьгүй юм ээ. 他去也不行
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+6）界限副动词 (迎接副动词) тал тэл , 表示动作达到的限度或后一个动作继续到前一动作的实现。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+иртэл хүлээе 等到回来，
+</p>
+<p>
+чамайг буцаж иртэл би заавал хүлээж байя.
+</p>
+<p>
+我一定等到你回来
+</p>
+<p>
+Нар гартал унтжээ 睡到太阳出来了
+</p>
+<p>
+Ширээгээ өнгө гартал зүлгэв. 桌子擦得光亮
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+7）目的副动词 хаар хээр хоор хөөр。表示前一个动作是后一个动作的目的。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бичиг авахаар иржээ. 取书来了
+</p>
+<p>
+Ус авахаар явжээ 取水去了
+</p>
+<p>
+Өвс хадахаар гарчээ. 出去割草去了
+</p>
+<p>
+Будаа идэхээр явъя. 吃饭去
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+8）趁机副动词 нгаа нгээ нгоо нгөө нгуут нгүүт。表示顺便 (或“临 XX 时候”) 做某种动作，与跟随副动词的 хлаар хлээр 相近。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Явангаа дайраад гаръя. 临走的时候路过一下
+</p>
+<p>
+Ирэнгээ аваад ир. 来的时候拿来吧
+</p>
+<p>
+Чи ирэнгүүтээ Бугдаар дайрч явангуутаа Бээжингээр дайрч болно.
+</p>
+<p>
+你可以来的时候经过包头, 走的时候经过北京
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）混合连接副动词
+
+</p>
+<p>
+混合连接副动词主要就是 саар сээр。它表示延续的意义，是持续体的一种。混合连接副动词既有单纯连接的特点，又有制约连接的特点。
+</p>
+<p>
+1) 它和单纯连接副动词一样，可以连接普通动词与助动词，也可以以 саар саар 形式重复同一个动词表示体的意义，可以连接独立的两个动词或以两个动词为基础的词组和分句。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн чинь одоо болтол хүлээсээр байна шүү.
+</p>
+<p>
+那个人一直到现在还在等着
+</p>
+<p>
+Нааш цааш гүйсээр байгаад бүх биеэсээ нь хөлс гарчихжээ.
+</p>
+<p>
+跑来跑去全身都出汗了
+</p>
+<p>
+Хээр гадаа гүйсээр бүх шөнийг мэдсэнгүй өнгөрүүл .
+</p>
+<p>
+在野外奔跑着不知不觉地过了一夜
+</p>
+<p>
+Хөгшин ээж нулимсаа зүлгэсээр өөрийн гэрийн зовлонт түүхээ ярьж өгчээ.
+</p>
+<p>
+老大娘擦着眼泪诉说了苦难的家史
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）它和制约连接副动词一样，表示条件关系。
+</p>
+<p>
+
+<a href="./media/image12.png" target="_blank" ><img
+src="./media/image12.png"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+<p>
+
+<a href="./media/image13.png" target="_blank" ><img
+src="./media/image13.png"
+style="
+width:434pt;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Үзсээр таньчихжээ. 一看就认出来了
+</p>
+<p>
+Хэлсээр мэдэх байлгүй. 一定一说就知道
+</p>
+<p>
+Энэ хүү гэрт орж ирсээр юм хүмийг бүгд сандаачихдаг.
+</p>
+<p>
+这孩子一进屋就会把东西都弄乱
+</p>
+<p>
+Тэр хүн харьж ирсээр бид эндээс мордоё.
+</p>
+<p>
+那个人一回来我们就从这里出发
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）саар сээр 这个形式，除了上述两方面的特点以外，还有同形动词类似的用法。这就是它跟形动词一样能作定语，能单独成为结束式谓语。这些是它与别的副动词不同的地方。这和它的来源 (它的来源是 сан-аар , сэн-ээр ) 有关。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Эмээл тохсоор морь. 一直备鞍的马
+</p>
+<p>
+Тэргэнд хөлсөөр мал. 一直套车的牲口
+</p>
+<p>
+Идсээр будаа. 家常便饭
+</p>
+<p>
+Тэр хүн одоо болтол унтсаар.
+</p>
+<p>
+那个人直到现在还在睡觉
+</p>
+<p>
+Бид өчигдөр шөнөөс аваад ажилласаар.
+</p>
+<p>
+我们从昨夜起一直在工作
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+例句：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хурдан гүйж оч. 赶快跑着去 (并列)
+</p>
+<p>
+Захидал бичиж сууж байна 正坐着写信 (并列)
+</p>
+<p>
+Би сонсоод сая мэджээ 我听到后才明白 (先行)
+</p>
+<p>
+Зочин ирээд байна 客人已经来了 (先行)
+</p>
+<p>
+Шувуу нисэн одов 鸟飞去 (共同副动词 H)
+</p>
+<p>
+Босмогц ажилд гарлаа 一起床就上工了 (立刻)
+</p>
+<p>
+Үзмэгц таньсан 一看就认识了 (立刻)
+</p>
+<p>
+Чамайг буцахлаар захидал өгүүлье 当你回去时捎个信去 (跟随)
+</p>
+<p>
+Ирэхлээрээ аваад ир 来的时候拿来 (跟随)
+</p>
+<p>
+Сураманжин сая чадна 经过学习才会 (前提)
+</p>
+<p>
+Ингэмэнжин сая таарна 这样才对 (前提)
+</p>
+<p>
+Та очвол би бас очиё 如果您去我也去 (条件)
+</p>
+<p>
+Та очивч би очихгүй 即使您去我也不去 (让步)
+</p>
+<p>
+Чамайг буцаж иртэл хүлээж байя (我) 要等到你返回来 (界限)
+</p>
+<p>
+Үүр цайтал салхилав 刮风刮到天亮 (界限)
+</p>
+<p>
+Ус авахаар явжээ 打水去了 (目的)
+</p>
+<p>
+Бичиг зээлэхээр иржээ 借书来了 (目的)
+</p>
+<p>
+Явангаа дайраад гарая 走时顺路去一趟吧 (趁机)
+</p>
+<p>
+Ирэнгээ аваад ир 来时 (顺便) 带来 (趁机)
+</p>
+<p>
+Гүйсээр байгаад ядарчихжээ 跑着跑着乏了 (延续)
+</p>
+<p>
+Чи хэлсээр тэр мэдчих юм 你一说他就知道了 (延续)
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsection 形动词......
+-->
+<h5 id="autosec-124"><span class="sectionnumber">2.2.3&#x2003;</span>形动词</h5>
+<a id="cyrillic-grammar-autopage-124"></a>
+
+<!-...... subsubsection 形动词及其分类......
+-->
+<h6 id="autosec-125"><span class="sectionnumber">2.2.3.1&#x2003;</span>形动词及其分类</h6>
+<a id="cyrillic-grammar-autopage-125"></a>
+
+<p>
+形动词既表示行为、动作，又表示事物的性质特征 (包含行为、动作意义的性质、特征)。因而既有动词的性质，又有形容词的性质。
+</p>
+<p>
+蒙古语形动词有如下六种：
+</p>
+<p>
+(1) 过去时形动词 -сан , -сэн ：它充当述语时既可以表示绝对的过去时 (结束式)，又可以表示相对过去时 (后边另有助动词表示绝对时的时候它表示相对时，详见助动词部分)。它还可以表示具有过去时意义的定语和其它句子成分 (动词
+的静词化形式)。它也和形容词一样可以代替它所修饰的名词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн явсан. 那个人走了
+</p>
+<p>
+Намайг очиход тэр хүн явсан байжээ.
+</p>
+<p>
+我去的时候那个人已经走了
+</p>
+<p>
+Явсан хүн 走了的人
+</p>
+<p>
+Тэр хүний явсныг би мэдсэнгүй.
+</p>
+<p>
+我不知道他已经走了
+</p>
+<p>
+Мэдсэн (хүн) нь явжээ. 知道的走了
+</p>
+<p>
+Мэдсэнгүй (хүн) нь хоцорчээ. 不知道的留下了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）现在将来时形动词 -х ：它充当述语时也可以表示绝对的或相对的现在将来时。一般不能以 -х 结束句子，后边或用语气词，或用助动词。它还可以表示具有现在将来时或不定时意义的定语和其它句子成分。它也和形容词一样可
+以代替它所修饰的名词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн энэ өдөр лав ирэх юм. 他今天一定来
+</p>
+<p>
+Хувцсаа угаах байжээ. 我本应该洗衣服
+</p>
+<p>
+Явах өдрөө тогтооё. 决定走的日子
+</p>
+<p>
+Бороо орох өдөр амаръя. 在下雨天休息
+</p>
+<p>
+Тэр хүн бас очихыг би сая сонссон.
+</p>
+<p>
+我才听说那个人也去
+</p>
+<p>
+Би мэдэхгүй. 我不知道
+</p>
+<p>
+Голоо гараад хөөргөө эвдэх. 过河拆桥
+</p>
+<p>
+Явах (хүн) нь явчихжээ. 走的走了
+</p>
+<p>
+Ирэх (хүн) нь бас ирээгүй. 该来的还没来
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+现在将来时形动词中，有的代替它所修饰的名词而变为名词。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Үнэмлэх 证明，
+</p>
+<p>
+батлах 保证，
+</p>
+<p>
+идэх =идэх юм 吃的，
+</p>
+<p>
+өмсөх =өмсөх юм 穿的,（但不是所有的 идэх өмсөх 都名词化)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）经常体形动词 даг дэг дог дөг ：它充当述语时表示动作的经常性或习惯性，多用在现在时。充当定语或其它句子成分时也包含经常体的意义。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр эрт босдог 他 (平常) 起得早
+</p>
+<p>
+Найман цагт гэрээсээ гардаг. 八点钟从家出发
+</p>
+<p>
+Эрт босдог хүн. (平常) 早起的人
+</p>
+<p>
+Орой унтдаг заншилтай. (平常) 有晚睡的习惯
+</p>
+<p>
+Би тэнд очдоггүй. 我 (平常) 不去那里
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）延续体形动词 аа ээ оо өө ：表示持续进行的动作，多用在现在时。口语里主要用其否定形式：“аагүй , ээгүй , аадүй , ээдүй ”。肯定形式除 байгаа , яваа 等少数词以外很少用。充当述语时需要有语气词、助动词的帮助。
+<sup>4</sup>
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-126"></a>
+<p>
+<sup>4</sup>&nbsp;аагүй 与 аадүй 意思一样
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Манай дарга хаагуур яваа вэ?
+</p>
+<p>
+我们的首长哪里去了?
+</p>
+<p>
+Асуудлыг тасалж яваа биз. 解决问题去了吧
+</p>
+<p>
+Би чингэж огт бодоогүй. 我从来没有那样想过
+</p>
+<p>
+Би ажлаа дуусаагүй. 我的工作没有完
+</p>
+<p>
+Яарч байгаа биз ? 忙着呢吧？
+</p>
+<p>
+Дуусаагүй ажил. 未完成的工作
+</p>
+<p>
+Шийдвэрлээгүй асуудал. 没有解决的问题
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（5）可能性形动词 маар мээр моор мөөр ：表示动作的可能性, 也表示值得的意义。(想要做…）。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Намайг явуулмаар байна. 似乎要让我去
+</p>
+<p>
+Нүд эрээлжмээр өнгө бүрийн цэцэг.
+</p>
+<p>
+眼花缭乱的各种花
+</p>
+<p>
+Өөр явуулмаар хүн байна уу?
+</p>
+<p>
+有没有别的可以派去的人?
+</p>
+<p>
+Хуга татмаар 扯断的样子
+</p>
+<p>
+Хага цохимоор 打断的样子
+</p>
+<p>
+Хүнийг барьж идчихмээр 吃人的样子
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（6）主体形动词 гч ：表示行为的主体，多用于书面语。有的逐渐形成为派生形容词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Үгүйсгэгч этгээд 虚无主义者 (этгээд 分子, 人)
+</p>
+<p>
+Зоригжуулагч хүчин 鼓舞力量
+</p>
+<p>
+Үл итгэгч хүн 不信任的人
+</p>
+<p>
+Үүнийг мэдэгч 知道这个的
+</p>
+<p>
+Түүнийг авагч 要那个的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+这类的词中丧失支配名词的能力的不应看作主体形动词，而应看作是一般名词。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+тэргүүлэгч 主席，байлдагч 战士，төлөөлөгч 代表，найруулагч 编辑，сурагч 学生，зурагч 画家
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+此外还有 гштай гштэй , хуйц хүйц , 是一种不完全的较少使用的形动词。
+</p>
+<p>
+<b>гштай гштэй ：</b> 表示值得的意义，可充当述语、定语，但没有格变。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энэ явдлыг анхаарагштай 值得注意这件事
+</p>
+<p>
+Тэр ажлыг хийгштэй 值得做那项工作
+</p>
+<p>
+Тэр хүний хэлснийг хянагштай
+</p>
+<p>
+那个人说的值得深思 (审查)
+</p>
+<p>
+Энэ чинь анхаарагштай явдал байна.
+</p>
+<p>
+这是值得注意的事情
+</p>
+<p>
+Хийгштэй ажил арвин байна.
+</p>
+<p>
+有许多值得做的工作
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<b>хуйц хүйц ：</b> 表示程度或某种可能性，可充当定语和状语，基本上没有格变。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хийж чадахуйц ажил. 能做的事情
+</p>
+<p>
+Эрдэм сурахуйц 学年儿童
+</p>
+<p>
+Мэдэгдэхүйц сайжирах 显著地改进
+</p>
+<p>
+Юм ойлгохуйц болох 到懂事的地步
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形动词的语法特征......
+-->
+<h6 id="autosec-127"><span class="sectionnumber">2.2.3.2&#x2003;</span>形动词的语法特征</h6>
+<a id="cyrillic-grammar-autopage-127"></a>
+
+<p>
+形动词的语法特征主要表现在它既有动词性又有静词性，以及它的动词性和静词性的结合方面。
+</p>
+<p>
+形动词的动词性表现在它的词干有态和体的变化，前边能支配各格名词，前边可以受形容词、副词的修饰等方面。
+</p>
+<p>
+形动词的静词性则表现在它有格的变化 (包括可以接加后置词、时位词等)，可以接加数的附加成分和领属附加成分等方面。
+</p>
+<p>
+形动词的动词性还表现在它可以充当结束式动词述语。它的静词性还表现在它可以充当定语、宾语、主语。形动词在充当结束式动词述语的同时，后边还可以接加一般静词性谓语后接加的助动词和语气词，这进一步说明它的动词性
+与静词性的结合。
+</p>
+<p>
+<b>（1）形动词的动词性 </b>
+</p>
+<p>
+1〉形动词有态和体的变化，如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+явсан , явуулсан , явагдсан , явалцсан , явцгаасан , явчихсан , яваадахсан , явсхийсэн , хэлэх , хэлүүлэх , хэлэгдэх , хэлэлцэх , хэлцгээх , хэлчихэх , хэлээдэх , хэлсхийх , барьдаг , бариулдаг , баригддаг , барилддаг , барьцгаадаг , барьчихдаг ,
+авмаар , авуулмаар , авагдмаар , авалцмаар , авцгаамаар , авчихмаар , аваадахмаар
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+关于 -сан уул гд лц цгаа чих схий аадах 等的意义，参见动词体和态部分。
+</p>
+<p>
+2〉形动词能够支配各格名词，尤其是宾格名词，如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хэлсэн 他说了。
+</p>
+<p>
+Түүний хэлсэн нь 他说的是。
+</p>
+<p>
+Түүнд хэлсэн. 向他说了。
+</p>
+<p>
+Түүнийг хэлсэн. 说他了。
+</p>
+<p>
+Түүнээр хэлүүлсэн. 让他说了。
+</p>
+<p>
+Түүнээс хэлсэн 他说了。
+</p>
+<p>
+Түүнтэй хэлэлцсэн 和他说了 (谈了)。
+</p>
+<p>
+Тэр хэлэхдээ 他说是。
+</p>
+<p>
+Түүн хэлсэн нь 他说的是。
+</p>
+<p>
+Түүнд хэлэх хэрэгтэй. 需要向他说。
+</p>
+<p>
+Түүнийг хэлэх хэрэгтэй. 需要说他。
+</p>
+<p>
+Түүнээр хэлүүл. 让他说。
+</p>
+<p>
+Түүнээс хэлэх нь. 他说。
+</p>
+<p>
+Түүнтэй хэлэлцэх. 和他谈。
+</p>
+<p>
+Тэр хэлдэг. 他 (经常) 说。
+</p>
+<p>
+Түүний хэлдэг нь 他 (经常) 说的是。
+</p>
+<p>
+Түүнд хэлдэг 向他经常说。
+</p>
+<p>
+Түүнийг хэлдэг (经常) 说他。
+</p>
+<p>
+Түүнээр хэлүүлдэг 让他经常说。
+</p>
+<p>
+Түүнээс хэлдэг 他 (经常) 说。
+</p>
+<p>
+Түүнтэй хэлэлцдэг 和他 (经常) 交谈。
+</p>
+<p>
+Тэр хэлмээр юм. 他可能说。
+</p>
+<p>
+Түүн хэлмээр хэрэг 他可能说的事。
+</p>
+<p>
+Түүнд хэлээгүй．未对他说。
+</p>
+<p>
+Түүний үг сонсогч. 听他话的人。
+</p>
+<p>
+Түүнээр хэлүүлмээр. 可能让他说，想让他说。
+</p>
+<p>
+Түүнээс асуумаар. 可能和他问，想和他问。
+</p>
+<p>
+Түүнтэй хэлэлцмээр. 可能和他谈，想和他谈
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3〉形动词可受形容词、副词修饰。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хурдан явах 快走，хурдан явсан 快速走了，хурдан явдаг (惯于) 快走，хурдан явмаар (可能) 快走，хурдан явагч 快走的，аажуу хэлэх 慢说，аажуу хэлсэн 慢说了，аажуу хэлдэг (惯于) 慢说，аажуу хэлмээр (可能) 慢说，аажуу хэлэгч 慢
+说的，нэн айх 更怕，нэн айсан 更怕了，маш айдаг 很怕，үл айдаг 不怕，бүрмөсөн явмаар болжээ 完全准备好走了，сайхан уншигч 念得好的，арай яваагүй 还没有走
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<b>（2）形动词的静词性 </b>
+</p>
+<p>
+形动词的静词性首先表现在它具有格的变化。形动词的格变，在形式上与名词基本一致，但表达的意义与名词的格有许多不同。因此形动词的各格需要单独研究。
+</p>
+
+<!-...... subparagraph 第一、主格......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-128"><span class="sectionnumber">2.2.3.2.0.1&#x2003;</span>第一、主格</span>
+<a id="cyrillic-grammar-autopage-128"></a>
+
+</p>
+<p>
+1）形动词的词干形式，如同形容词那样，主要充当修饰语。如果需要充当主语，则需要主格标志 нь чинь 等。如：үзээгүй ном 没看的书，буцалсан ус 开水，товойсон амжилт 突出的成绩，явах үе 走的时候，ярьдаг үг 常说的话，
+хийдэг ажил 常做的事，сайшаамаар хэрэг 值得表扬的事，хэлсэн нь зүйтэй 说得有道理，хийсэн нь сайхан 做得好看，суралцах нь чухал 学习重要，мэдэх нь арвин 知道的多
+</p>
+<p>
+2）以时间形动词的词干形式为基础，可构成后置词结构及一些时位词结构。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Явах тутам хурдан болох 越走越快
+</p>
+<p>
+Хэлсэн шиг бодогдоно 好像说过
+</p>
+<p>
+Үзсэн мэт хэлнэ 说得似乎眼见一样
+</p>
+<p>
+Ирсэн тухай мэдээ 关于到来的消息
+</p>
+<p>
+Уулзах болгон ярих 每次遇见都说
+</p>
+<p>
+Хэлэх зуур 说的当中
+</p>
+<p>
+Мэдсэн хойно 知道以后
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 第二、所属格 (属格、领格…）......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-129"><span class="sectionnumber">2.2.3.2.0.2&#x2003;</span>第二、所属格 (属格、领格…）</span>
+<a id="cyrillic-grammar-autopage-129"></a>
+
+</p>
+<p>
+1）形动词的所属格形式，也可以连接定语与被限定语，但比较少 (绝大部分定语采用主格形式)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр хүн энд ирсний уршигаас…由于他到这里来…
+</p>
+<p>
+Чадахын хэмжээгээр 尽量
+</p>
+<p>
+Хөдөлмөрлөсний ачаар 由于劳动的好处
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）以形动词的所属格形式为基础，可构成后置词结构，以及时位词结构。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Үйлчлэхийн төлөө 为了服务
+</p>
+<p>
+Бүтээн байгуулахын төлөө 为了建设
+</p>
+<p>
+Ирэхийн өмнө 来之前
+</p>
+<p>
+Ирсний хойно 来之后
+</p>
+<p>
+Болсны хойно 成熟之后
+</p>
+<p>
+Миний энд ирдэгийн учир нь 我到这里是因为
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<b> 第三、向位格 (给在格)</b>
+</p>
+<p>
+1）形动词的向位格可以表示与某种性质特征有关的行为。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Идэхэд амттай 吃着好吃，
+</p>
+<p>
+уухад сайн 便于喝，
+</p>
+<p>
+наадахад авьяастай 会玩，
+</p>
+<p>
+хийхэд дэмтэй 做得熟练，эвдрэхэд
+</p>
+<p>
+амархан 容易坏，
+</p>
+<p>
+байгуулахад хүчиртэй 建设起来不易，
+</p>
+<p>
+үзэхэд муухай 看着不好
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）表示具有行为意义的原因 (是一种两个动词之间的因果关系)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Таны ирсэнд бид их баярлаж байна.
+</p>
+<p>
+我们很高兴你来
+</p>
+<p>
+Түүний чингэж хэлсэнд бүгдээр цөм саналтай.
+</p>
+<p>
+对他那个说法大家都有意见
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）表示具有行为意义的时机
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Таныг ирэхэд тэд явчихсан. 您来时他们都走了
+</p>
+<p>
+Өлсөхөд идээн эрдэнэ , даарахад дах эрдэнэ.
+</p>
+<p>
+饿时饭是宝，冻时衣是宝
+</p>
+<p>
+Арсланг барихад аргаар 擒狮要智擒
+</p>
+<p>
+Тариа тариалахад хэрэглэнэ. 种地时用
+</p>
+<p>
+Мал хариулахад зарна 放牧时用
+</p>
+<p>
+Намайг мэдэхэд тэд хийгээд барчихсан.
+</p>
+<p>
+我知道时他们做完了
+</p>
+<p>
+Чингэж хэлэхэд болохгүй зүйлгүй.
+</p>
+<p>
+那样说并无不可
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4）表示具有行为意义的境地
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Уйлахад хүрэх 到哭的地步
+</p>
+<p>
+Үхэхэд ойртох 接近死亡
+</p>
+<p>
+Өлсөж даарахад хүрэх 到饿冻的境地
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+5）表示具有行为意义的依存条件
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Үг гэдэг чинь хэлэхэд байна. 话在怎么说
+</p>
+<p>
+Малын хүч тарга хэрхэн хариулах байна.
+</p>
+<p>
+牲畜的强壮和膘情靠放牧的如何
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+6）形动词的向位格可以构成一种比较结构
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ингэсэнд орвол чингэсэн нь дээр.
+</p>
+<p>
+与其这样不如那样
+</p>
+<p>
+Үүнийг авсанд орвол түүнийг авсан нь дээр.
+</p>
+<p>
+与其要这个不如要那个
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 第四、宾格......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-130"><span class="sectionnumber">2.2.3.2.0.3&#x2003;</span>第四、宾格</span>
+<a id="cyrillic-grammar-autopage-130"></a>
+
+</p>
+<p>
+1）形动词的宾格，表示行为意义的客体
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Таны ирэхийг бид хүсэж байна. 我们希望您来
+</p>
+<p>
+Түүний явсныг та мэдээгүй юм уу?
+</p>
+<p>
+您还不知道他已经走了吗？
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）在形动词宾格基础上形成的惯用形式
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хийхээ мэд 随便做去 (任你做去)，
+</p>
+<p>
+хэлэхээ мэд 随便说去 (任你说去)，
+</p>
+<p>
+идэхээ мэд 随便吃去 (任你吃去)。
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 第五、凭借格（用让格）......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-131"><span class="sectionnumber">2.2.3.2.0.4&#x2003;</span>第五、凭借格（用让格）</span>
+<a id="cyrillic-grammar-autopage-131"></a>
+
+</p>
+<p>
+1）形动词的凭借格，可以表示凭借的行为。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Үхэхээр айлгах 以死来威胁。
+</p>
+<p>
+Алахаар сүрдүүлэх 以杀死来威胁。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）形动词的凭借格也可以表示另一个行为的内容。主要是表示“做为”&#x202f;“认为”的内容。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Барснаар бодох 算是完结
+</p>
+<p>
+Ирснээр бодох 算是来了
+</p>
+<p>
+Болохгүйгээр үзэх 认为不可
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）用在形容词述语前，表示一种主述关系。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Идэхээр сайн 吃的方面好，吃得好
+</p>
+<p>
+Явахаар барагтай 走得不好
+</p>
+<p>
+Гүйхээр хурдан 跑得快
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4）表示两个动词的时机关系。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Түүнийг ирэхээр нь асуу. 他来的时候问一问
+</p>
+<p>
+Түүнийг хэлэхээр нь би санаанд орлоо.
+</p>
+<p>
+他说的时候我才想起来
+</p>
+<p>
+Өөрөө мэдэхгүйгээр бусдыг хэлэх.
+</p>
+<p>
+自己不知道反而说别人
+</p>
+<p>
+Гол үзээгүйгээр гутлаа тайлах.
+</p>
+<p>
+未曾见河先脱鞋 (成语)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+5）表示两个动作的并行关系。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Суухаар унтана 坐着睡
+</p>
+<p>
+Зогсохоор амарна 站着休息
+</p>
+<p>
+Хэвтэхээр үзнэ 躺着看
+</p>
+<p>
+Босохоор үхнэ 站着死
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+6）表示两个动作的目的关系。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хоол идэхээр явав 吃饭去了
+</p>
+<p>
+Эмч болохоор чармайх 争取当医生
+</p>
+<p>
+Сургуульд орохоор бэлтгэх 准备上学校
+</p>
+<p>
+Манлайд нь гарахаар мэрийн чармайх. 力争上游
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+7）表示两个动作之间的选择关系
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Зогсохоороо суу 与其站着不如坐着。
+</p>
+<p>
+Нэрээ хугалахаар ясаа хугала.
+</p>
+<p>
+与其败坏名声不如折断筋骨。
+</p>
+<p>
+Эрхийг сурахаар бэрхийг сур.
+</p>
+<p>
+与其滋长娇气不如增长志气
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+8）表示两个动作的依据关系
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бодсоноор хэлэх 按照想的说
+</p>
+<p>
+Сурснаар заах 按照学的教
+</p>
+<p>
+Хэлснээр хийх 按照说的做 (言必行)
+</p>
+<p>
+Хийхээр болно , хэлэхээр болохгүй.
+</p>
+<p>
+取决于做，不取决于说。
+</p>
+<p>
+Миний үзэхээр тийм биш 依我看不是那样
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+9）表示原因
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Эрт ирснээрээ болжээ 由于早来所以好了
+</p>
+<p>
+Орой хүрснээрээ хоцорчээ. 由于晚到所以耽误了
+</p>
+<p>
+Хөдөлмөр хийснээрээ бие нь сайн болжээ.
+</p>
+<p>
+由于劳动所以身体好了
+</p>
+<p>
+Сайн чармайснаараа амжилт олжээ.
+</p>
+<p>
+由于很好的努力，所以取得了成就
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+10）表示未然意义
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Маргааш явахаар болов. 明天要走
+</p>
+<p>
+Тэр хүнийг очихоор хэлж байна. 说那个人要去
+</p>
+<p>
+Эндээс шилжихээр болов. 要从这里调走
+</p>
+<p>
+Тэд энд ирэхээр шийдэв. 他们决定要来这里
+</p>
+<p>
+Би л явахаар үгүй. 我是不会去的
+</p>
+<p>
+Би явахаар л үгүй. 我不会去的
+</p>
+<p>
+Тэр одоо гэртээ харихаар байна. 他现在要回家
+</p>
+<p>
+Тэр үед бид багшийнд очихоор байжээ.
+</p>
+<p>
+那时候我们要到老师那里去
+</p>
+<p>
+Одоо сургуульд орохоор байна. 现在正在准备入学
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+11）形动词还可以表示可以或值得进行的行为 (= маар мээр)
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Надад гааль татвар төлөхөөр юм байхгүй.
+</p>
+<p>
+我这里没有可以交税的东西
+</p>
+<p>
+Надад хэлэхээр үг байхгүй. 我没有可说的话
+</p>
+<p>
+Чамд үзэхээр бичиг байна уу? 你有可看的书吗?
+</p>
+<p>
+Надад уншуулахаар ном үгүй үү?
+</p>
+<p>
+有没有可以让我看的书？
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+12）在形动词凭借格基础上形成的惯用形式。
+</p>
+<p>
+表示“做还是做”。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Дургүй боловч явахаар явна шид.
+</p>
+<p>
+虽然不愿意，去还是去
+</p>
+<p>
+Хэдийвэр ааштай боловч хийхээр хийнэ шүү.
+</p>
+<p>
+虽然有些脾气，做还是做
+</p>
+<p>
+Чингэж хэлэхээр хэлж байна , биелүүлж чадах гэж үү дээ. 说是那样说，是否能够实现呢
+</p>
+<p>
+表示“尽管做去”
+</p>
+<p>
+Явахаараа яв 尽管你走去
+</p>
+<p>
+Хэлэхээрээ хэл 尽管你说去
+</p>
+<p>
+Хийхээрээ хий 尽管你做去
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 第六、从比格......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-132"><span class="sectionnumber">2.2.3.2.0.5&#x2003;</span>第六、从比格</span>
+<a id="cyrillic-grammar-autopage-132"></a>
+
+</p>
+<p>
+1）形动词从比格可以表示间接对象
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Мэдэхээс нь асуу 和知道的问
+</p>
+<p>
+Арвин олсноос нь ав 和多的要
+</p>
+<p>
+Өвчин олохоос айна 怕得病
+</p>
+<p>
+Хэрэг гарахаас айна 怕出事
+</p>
+<p>
+Хэлэхээсээ ичнэ
+</p>
+<p>
+说出来怕羞 (怕丢丑), 不好意思说出来
+</p>
+<p>
+Хэлэхээсээ айна 怕说出来
+</p>
+<p>
+Очихоос татгалзахгүй 敢于去 (对于去不犹豫)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）形动词从比格可以表示全体和部分的关系
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Болсноос нь ид 吃熟的
+</p>
+<p>
+Идэхээс амтай 有吃的粮
+</p>
+<p>
+Өмсөхөөс хувцастай 有穿的衣服
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）形动词从比格可以表示比较的对象
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Зурснаас сайхан 比画的好看
+</p>
+<p>
+Бодсоноос илүү хурдан 比想象的还快
+</p>
+<p>
+Нисэхээс хурдан 比飞还快
+</p>
+<p>
+Алхахаас удаан 比步行慢
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4）形动词从比格可以表示行为意义的原因
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Миний хэлснээс тэр хүн сэжиг авчээ.
+</p>
+<p>
+从我的话语当中他起了疑心，他怀疑我的话
+</p>
+<p>
+Өвчин хүрснээс (болж) бие нь муу болжээ.
+</p>
+<p>
+由于生病身体不好了
+</p>
+<p>
+Сайн чармайснаас болжээ. 由于很好地努力的结果
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+5）形动词从比格可以表示行为意义的背离对象
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Үхэхээсээ гарах 脱险（幸免于死)
+</p>
+<p>
+Миний хэлснээс гарсангүй (зөрсөнгүй).
+</p>
+<p>
+没有出我所说
+</p>
+<p>
+Түүний ярьснаас ондоо болжээ.
+</p>
+<p>
+和他说的不一样啦。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+6）形动词从比格为基础可以构成一些时位词结构和后置词结构
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ирэхээс өмнө 来之前
+</p>
+<p>
+Хэлснээс хойш 自从说了以后
+</p>
+<p>
+Бодсоноос дээр 比想的好
+</p>
+<p>
+Явахаас өөр аргагүй 除走之外别无办法
+</p>
+<p>
+Хэлснээс биш хараасан биш 说是说了没有骂
+</p>
+<p>
+Авахаас ондоо аргагүй 除要之外别无办法
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+7）在形动词从比格基础上形成的惯用形式
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хийхээсээ алд! 做就做去，管他呢!
+</p>
+<p>
+Явахаасаа алд! 走就走去，管他呢！
+</p>
+<p>
+Хэлэхээсээ алд! 说就说去，管他呢！
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subparagraph 第七、和同格......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-133"><span class="sectionnumber">2.2.3.2.0.6&#x2003;</span>第七、和同格</span>
+<a id="cyrillic-grammar-autopage-133"></a>
+
+</p>
+<p>
+1）形动词和同格可以表示某种间接宾语
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Миний ирэх түүний явахтай таарчээ.
+</p>
+<p>
+我来的时候正碰上他走
+</p>
+<p>
+Ном дээр бичсэнтэй ондоо байна.
+</p>
+<p>
+和书上写的不一样
+</p>
+<p>
+Хэлсэн нь хийсэнтэйгээ адилгүй.
+</p>
+<p>
+说的和做的不一样
+</p>
+<p>
+Хэлснийг нь хийсэнтэй нь адилтгавал зөрөөтэй.
+</p>
+<p>
+说的和做的比较起来不一致
+</p>
+<p>
+Би очиход түүний будаа идэхтэй таарчээ.
+</p>
+<p>
+我去的时候正碰上他吃饭
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）以和同格为基础可以构成某些后置词结构
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хэлэхтэй зэрэг би мэдчихлээ. 一说我就知道了
+</p>
+<p>
+Намайг ирэхтэй зэрэг тэд явчихлаа.
+</p>
+<p>
+我一来他们就走了
+</p>
+<p>
+Галт тэрэг хөдлөхтэй зэрэг радио дуугарав.
+</p>
+<p>
+火车一动，广播就响了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+除了上述种种格变以外，形动词的静词性也表现在后边可以接加复数附加成分方面。但形动词后边接加的复数附加成分，如同在形容词后边接加的附加成分一样，具有构词作用。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+тэнхэрсэнүүд 恢复健康的人们
+</p>
+<p>
+муудсанууд 疲乏的人们，不相好的人们
+</p>
+<p>
+ууланд байхнууд 山上的人们
+</p>
+<p>
+явж байхнууд 走的人们
+</p>
+<p>
+дагасан 跟随 (过去时)—дагагсад 随从
+</p>
+<p>
+орсон 进 (过去时)—орогсод 进士
+</p>
+<p>
+явсан 去 (过去时)—явагсад 去者
+</p>
+<p>
+үзсэн 看 (过去时)—үзэгсэд 观众
+</p>
+<p>
+үзэгч 看的人—үзэгчид 观众
+</p>
+<p>
+сонсогч 听的人—сонсогчид 听众
+</p>
+<p>
+мэдэгч 知道的人—мэдэгчид 识者
+</p>
+<p>
+уншигч 读的人—уншигчид 读者
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+除了格、数方面的变形以外，形动词的静词性还表现在它后边可以连用领属附加成分上。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чиний хэлсэн чинь таарна. 你说得对
+</p>
+<p>
+Чи өөрийн хэлсэнээ мартав уу?
+</p>
+<p>
+你把自己说的忘了吗?
+</p>
+<p>
+Тэр өөртөө ирэх нь дээр. 他本人来才好
+</p>
+<p>
+Түүнийг ирэхээс нь өмнө чи ирчихжээ.
+</p>
+<p>
+他来之前你来了
+</p>
+<p>
+Хийсэн чинь миний бодсоноос сайхан.
+</p>
+<p>
+你做的比我想象的好看。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）形动词的动词性和静词性的结合
+</p>
+<p>
+形动词除了具有上述的动词性和静词性以外，充当结束式谓语的形动词后边还可以接加一般静词性谓语后接加的各种助动词和语气词。这更进一步说明了它不但具有两重性，而且它的两重性还可以结合在一起。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хоёр өдөр яваад БаянДабаанд хүрэхэд тэд хэдийнэ давшсан байжээ.
+</p>
+<p>
+走了两天到巴彦达巴时他们早就搬走了
+</p>
+<p>
+Цогжил өнөө жил цэрэг элсэх үед хамгийн түрүүнд нэрээ мэдүүлсэн байна.
+</p>
+<p>
+朝格吉勒在今年征兵时最先报的名
+</p>
+<p>
+Энэ хэргийг би түүнээс асуух байжээ.
+</p>
+<p>
+这件事我和他问一问就好了
+</p>
+<p>
+Бушуу очихгүй бол болохгүй тэр хүн явчих байна.
+</p>
+<p>
+不快去不行，那个人会走掉的
+</p>
+<p>
+Түүнийг үзэх бүр багын үеийн хэрэг нь бодогддог байжээ.
+</p>
+<p>
+每次见他，就想起小时候的事情
+</p>
+<p>
+Олноороо тэд хоёрын харилцааг мэддэг байна.
+</p>
+<p>
+大家都知道他们二人的关系
+</p>
+<p>
+Та чингэж хэлсэн билүү? 您那么说了对吧？
+</p>
+<p>
+Энэ хэргийг тэд мэдэх юм. 这件事他们知道
+</p>
+<p>
+Тэр хүн чингэж хэлдэг юм даа.
+</p>
+<p>
+那个人常常那么说
+</p>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

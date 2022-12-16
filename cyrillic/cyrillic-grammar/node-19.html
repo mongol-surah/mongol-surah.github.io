@@ -1,0 +1,3217 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—蒙古语词组类别 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-224"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... section 蒙古语词组类别......
+-->
+<h4 id="autosec-225"><span class="sectionnumber">1.2&#x2003;</span>蒙古语词组类别</h4>
+<a id="cyrillic-grammar-autopage-225"></a>
+<a id="cyrillic-grammar-autofile-19"></a>
+<p>
+为了便于句子结构的分析，下面我们从词组的内部关系对蒙古语的词组进行较详细的分类。
+</p>
+
+<!-...... subsection 体述关系词组......
+-->
+<h5 id="autosec-226"><span class="sectionnumber">1.2.1&#x2003;</span>体述关系词组</h5>
+<a id="cyrillic-grammar-autopage-226"></a>
+
+<p>
+内部分为以下各类：
+</p>
+
+<!-...... subsubsection 名词---名词......
+-->
+<h6 id="autosec-227"><span class="sectionnumber">1.2.1.1&#x2003;</span>名词—名词</h6>
+<a id="cyrillic-grammar-autopage-227"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би бол сурагч. 我是学生。
+</p>
+<p>
+Миний аав бол ажилчин. 我的父亲是工人
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 名词---形容词......
+-->
+<h6 id="autosec-228"><span class="sectionnumber">1.2.1.2&#x2003;</span>名词—形容词</h6>
+<a id="cyrillic-grammar-autopage-228"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+өнгө нь сайхан 色好 хэмжээ нь их 分量大 уул нь үзэмжтэй 山好看 ус нь тунгалаг 水清 усаар элбэг 水丰富 зүсээр сайхан 长得美丽 чадлаар барагтай 能力差 дээгүүрээ цагаан 上边白 доогуураа хар 下边黑
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 名词---动词......
+-->
+<h6 id="autosec-229"><span class="sectionnumber">1.2.1.3&#x2003;</span>名词—动词</h6>
+<a id="cyrillic-grammar-autopage-229"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хүмүүс ирлээ 人们来了 нисгэл буулаа 飞机降落了
+</p>
+<p>
+шувууны жиргэх 鸟叫 түүний хэлсэн нь 他说 түүнээс хэлсэн нь 他说
+</p>
+<p>
+чамайг ирэхийг мэднэ 知道你来 түүнийг иртэл чи хүлээж бай 你等到他来
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形容词---名词......
+-->
+<h6 id="autosec-230"><span class="sectionnumber">1.2.1.4&#x2003;</span>形容词—名词</h6>
+<a id="cyrillic-grammar-autopage-230"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+их нь хүү 大的是儿子
+</p>
+<p>
+бага нь охин 小的是女儿
+</p>
+<p>
+хоёр нь сурагч 两个是学生
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形容词---形容词......
+-->
+<h6 id="autosec-231"><span class="sectionnumber">1.2.1.5&#x2003;</span>形容词—形容词</h6>
+<a id="cyrillic-grammar-autopage-231"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+их нь сайн 大的好 бага нь сайхан 小的好看
+</p>
+<p>
+нэг нь зүгээр 一个可以 хоёр нь барагтай 两个差一些
+</p>
+<p>
+өндрөөр таван тохой 高五尺 уртаар зуун газар 长百里
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形容词---动词......
+-->
+<h6 id="autosec-232"><span class="sectionnumber">1.2.1.6&#x2003;</span>形容词—动词</h6>
+<a id="cyrillic-grammar-autopage-232"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Сайн нь үлджээ 好的剩下了
+</p>
+<p>
+улаан нь болжээ 红的熟了
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形动词---名词......
+-->
+<h6 id="autosec-233"><span class="sectionnumber">1.2.1.7&#x2003;</span>形动词—名词</h6>
+<a id="cyrillic-grammar-autopage-233"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сая ирсэн нь та нар уу? 刚来的是你们吗？
+</p>
+<p>
+Чиний хэлж байх чинь тэр хүн үү? 你说的是那个人吗？
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形动词---形容词......
+-->
+<h6 id="autosec-234"><span class="sectionnumber">1.2.1.8&#x2003;</span>形动词—形容词</h6>
+<a id="cyrillic-grammar-autopage-234"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хийх нь сайн 做的好 зурсан нь сайхан 画得好
+</p>
+<p>
+өвчин хүрэх нэг муу 生病是一件坏事 сайн багш олох нэг сайн 遇到好老师是一件好事
+</p>
+<p>
+явахаар сайн 走得好 гүйхээр хурдан 跑得快
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形动词---动词......
+-->
+<h6 id="autosec-235"><span class="sectionnumber">1.2.1.9&#x2003;</span>形动词—动词</h6>
+<a id="cyrillic-grammar-autopage-235"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ирэх нь иржээ 来的来了 явах нь явжээ 走的走了
+</p>
+<p>
+өтгөс нь амарч байна 年老的在休息
+</p>
+<p>
+идэх байна 有吃的 өмсөх (байх) үгүй 没有穿的
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 个别情况下摹拟词作述语......
+-->
+<h6 id="autosec-236"><span class="sectionnumber">1.2.1.10&#x2003;</span>个别情况下摹拟词作述语</h6>
+<a id="cyrillic-grammar-autopage-236"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тал руу дайван дайван ташуур үгүй гуйван гуйван.
+</p>
+<p>
+向野外一拐一拐 (地跑)，没人赶也一拐一拐 (地跑)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<b> 说明：</b>
+</p>
+<p>
+为了简便起见，我们在这里只是举出了词组关系的基本类型。这里的名词、形容词、副词分别代表了同一类型变化的词类。
+</p>
+<p>
+譬如：
+</p>
+<p>
+1）名词：除了表示名词以外，还代表名词性代词以及作为名词用的形容词、数词、某些情况下的名词型时位词等。
+</p>
+<p>
+2）形容词：除了表示形容词外，还代表数词、形容词性代词、某些情况下的形容词型时位词等。
+</p>
+<p>
+3）副词：除了表示副词外，还代表副词型 (形容词、代词、时位词) 等。
+</p>
+<p>
+4）动词：在支配其它词的关系上 (处在词组的后半部时) 代表一切动词。
+</p>
+<p>
+5）形动词：在被其它词支配时 (处在词组的前半部时)，从动词中分出形动词，作单独处理。
+</p>
+
+<!-...... subsection 定体关系词组......
+-->
+<h5 id="autosec-237"><span class="sectionnumber">1.2.2&#x2003;</span>定体关系词组</h5>
+<a id="cyrillic-grammar-autopage-237"></a>
+
+<p>
+内部可分为下列各类：
+</p>
+
+<!-...... subsubsection 名词---名词......
+-->
+<h6 id="autosec-238"><span class="sectionnumber">1.2.2.1&#x2003;</span>名词—名词</h6>
+<a id="cyrillic-grammar-autopage-238"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+модон тэрэг 木车 чулуун байшин 石头房子
+</p>
+<p>
+төмөр суулга 铁桶 энгийн үе 平时
+</p>
+<p>
+намын удирдлага 党的领导 сүүтэй цай 奶茶
+</p>
+<p>
+аягатай ус 碗里的水 үүлтэй өдөр 阴雨
+</p>
+<p>
+нөхөд лүгээгийн харьцаа 同志关系 ууландахь гөрөөс 山间的野兽<sup>3</sup>
+</p>
+<p>
+өмнө уул 南山 өмнө талын уул 南边的山
+</p>
+<p>
+төмөр мэт чулуу 铁一般的石头 энэ мэтийн хэрэг 像这样的事
+</p>
+<p>
+чамтай адил хүн 和你一样的人 хувьсгалын тухай онол 关于革命的理论
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-239"></a>
+<p>
+<sup>3</sup>&nbsp; 食草的野兽
+</p>
+
+</div>
+</div>
+
+<!-...... subsubsection 名词---形容词......
+-->
+<h6 id="autosec-240"><span class="sectionnumber">1.2.2.2&#x2003;</span>名词—形容词</h6>
+<a id="cyrillic-grammar-autopage-240"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гал улаан 火红 өндөгний шар 蛋黄
+</p>
+<p>
+хөө хар 漆黑 дун цагаан 洁白
+</p>
+<p>
+уулын өндөр 山的高 нарын халуун 太阳的热
+</p>
+<p>
+морины хурдан 马的快 модны бүдүүн 树的粗大
+</p>
+<p>
+өвлийн хүйтэн 冬天的冷
+</p>
+<p>
+уул шиг өндөр 山一般高 далай шиг гүн 海一般深
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形容词---名词......
+-->
+<h6 id="autosec-241"><span class="sectionnumber">1.2.2.3&#x2003;</span>形容词—名词</h6>
+<a id="cyrillic-grammar-autopage-241"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сайн морь 好马 холын айл 远村
+</p>
+<p>
+удаан жил 多年 олон хүн 很多人
+</p>
+<p>
+бяцхан хүү 小孩子 гүн найр 深情
+</p>
+<p>
+саруул тал 原野 хөх огторгуй<sup>4</sup> 蓝的天空
+</p>
+<p>
+алсын бараа<sup>5</sup> 远景
+</p>
+<p>
+дөчин жил 四十年 арваад хүн 十来个人
+</p>
+<p>
+хос болжмор 一对云雀 хоёр хэв цай 两块砖茶
+</p>
+<p>
+нэг кило будаа 一公斤米
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-242"></a>
+<p>
+<sup>4</sup>&nbsp;(太空)
+</p>
+<p>
+<sup>5</sup>&nbsp;(轮廓)
+</p>
+
+</div>
+</div>
+
+<!-...... subsubsection 形容词---形容词......
+-->
+<h6 id="autosec-243"><span class="sectionnumber">1.2.2.4&#x2003;</span>形容词—形容词</h6>
+<a id="cyrillic-grammar-autopage-243"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+шар улаан 黄红 их сайн 很好 сүртэй их 很大
+</p>
+<p>
+ийм мэргэн 这样聪明 тийм сайн 那样好
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形动词---名词......
+-->
+<h6 id="autosec-244"><span class="sectionnumber">1.2.2.5&#x2003;</span>形动词—名词</h6>
+<a id="cyrillic-grammar-autopage-244"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+явах үе 走时 ардчилсан ёс 民主
+</p>
+<p>
+сайн явахын өрөөл 对前途的祝愿 ирсний шинж тэмдэг 来的迹象
+</p>
+<p>
+товойсон амжилт 突出的成绩
+</p>
+<p>
+ярьдаг үг 说的话 хийдэг ажил 做的事
+</p>
+<p>
+сайшаамаар хэрэг 值得称赞的事
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形动词---形容词......
+-->
+<h6 id="autosec-245"><span class="sectionnumber">1.2.2.6&#x2003;</span>形动词—形容词</h6>
+<a id="cyrillic-grammar-autopage-245"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бахархмаар сайхан 好看得使人羡慕 (бахархах 自豪, 羡慕)
+</p>
+<p>
+Гайхмаар их 大得出奇
+</p>
+<p>
+Зодохын ихээр зодох 打得很厉害
+</p>
+<p>
+Хэлэхийн муугаар хэлэх 说得一无是处
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 副词---形容词......
+-->
+<h6 id="autosec-246"><span class="sectionnumber">1.2.2.7&#x2003;</span>副词—形容词</h6>
+<a id="cyrillic-grammar-autopage-246"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+маш сайн 很好 тун арвин 特别多 улам тодорхой 更清楚
+</p>
+<p>
+тас өөр 完全不一样 таг сохор 完全瞎子
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 摹拟词---名词......
+-->
+<h6 id="autosec-247"><span class="sectionnumber">1.2.2.8&#x2003;</span>摹拟词—名词</h6>
+<a id="cyrillic-grammar-autopage-247"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Шор шор явдалтай 飒飒的走法
+</p>
+<p>
+Гингэр гангар хадхуур бугуйвч
+</p>
+<p>
+丁零当郎的首饰手镯
+</p>
+<p>
+Сэр сэр салхи 飒飒吹的风.
+</p>
+<p>
+Шивэр чивэр бороо 淅淅沥沥下的雨
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsection 宾述关系词组......
+-->
+<h5 id="autosec-248"><span class="sectionnumber">1.2.3&#x2003;</span>宾述关系词组</h5>
+<a id="cyrillic-grammar-autopage-248"></a>
+
+<p>
+分为直接宾述关系与间接宾述关系两种。
+</p>
+<p>
+А. 直接宾述关系
+</p>
+<p>
+直接宾语是以宾格形式及其省略形式出现的宾语。大致有下列三种。
+</p>
+
+<!-...... subsubsection 名词---动词......
+-->
+<h6 id="autosec-249"><span class="sectionnumber">1.2.3.1&#x2003;</span>名词—动词</h6>
+<a id="cyrillic-grammar-autopage-249"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Биднийг тосож аваад 迎接我们
+</p>
+<p>
+Та нарыг хүлээж байсан 曾等待你们
+</p>
+<p>
+Олон түмнийг хөдөлгөх 发动群众
+</p>
+<p>
+Хэл бичгийн ажлыг сайжруулах
+</p>
+<p>
+改进语文工作
+</p>
+<p>
+Өвс хадах 割草 ном авах 买书
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形容词---动词......
+-->
+<h6 id="autosec-250"><span class="sectionnumber">1.2.3.2&#x2003;</span>形容词—动词</h6>
+<a id="cyrillic-grammar-autopage-250"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хүний сайныг мэдэхгүй 不知别人的好
+</p>
+<p>
+Хүний мууг тоочино 说别人的不好
+</p>
+<p>
+Дотроос нь их ихийг нь аваад ир
+</p>
+<p>
+从中拿大的来
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形动词---动词......
+-->
+<h6 id="autosec-251"><span class="sectionnumber">1.2.3.3&#x2003;</span>形动词—动词</h6>
+<a id="cyrillic-grammar-autopage-251"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чиний ирэхийг хүснэ 希望你来
+</p>
+<p>
+Миний хэлснийг ойлгов уу?
+</p>
+<p>
+理解了我所说的吗？
+</p>
+<p>
+Миний явахыг хурдан гэнэ 说我走得快
+</p>
+<p>
+Түүний хэлснийг буруу гэж байна
+</p>
+<p>
+据说他说的不对
+</p>
+<p>
+Чи түүний ирснийг мэднэ үү?
+</p>
+<p>
+你知道他来了吗？
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+B. 间接宾述关系
+</p>
+<p>
+间宾述关系是以各间接格 (给在格、从比格、用让格、和同格) 的形式出现的宾语，以及以一些后置词的形式出现的宾语。大致有以下六种。
+</p>
+
+<!-...... subsubsection 名词---形容词......
+-->
+<h6 id="autosec-252"><span class="sectionnumber">1.2.3.4&#x2003;</span>名词—形容词</h6>
+<a id="cyrillic-grammar-autopage-252"></a>
+
+<p>
+给在格 (向位格)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+цасанд сайн 对雪好 моринд сайн 对马好 элсэнд муу 对沙漠不好 түүнд ашигтай 对他有利 манай ажилд тустай 对我们工作有利
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+和同格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+далайтай ойр 和海近 хүмүүстэй эетэй 与人和气
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+从比格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+цаснаас цагаан 比雪白 далайнаас гүн 比海深 уулнаас өндөр 比山高 түүнээс илүү 比他多
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 名词---动词......
+-->
+<h6 id="autosec-253"><span class="sectionnumber">1.2.3.5&#x2003;</span>名词—动词</h6>
+<a id="cyrillic-grammar-autopage-253"></a>
+
+<p>
+给在格 (向位格)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+олонд өгөх 给大家 ард түмэнд үйлчлэх 为人民服务 Монгол хэлэнд шинэ үг нэмэгдэх 蒙古语中新词增加 түүнд сонирхох 对它感兴趣 танд тохирно 对您合适 наранд шарагдах 被太阳晒 сурагчдад уншуулах 让学生念
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+从比格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+багшаас асуу 问老师 түүнээс авах 和他要 нохойгоос айх 怕狗 юмаас үргэх 由于某物而惊跑 дайнаас ангижрах 脱离战争 хониныг ямаанаас ялгах 把绵羊和山羊分开 гараас нь барих 从手抓 бүснээс нь атгах 从腰带抓 ногооноос нь зуух 就
+菜 (用菜)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+用让格 (凭借格)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+мориор явах 骑马去 гараараа барих 用手抓 төмрөөр хийх 用铁做 түүнээр хэлүүлэх 让他说 төлөөлөгчөөр сонгох 选为代表 эрдэнээр үзэх 看作珍宝
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+和同格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+тэр хүн чамтай хамт явна 他和你一起走
+</p>
+<p>
+Би тэр хүнтэй танилцахгүй
+</p>
+<p>
+我不认识那个人
+</p>
+<p>
+Манай хоньтой нийлүүлэх
+</p>
+<p>
+和我们的羊合起来
+</p>
+<p>
+Нөгөө асуудалтай холбогдоно
+</p>
+<p>
+与另外的问题有关
+</p>
+<p>
+Чамтай учрасан 和你遇到了
+</p>
+<p>
+Хүүхэдтэй наадаж байна 和孩子们玩呢
+</p>
+<p>
+Хүнтэй таарахгүй 和别人不一样
+</p>
+<p>
+Үүнийг түүнтэй адилтгаж болохгүй
+</p>
+<p>
+这不能和那个比
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+后置词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ард түмний төлөө үйлчлэх 为人民服务
+</p>
+<p>
+Тэр тухай ярьж өгөв 谈关于那个事情
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形容词---形容词......
+-->
+<h6 id="autosec-254"><span class="sectionnumber">1.2.3.6&#x2003;</span>形容词—形容词</h6>
+<a id="cyrillic-grammar-autopage-254"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сайнд дуртай 愿意好的，муугаас муу 最坏
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形容词---动词......
+-->
+<h6 id="autosec-255"><span class="sectionnumber">1.2.3.7&#x2003;</span>形容词—动词</h6>
+<a id="cyrillic-grammar-autopage-255"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ихд дурлах 贪大 хурдандаа орно 属于快的 сайндаа багтана 属于好的 халуунаас айх 怕热 сайныг муугаас ялгах 把好的和坏的分开 сайнаас нь ав (шилэх 选举挑选) 挑好的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+用让格 (凭借格)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Сайнаар төлөх 用好的补偿 (支付)
+</p>
+<p>
+Муугаар орлуулах 以坏的代替
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+和同格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Сайнтай нөхөрлөх 和好的交朋友
+</p>
+<p>
+Сайнтай адилтгах 和好的比较
+</p>
+<p>
+后置词：Сайн шагаар нь сольё 换个好一些的
+</p>
+<p>
+Таны эрүүл мэндийн төлөө хундага өргөе
+</p>
+<p>
+为了您的健康干杯
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形动词---形容词......
+-->
+<h6 id="autosec-256"><span class="sectionnumber">1.2.3.8&#x2003;</span>形动词—形容词</h6>
+<a id="cyrillic-grammar-autopage-256"></a>
+
+<p>
+从比格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хийх нь хэлэхээс илүү чухал 做比说重要
+</p>
+<p>
+харааснаас илүү 比骂还厉害
+</p>
+<p>
+зурснаас сайхан 比画的还好
+</p>
+<p>
+бодсоноос сайн (хурдан) 比想象的好 (快）
+</p>
+<p>
+миний үзсэнээс их 比我看的大
+</p>
+<p>
+идэхээс амтай (үгүй) 有吃的粮 (没有)
+</p>
+<p>
+өмсөхөөс хувцастай(үгүй) 有 (没有) 穿的衣服
+</p>
+<p>
+和同格：
+</p>
+<p>
+тэдний хэлсэнтэй ондоо байна
+</p>
+<p>
+和他们说的不一样
+</p>
+<p>
+миний үзсэнтэй(бодсонтой) ав адилхан
+</p>
+<p>
+和我看的 (想的) 完全一样
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形动词---动词......
+-->
+<h6 id="autosec-257"><span class="sectionnumber">1.2.3.9&#x2003;</span>形动词—动词</h6>
+<a id="cyrillic-grammar-autopage-257"></a>
+
+<p>
+从比格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+өвчин олохоос айна 怕得病 хэлэхээс айна 怕说
+</p>
+<p>
+用让格 (凭借格)：үхэхээр айлгана 以死威胁
+</p>
+<p>
+барснаар бодоё 算作完了
+</p>
+<p>
+шинэ авснаар янз гадарла 用新买的做面子
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+和同格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+миний ирэх түүний явахтай тааралджээ
+</p>
+<p>
+我来的时候正遇上他走
+</p>
+<p>
+бичсэнийг хэлсэнтэй адилтгах
+</p>
+<p>
+把写的和说的作比较
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+后置词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ирсэн (явсан) шиг хэлж байна
+</p>
+<p>
+据说好像来 (走) 了
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsection 状述关系词组......
+-->
+<h5 id="autosec-258"><span class="sectionnumber">1.2.4&#x2003;</span>状述关系词组</h5>
+<a id="cyrillic-grammar-autopage-258"></a>
+
+<p>
+分为静状述关系和动状述关系两种。
+</p>
+<p>
+А. 静状述关系词组大致分为四种
+</p>
+
+<!-...... subsubsection 名词---名词 + ��� ��� ......
+-->
+<h6 id="autosec-259"><span class="sectionnumber">1.2.4.1&#x2003;</span>名词—名词 + тай тэй</h6>
+<a id="cyrillic-grammar-autopage-259"></a>
+
+<p>
+主格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+өглөө хуралтай 早晨有会
+</p>
+<p>
+орой ажилтай 晚上有工作
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+给在格 (向位格)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+энэ голд загастай 这河里有鱼
+</p>
+<p>
+тэр ууланд модтой 那山上有树
+</p>
+<p>
+найман цагт үдэшлэгтэй 八点有晚会
+</p>
+<p>
+хоёр цагт хуралтай 两点有会
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 名词---动词......
+-->
+<h6 id="autosec-260"><span class="sectionnumber">1.2.4.2&#x2003;</span>名词—动词</h6>
+<a id="cyrillic-grammar-autopage-260"></a>
+
+<p>
+主格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+өглөө явна 早晨走 маргааш суралцна 明天学习
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+给在格 (向位格)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+найман цагт явна 八点走 Хөх хотод хүрэх 到呼和浩特 жилд нэг удаа харина 一年回一次 гадаадад сууна 驻外
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+从比格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+өглөөнөөс бороо оров 从早晨下了雨 Бээжингээс буцаж ирсэн 从北京回来了 дэлгүүрээс худалдан авах 从商店买 дээрээс унах 从上边掉
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+用让格 (凭借格)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+чармайлгаар сурах 努力学习 албадлагаар хийлгэх 强迫做 зунаар хөдөө явах 夏天下乡 шөнөөр манаа манах 夜里放哨 уулнаар тойрох 山上转 замаар хэсэх 沿路溜达 далайгаар аялах 海上航行 их дуугаар бархирах 大声喊 зоригоор аашилах
+胡闹
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+后置词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+уул шиг овоолно 堆得山一样
+</p>
+<p>
+далай шиг давалгаална 像海一样翻浪 (波涛汹涌)
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形容词---动词......
+-->
+<h6 id="autosec-261"><span class="sectionnumber">1.2.4.3&#x2003;</span>形容词—动词</h6>
+<a id="cyrillic-grammar-autopage-261"></a>
+
+<p>
+主格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сайхан сонсдов 听得很好. хурдан явах 快走
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+给在格 (向位格)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+зоригтойдоо болжээ 多亏有志气
+</p>
+<p>
+сэргийдээ мэджээ 由于清醒而发觉了
+</p>
+<p>
+хүйтэнд даарах 由于天寒而发冷
+</p>
+<p>
+хамгийн хурдандаа нэг сар болно 最快得一个月
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+从比格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+харанхуйгаас (болж) үзэж чадсангүй
+</p>
+<p>
+由于天黑没有看清楚
+</p>
+<p>
+Ойроос (аваад) ном үзэх байжээ
+</p>
+<p>
+最近以来看起书了
+</p>
+<p>
+Усны гүнгээс гарчээ 从水的深处出来了
+</p>
+<p>
+Холоос иржээ 从远方来的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+用让格 (凭借格)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сайнаар ажиллаж байна. 工作得很好
+</p>
+<p>
+ихээр бүтээн байгуулах 大规模建设
+</p>
+<p>
+нарийн нямбайгаар шинжиж үзэх 仔细观察
+</p>
+<p>
+дотноор хэлэх 亲密地说
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 副词---动词......
+-->
+<h6 id="autosec-262"><span class="sectionnumber">1.2.4.4&#x2003;</span>副词—动词</h6>
+<a id="cyrillic-grammar-autopage-262"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+тун ядарчээ 很累 үргэлж асуудаг 常问 гэнэт ирэв 突然来了 бушуу алхах 走得快 хага цохих 打破 тас цавчив 砍断 шувт дайрах 冲破
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+B. 动状述关系词组大致分为四种
+</p>
+
+<!-...... subsubsection 形动词---名词......
+-->
+<h6 id="autosec-263"><span class="sectionnumber">1.2.4.5&#x2003;</span>形动词—名词</h6>
+<a id="cyrillic-grammar-autopage-263"></a>
+
+<p>
+给在格 (向位格)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+өлсөхөд идээ эрдэнэ 饿时食物宝贵
+</p>
+<p>
+даарахад дах эрдэнэ 冻时衣服宝贵
+</p>
+<p>
+идэхэд эр 能吃. <sup>6</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-264"></a>
+<p>
+<sup>6</sup>&nbsp;〖дах 翻毛光板皮衣; 皮外套〗
+</p>
+
+</div>
+</div>
+
+<!-...... subsubsection 形动词---形容词......
+-->
+<h6 id="autosec-265"><span class="sectionnumber">1.2.4.6&#x2003;</span>形动词—形容词</h6>
+<a id="cyrillic-grammar-autopage-265"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+给在格 (向位格)：хийхэд сайн 做起来好 идэхдээ сайн 饭量好 идэхэд сайн 吃起来好 очиход бэлхэн байна 随时准备去 чанахад амар 煮时容易
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 形动词---动词......
+-->
+<h6 id="autosec-266"><span class="sectionnumber">1.2.4.7&#x2003;</span>形动词—动词</h6>
+<a id="cyrillic-grammar-autopage-266"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Намайг ирэхэд байж байсан 我来时有来着
+</p>
+<p>
+тариа тарихад хэрэглэнэ 种地时用
+</p>
+<p>
+таны ирсэнд бид их баярлаж байна
+</p>
+<p>
+您来我们很高兴
+</p>
+<p>
+байдаг хүчин чадалаа бүтээн байгуулах зориулна
+</p>
+<p>
+全力投入建设事业. <sup>7</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-267"></a>
+<p>
+<sup>7</sup>&nbsp;(чадал 力量力气; 能力, 才干, 本领)
+</p>
+
+</div>
+</div>
+<p>
+从比格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+даарснаас (болж) өвчин олжээ
+</p>
+<p>
+由于着凉得了病
+</p>
+<p>
+Сайн чармайснаас (болж) амжилт олжээ
+</p>
+<p>
+由于很好努力的结果取得了成绩
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+用让格 (凭借格)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+түүнийг ирэхээр нь асуу
+</p>
+<p>
+他来的时候问问
+</p>
+<p>
+суухаар унтана 坐着睡觉
+</p>
+<p>
+эмч болохоор чармайх 努力想当医生
+</p>
+<p>
+маргааш явахаар тогтоов 决定明天走
+</p>
+<p>
+миний хэлснээр хий. 按照我说的做
+</p>
+<p>
+нэрээ хугалахаар ясаа хугала
+</p>
+<p>
+与其损害名誉不如折断筋骨
+</p>
+<p>
+эрт ирснээрээ сая завдажээ
+</p>
+<p>
+多亏早来才赶上了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+和同格：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+таны хэлэхтэй зэрэг би мэдлээ.
+</p>
+<p>
+您一说我就知道了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+后置词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+зоог таарсан тул удтал ярилцав
+</p>
+<p>
+说话投机所以谈到很晚
+</p>
+<p>
+үүргээ давуулан биелүүлэхийн төлөө чармайж байна.
+</p>
+<p>
+正在为超额完成任务而努力
+</p>
+<p>
+явах тутам хурдан явна 越走越快
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 副动词---动词......
+-->
+<h6 id="autosec-268"><span class="sectionnumber">1.2.4.8&#x2003;</span>副动词—动词</h6>
+<a id="cyrillic-grammar-autopage-268"></a>
+
+<p>
+并列副动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+шоглож асуув 开玩笑问
+</p>
+<p>
+тойрч явжээ 绕着走了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+先行副动词 (分离副动词)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+
+</p>
+<p>
+аваад ирэв 拿来了 гараад явчихсан 出去了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+共同副动词 (联合副动词)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+оцойн суух 蹲着坐
+</p>
+<p>
+сарнилцан бутрав 溃散了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+假定副动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+мэдвэл хэл 知道的话说吧
+</p>
+<p>
+чи очвол би бас очъё 你去我也去
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+立刻副动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хэлмэгц мэджээ 一说就知道了
+</p>
+<p>
+ормогц гараад ирэв 进去就出来了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+跟随副动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ирэхлээр нь асуу 来时候问
+</p>
+<p>
+явахлаар нь авчуул 走时候带走
+</p>
+<p>
+үзэхлээр үгүй болов 一看就没有了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+界限副动词 (迎接副动词)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+чи цадтал ид 你得吃饱
+</p>
+<p>
+орой болтол суув 坐到很晚
+</p>
+<p>
+удтал алга ташив 掌声经久不息
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+让步副动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+мэдэвч хэлэхгүй 虽然知道, 不说
+</p>
+<p>
+ававч өгөхгүй 要也不给
+</p>
+<p>
+яавч мартахгүй 怎么也不忘
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+前提副动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+
+</p>
+<p>
+сурманжин чадна 学而后会
+</p>
+<p>
+хэлмэнжин сая мэднэ 说了才知道
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+延续副动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гүйсээр ирэв 跑着来的
+</p>
+<p>
+суусаар ядав 坐得累了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+目的副动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+үзэхээр очно 去看
+</p>
+<p>
+юмаа авахаар гарна 出去买东西
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsection 联合关系词组......
+-->
+<h5 id="autosec-269"><span class="sectionnumber">1.2.5&#x2003;</span>联合关系词组</h5>
+<a id="cyrillic-grammar-autopage-269"></a>
+
+<p>
+分为静词联合关系与动词联合关系，静词联合关系又分为同位关系与复指、总括关系。
+</p>
+<p>
+A. 静词联合关系
+</p>
+
+<!-...... subsubsection 名词的同位关系......
+-->
+<h6 id="autosec-270"><span class="sectionnumber">1.2.5.1&#x2003;</span>名词的同位关系</h6>
+<a id="cyrillic-grammar-autopage-270"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Улс төр үзэл санааны ажил 政治思想工作
+</p>
+<p>
+Ажилчин тариачины холбоо 工农联盟
+</p>
+<p>
+сонины хороо хэвлэлийн хороонд очих
+</p>
+<p>
+到报社、出版社去
+</p>
+<p>
+Баатар Бадмаагаас асуу 问巴特尔、巴德玛
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsection 形容词的同位关系......
+-->
+<h5 id="autosec-271"><span class="sectionnumber">1.2.6&#x2003;</span>形容词的同位关系</h5>
+<a id="cyrillic-grammar-autopage-271"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+тунгалаг сайхан ус 清澈的水 бүдүүн улаан авдар 大红柜 хэрэгцээтэй бөгөөд бололцоотой бол хийе 需要并且可能的话就做
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 其它词的同位关系......
+-->
+<h6 id="autosec-272"><span class="sectionnumber">1.2.6.1&#x2003;</span>其它词的同位关系</h6>
+<a id="cyrillic-grammar-autopage-272"></a>
+
+<p>
+往往有构词作用或有某种语法意义。
+</p>
+<p>
+энэ тэрийг асуух 问这问那 дөрөв тав авах 要四五个 зүүн баруун гэрт сууж байна 住在东西屋 дээр доорыг ялгахгүй 不分上下
+</p>
+
+<!-...... subsubsection 复指关系、总括关系......
+-->
+<h6 id="autosec-273"><span class="sectionnumber">1.2.6.2&#x2003;</span>复指关系、总括关系</h6>
+<a id="cyrillic-grammar-autopage-273"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+нийслэл Бээжин 首都北京 Баатар нөхөр 巴特尔同志 тэд тавуул 他们五人 чи бид хоёр 你我二人 ард нийт 人民大众 олон бүгд 大家 та бүхэн 你们大家 Гомбо Гонцог зэрэг 高木博、刚朝格等 бийр цаас гэх зэрэг 笔纸等
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+B. 动词联合关系
+</p>
+<p>
+主要以单纯连接副动词形式出现，有时也以形动词形式出现 (形动词的联合形式有时有构词作用)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Сонсож сууна 坐着听 харч зогсоно 站着看 идэж ууна 吃喝 бодож хэвтэнэ 躺着想
+</p>
+<p>
+ирээд хэлжээ 来说了 аваад явжээ 拿走了 хэлээд иржээ 说后来了 яваад авчирсан 去拿来了
+</p>
+<p>
+Ирэх ирэхгүйг нь мэдэхгүй (ирэх эсэхийг мэдэхгүй)
+</p>
+<p>
+不知道他来不来
+</p>
+<p>
+Би түүний ирсэн ба явсан тухай дам сонсжээ.
+</p>
+<p>
+关于他的来和走我是间接听说的
+</p>
+<p>
+Үхэх эдгэхийн боомт 生死关头
+</p>
+<p>
+олох алдахаа бодохгүй 不计较得失
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsection 辅助关系词组......
+-->
+<h5 id="autosec-274"><span class="sectionnumber">1.2.7&#x2003;</span>辅助关系词组</h5>
+<a id="cyrillic-grammar-autopage-274"></a>
+
+<p>
+可分为时位词结构，情态词结构，助动词结构，联系动词 (гэх) 等。
+</p>
+
+<!-...... subsubsection 时位词结构......
+-->
+<h6 id="autosec-275"><span class="sectionnumber">1.2.7.1&#x2003;</span>时位词结构</h6>
+<a id="cyrillic-grammar-autopage-275"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+уулан дээр 山上 далайн(ы) дотор 海里 үүдэн гадна 门外 гэрийн ард 房后
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 情态词结构......
+-->
+<h6 id="autosec-276"><span class="sectionnumber">1.2.7.2&#x2003;</span>情态词结构</h6>
+<a id="cyrillic-grammar-autopage-276"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+явах хэрэгтэй 需要走
+</p>
+<p>
+мэдсэн бололтой 大概知道了
+</p>
+<p>
+хэлсэн маягтай 好像说了
+</p>
+<p>
+явах байдалтай 好像要走
+</p>
+<p>
+ирэх дуртай 愿意来
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 助动词结构......
+-->
+<h6 id="autosec-277"><span class="sectionnumber">1.2.7.3&#x2003;</span>助动词结构</h6>
+<a id="cyrillic-grammar-autopage-277"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ирэх болсон 要来
+</p>
+<p>
+очмоор байсан 可能去 (过去时)
+</p>
+<p>
+хэлдэг байна (常) 说 мэдсэн байжээ 知道了
+</p>
+<p>
+сайн байна 好
+</p>
+<p>
+муухай болжээ 不好了
+</p>
+<p>
+зоригтой байсан 有志气 (过去时)
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 联系动词结构 ��-(叫作、说、以为、嫌) ......
+-->
+<h6 id="autosec-278"><span class="sectionnumber">1.2.7.4&#x2003;</span>联系动词结构 гэ-(叫作、说、以为、嫌)</h6>
+<a id="cyrillic-grammar-autopage-278"></a>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хүүхэд гэх 称孩子
+</p>
+<p>
+багш гэх 称老师
+</p>
+<p>
+хүйтэн гэх 嫌冷
+</p>
+<p>
+халуун гэх 嫌热
+</p>
+<p>
+хурдан гэх 认为快
+</p>
+<p>
+буруу гэх 认为错误
+</p>
+<p>
+ирлээ гэх 据说来了
+</p>
+<p>
+явлаа гэх 据说走了
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsection 复合词组......
+-->
+<h5 id="autosec-279"><span class="sectionnumber">1.2.8&#x2003;</span>复合词组</h5>
+<a id="cyrillic-grammar-autopage-279"></a>
+
+<p>
+以上谈的都是简单词组，实际语言里，词组的关系往往比较复杂，往往词组又套词组，以至有的词组相当长。下边举几个例子。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Монгол хэлний толь 蒙古语词典 монгол хэл 是个简单词组，монгол хэлний толь 是个复合词组。
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Өвөр Монголын Өөртөө Засах Орон 内蒙古自治区 Өвөр монгол 是一个简单词组，өөртөө засах (自治) 是一个简单词组，Өвөр Монголын өөртөө засах орон 是个复合词组。
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Өвөр Монголын Их Сургуулийн монгол хэл бичиг судлах газар 内蒙古大学蒙古语文研究所（复合词组）
+</p>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

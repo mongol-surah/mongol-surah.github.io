@@ -1,0 +1,2600 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—造句法 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-280"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... chapter 造句法......
+-->
+<h3 id="autosec-281"><span class="sectionnumber">第二章&nbsp;&#x2003;</span>造句法</h3>
+<a id="cyrillic-grammar-autopage-281"></a>
+<a id="cyrillic-grammar-autofile-20"></a>
+<p>
+句子是人们在交际中使用的最小的完整的言语单位。句子不但要由词和词组构成，而且它要有述语性和交际语调。述语性是指句子的内容和现实的关系，它通过式 (陈述式、祈使式等)、各种语气词、情态词、助动词等表示出来。交际
+语调是指说话时声调的高低变化、停顿等。
+</p>
+<p>
+因此，句子可以从两个方面研究：
+</p>
+<p>
+(1) 句法结构：它们研究的是句子中表示概念的词和词组的组成情况，句子的各种可能的规模等。
+</p>
+<p>
+(2) 句类、句式：它们研究的是句子述语性的不同类型。从述语性的角度看句子有哪些类、哪些式、语气、情态等。
+</p>
+
+<!-...... section 句法结构......
+-->
+<h4 id="autosec-282"><span class="sectionnumber">2.1&#x2003;</span>句法结构</h4>
+<a id="cyrillic-grammar-autopage-282"></a>
+
+<!-...... subsection 句子组成部分......
+-->
+<h5 id="autosec-283"><span class="sectionnumber">2.1.1&#x2003;</span>句子组成部分</h5>
+<a id="cyrillic-grammar-autopage-283"></a>
+
+<!-...... subsubsection 句子整体成分------句子成分......
+-->
+<h6 id="autosec-284"><span class="sectionnumber">2.1.1.1&#x2003;</span>句子整体成分——句子成分</h6>
+<a id="cyrillic-grammar-autopage-284"></a>
+
+<p>
+句子一般由主语部分、谓语部分组成。因此分析句子的时候，除一些特殊情况 (如单部句、省略句)，首先可把句子分解成主语部分和谓语部分，主语部分是谓语部分陈述的对象，谓语部分说明主语部分的行为状态以及对它的判断。主
+语部分和谓语部分都有中心词。主语中心词是主语的代表，谓语中心词是谓语的代表。
+</p>
+<p>
+主语 (中心词) 可以是人和事物，也可以是其他可以当作陈述对象的任何东西。主语一般由名词、代名词、形容词、数词、形动词构成，有时也可以由其他词类构成。主语既可以有单词形式，又可以有词组以及句子形式。主语一般以
+主格形式出现，个别情况下可以以从比格形式出现。词组的体述关系中所列非主格形式 (属格、宾格、用让格) 的体词，一般在句子内的体述关系词组 (成分句) 里使用。在句法分析中，主语 (以及体词) 旁边划 “——” 线表示。
+</p>
+<p>
+谓语 (中心词) 可以是动作，也可以是状态，在判断句里也可以是什么事物。谓语一般由动词、形容词、名词，以及其他代词、数词、摹拟词构成。在句法分析中，谓语 (以及述语) 旁边划 “- - -” 线表示。
+</p>
+<p>
+在这里作为句子成分讲的主语和谓语与组词法讲的体述关系有一致的地方也有不同的地方。一致的是：体述关系与主谓关系表达的关系是一致的，很多形式也是共同的 (因此要了解主谓关系的各种形式，需要参阅体述关系词组)，不
+同的是，体述关系包括的范围广，主谓关系是它的一部分。除了这一部分外，体述关系还包括体述关系的其他各种词组，它们在句子里一般构成成分句。此外，组词法的述语，既是对体语而言，又是对宾语状语而言。同样组词法的体
+语，既是对述语而言，又是对定语而言。从词组内部关系着眼而命名的体语、述语，在词组的对外关系方面 (即在更大的词组或句子关系方面) 可能成为别的什么成分。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span class="uline">Ах болоод дүү чинь</span> <span class="uline">юу хийж байх вэ</span>?
+</p>
+<p>
+你哥哥和弟弟做什么呢？<sup>1</sup>
+</p>
+<p>
+<span class="uline">Ах бол ажилчин</span>, <span class="uline">дүү бол сурагч</span>.
+</p>
+<p>
+哥哥是工人，弟弟是学生
+</p>
+<p>
+<span class="uline">Хоёр нь</span> <span class="uline">үлдээд</span> <span class="uline">гурав нь</span> <span class="uline">явжээ</span>.
+</p>
+<p>
+两个剩下了，三个走了
+</p>
+<p>
+<span class="uline">Ширээ сандлаа зүлгэсэн нь</span> <span class="uline">шилээр хийсэн шиг болжээ</span>.
+</p>
+<p>
+把桌椅擦得好像拿玻璃做的一样了
+</p>
+<p>
+<span class="uline">Чиний ингэж ёсгүй аашлах чинь</span> <span class="uline">таарахгүй</span>.
+</p>
+<p>
+你这样不讲道理是不对的
+</p>
+<p>
+<span class="uline">Төмөр замын суурь нь</span> <span class="uline">харагдана</span>.
+</p>
+<p>
+铁道路基可见
+</p>
+<p>
+<span class="uline">Аав аа та бас</span> <span class="uline">илүү хэрсүүлэ дээ</span>!
+</p>
+<p>
+爸爸，您也得多留点神呐！
+</p>
+<p>
+<span class="uline">Хүүхэд хүн</span> <span class="uline">битгий үүнийг асуугаад л бай.</span>
+</p>
+<p>
+小孩子，别老问这个啊
+</p>
+<p>
+<span class="uline">Хэрэг бодос</span> <span class="uline">хэзээд хөгжиж байдаг</span>.
+</p>
+<p>
+事物总是发展的. (бодос 物, 物质)
+</p>
+<p>
+<span class="uline">Галт тэрэг</span> <span class="uline">түчигнэж нисэх мэт өнгөрнө</span>.
+</p>
+<p>
+火车轰鸣，飞驰而过
+</p>
+<p>
+<span class="uline">Таны учрая гэж байсан хүн чинь</span> <span class="uline">энэ ээ</span>.
+</p>
+<p>
+您想见的人就是他
+</p>
+<p>
+<span class="uline">Хөдөлж алхахын шаламгай нь</span> <span class="uline">хөвчилж харвасан сум шиг</span>.
+</p>
+<p>
+动作之快犹如飞箭
+</p>
+<p>
+<span class="uline">Энэ бөсний өнгө нь</span> <span class="uline">сайхан</span> бөгөөд <span class="uline">чанар нь</span> <span class="uline">сайн</span>.
+</p>
+<p>
+这个布色也好，质量也好
+</p>
+<p>
+<span class="uline">Ирээдүй бол</span> <span class="uline">гэгээн саруул</span>, <span class="uline">зам бол</span> <span class="uline">муруй сарий</span>.
+</p>
+<p>
+前途是光明的, 道路是曲折的. (ирээдүй 未来)
+</p>
+<p>
+<span class="uline">Байцаалт хийх бол</span> <span class="uline">даруй асуудлыг шийдвэрлэх хэрэг мөн</span>.
+</p>
+<p>
+调查就是解决问题
+</p>
+<p>
+<span class="uline">“Гтун гтүн бол”</span> <span class="uline">захирах хүсэх төлөв болно</span>.
+</p>
+<p>
+“Гтун гтүн”是希望命令式
+</p>
+<p>
+<span class="uline">“Оохай”гэдэг нь</span> <span class="uline">аялга үг болно</span>.
+</p>
+<p>
+“Оохай”是个感叹词 <sup>2</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-285"></a>
+<p>
+<sup>1</sup>&nbsp;(内蒙古的写法是 болод 和, 与, 同. 的意思，而字典里只有 болоод)
+</p>
+<p>
+<sup>2</sup>&nbsp;(оохай=уухай)
+</p>
+
+</div>
+</div>
+<p>
+句中的主语在下述情况下带有主语标志 « нь чинь бол » 等：〈1〉形容词、数词、形动词作主语时；〈2〉在判断句里名词后边也用；
+〈3〉如果不用可能出误会的地方，以及用了以后更加清楚的地方。试比较：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ах нь дүүгээ дагуулах. 哥哥带领弟弟
+</p>
+<p>
+Ах дүүгээ дагуулах. 带领哥哥和弟弟
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хөх бөс нь хар бөснөөс дээр. 兰布比黑布好
+</p>
+<p>
+Хөх бөс хар бөснөөс дээр. (有可能理解为) 比兰布黑布都好
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+句中动词谓语有的带有表示体、情态、趋向的助动词 байх, эхлэх, барах, ирэх , очих …，болох, чадах, явах, мэдэх, үзэх �，өгөх, авах 等。静词谓语、形动词谓语有时也带 байх, болох 等助动词，магадгүй, бололтой, хэрэгтэй, ёстой 等情
+态词，它们协助谓语表示式、时间、人称、情态等各种语法意义。有时谓语还需要各种语气词的帮助。
+</p>
+<p>
+主语和谓语的语序，一般是主语在前，谓语在后。有时为了强调谓语，可把谓语提到主语前边。有时在文艺作品中，为了语言节律的需要，常常把谓语提到主语前边。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span class="uline">Арван найман настай</span>, <span class="uline">би</span>. 十八岁了, 我
+</p>
+<p>
+Хэн! <span class="uline">Үзэж бай даа</span>, <span class="uline">чи</span>. 哼, 看着吧，你
+</p>
+<p>
+<span class="uline">Яасан юм</span>? <span class="uline">хүү минь</span>. 怎么了? 我的孩子
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 句子局部成分------词组成分......
+-->
+<h6 id="autosec-286"><span class="sectionnumber">2.1.1.2&#x2003;</span>句子局部成分——词组成分</h6>
+<a id="cyrillic-grammar-autopage-286"></a>
+
+<p>
+这是进一步分析主语部分和谓语部分时分解出来的成分。它们也就是我们在研究词组成分时遇到的各种成分，即定语、宾语、状语、体语等，由于它们是词组内部关系的术语，所以说到定语时，同时表示它后面有体语，说到宾语、状
+语、体语时同时表示它们后边有述语。位于它们后边与它们相对的这些体语、述语，在一个更大的词组内，或在整体句子内，可能又是一个别的什么成分。也就是说，它们的对外关系，可能是更大结构里的某种对内关系。
+</p>
+<p>
+(1）定语：用在静词前面修饰和限定静词的词组成分。它可以是名词、形容词、代词、数词、时位词等静词，也可以是形动词，还可以是摹拟词。充当定语的可以是单词也可以是词组、成分句。关于定语与被限定语 (即体语) 之间的各
+种形式参看定语关系词组。在句法分析中，定语旁边划 “<span
+class="makebox"
+style="display:inline-block ; text-align:left ; "
+><span
+style="background:black; width:30pt ; height:1pt ;
+-ms-transform: translate(0pt,-6.03397pt);
+-webkit-transform: translate(0pt,-6.03397pt);
+transform: translate(0pt,-6.03397pt);
+display:inline-block;"
+><!----></span></span><span
+style="background:black; width:30pt ; height:1pt ;
+-ms-transform: translate(0pt,-2.586pt);
+-webkit-transform: translate(0pt,-2.586pt);
+transform: translate(0pt,-2.586pt);
+display:inline-block;"
+><!----></span>” 线表示，与它相对的体语用 “- - - -” 线表示。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энэ бол <span class="uline">хүнд бэрхшээлтэй</span> <span class="uline">үүрэг</span> шүү.
+</p>
+<p>
+这个任务很艰巨呀！
+</p>
+<p>
+<span class="uline">Чиний</span> <span class="uline">энэ чинь</span> <span class="uline">ямар</span> <span class="uline">үг юм</span> 你这是什么话！
+</p>
+<p>
+<span class="uline">Хэлний</span> <span class="uline">гол</span> <span class="uline">шинж тэмдэг</span> ямар байдаг билээ？
+</p>
+<p>
+语言的主要特征是什么？
+</p>
+<p>
+<span class="uline">Манай</span> <span class="uline">зол жаргалтай</span> <span class="uline">амьдрал</span> яаж ирсэн бэ?
+</p>
+<p>
+我们的幸福生活是怎么来的？
+</p>
+<p>
+Та <span class="uline">аль нутгийн</span> <span class="uline">хүн</span> бэ? Би бол <span class="uline">Шилийнгол аймгийн Авга хошууны</span> <span class="uline">хүн</span>.
+</p>
+<p>
+您是哪个地方的人？我是锡林郭勒盟阿巴嘎旗的人
+</p>
+<p>
+Аав аа, <span class="uline">өнөөгийн ирэх</span> <span class="uline">энэ</span> <span class="uline">бүл авга</span> <span class="uline">ямар шүү янзтай</span> <span class="uline">хүн</span> юм?
+</p>
+<p>
+爸爸，今儿这个表叔是个什么样儿呀？
+</p>
+<p>
+<span class="uline">Хүмүүсийн</span> <span class="uline">үзэл санаа</span> эрхбиш <span class="uline">нэгэнт хувирсан</span> <span class="uline">байдал</span>тай тохирсон байх хэрэгтэй.
+</p>
+<p>
+人们的思想必须适应已经变化了的情况
+</p>
+<p>
+<span class="uline">Зөрчилдөж бүхий</span> <span class="uline">хоёр тал</span>ын дотор заавал нэг нь <span class="uline">гол</span> <span class="uline">тал</span> болж нөгөө нь <span
+class="uline">дэслэх</span> <span class="uline">тал</span> болж байдаг юм.
+</p>
+<p>
+矛盾着的两个方面中，必有一方面是主要的，他方面是次要的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+定语和被限定语 (体语) 的语序。在蒙古语里定语一律在被限定语的前边。如果改变语序，语法关系也随着改变。如：явсан хүн 走了的人——хүн явсан 人走了，сүүний цом 奶杯——цом сүү 一杯奶，цагаан цаас 白纸——цаас цагаан
+纸白…
+</p>
+<p>
+一个体语如果有几个定语时，定语的次序一般是：意义联系紧密的放在体语近处。由近到远的大致次序是：质料定语、性质定语、数目定语、关系定语、动词定语、属格名词定语等。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Цагаан байшин 白房子，
+</p>
+<p>
+модон авдар 木箱子，
+</p>
+<p>
+өндөр их цагаан байшин 高大的白房子，
+</p>
+<p>
+бүдүүн их модон авдар 大木箱子，
+</p>
+<p>
+хоёр өндөр их цагаан байшин 两个高大的白房子，
+</p>
+<p>
+хоёр бүдүүн их модон авдар 两个大木箱子，
+</p>
+<p>
+сургуулийн хоёр өндөр их цагаан байшин 学校的两个高大的白房子，
+</p>
+<p>
+хувцас хийх хоёр бүдүүн их модон авдар 放衣服的两个大木箱子
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+固定词组和半固定词组不按一般的次序。定语一般放在固定词组之外。如：их газрын зураг 大的地图，хоёрдугаар багшийн сургууль 第二师范学校等
+</p>
+<p>
+(2) 宾语：表示行为、特征所涉及的对象。被涉及的对象一般以第三、第四、第五、第六、第七格的形式出现。作为及物动词直接涉及对象的第四格静词 (宾格) 称为直接宾语；及物与不及物动词以及一些形容词所涉及的其它各格 (三、
+五、六、七) 的对象称为间接宾语，带有后置词的对象也属于间接宾语。充当宾语的可以是单词，也可以是词组以及成分句。关于宾语和述语之间的宾述关系的种种形式可参见宾述关系词组。在句法分析中，宾语以 “~~~” 线表示，其
+相对的述语以 “- - - -” 线表示。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хүмүүсийн нийгмийн ахуй бол хүмүүсийн <span class="uline">үзэл санаагаа</span> <span class="uline">шийдвэрлэдэг</span>.
+</p>
+<p>
+人们的社会存在，决定人们的思想
+</p>
+<p>
+Бид хэрэг явдлыг үзэхээ эрхбиш түүний <span class="uline">мөн чанарыг</span> <span class="uline">үзэх хэрэгтэй</span>.
+</p>
+<p>
+我们看事情必须要看它的本质
+</p>
+<p>
+Задлан шинжлэл гэдэг нь даруй хэрэг бодосын <span class="uline">зөрчлийг</span> <span class="uline">задлан шинжлэх</span>ийг хэлж байна.
+</p>
+<p>
+所谓分析, 就是分析事物的矛盾。(шинжлэх 研究, 探讨, 仔细观察)
+</p>
+<p>
+Эрт босвол <span class="uline">нэгийг</span> <span class="uline">сурдаг</span>, орой босвол <span class="uline">нэгээс</span> <span class="uline">хоцордог</span>. (зүйр үг)
+</p>
+<p>
+早起可学一个东西，晚起可误一个学习机会 (谚语)
+</p>
+<p>
+<span class="uline">Эрхийг</span> <span class="uline">сурах</span>аар <span class="uline">бэрхийг</span> <span class="uline">сур</span>. (зүйр үг)
+</p>
+<p>
+与其娇生惯养，不如吃苦耐劳 (谚语)
+</p>
+<p>
+Тэр хүн <span class="uline">надад</span> <span class="uline">их сайн</span>, <span class="uline">миний суралцалга дээр</span> <span class="uline">арвин тусламж үзүүлсэн</span>.
+</p>
+<p>
+他对我很好，在我的学习上给过很多帮助
+</p>
+<p>
+Үйлдлэг хэрэв <span class="uline">хувьсгалын онолоор</span> <span class="uline">зүглүүр болгохгүй бол</span> даруй сохор балай үйлдлэг болно.
+</p>
+<p>
+实践若不以革命理论为指南，就会变成盲目的实践
+</p>
+<p>
+Энэ ном <span class="uline">Баатараас</span> <span class="uline">авсан</span> ном юм.
+</p>
+<p>
+这书是从巴特尔要的书
+</p>
+<p>
+Би <span class="uline">Ляньхуа ээжтэй</span> <span class="uline">уулзахгүй бол</span> болохгүй болж байна.
+</p>
+<p>
+我不见莲花老妈妈不行了
+</p>
+<p>
+Онол хэрвээ <span class="uline">хувьсгалын үйлдлэгтэй</span> <span class="uline">уялдахгүй бол</span> даруй хий хоосон онол болно.
+</p>
+<p>
+理论若不和革命实践联系起来，就会变成 (空洞) 无对象的理论
+</p>
+<p>
+<span class="uline">Үндэстний төрийн бодлогын тухай</span> <span class="uline">ухуулга хийх хэрэгтэй</span>.
+</p>
+<p>
+关于民族政策，需要进行宣传
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+宾语和述语的词序，一般宾语在前述语在后，加上主语考虑的话，一般词序是：主语—宾语—述语。但是为了强调宾语，或者由于语言节律的需要，常常把宾语提到主语前边。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span class="uline">Би</span> <span class="uline">тэрийг чинь</span> <span class="uline">мэдэхгүй</span>. 我不知道那个
+</p>
+<p>
+<span class="uline">Тэрийг чинь</span> <span class="uline">би</span> <span class="uline">мэдэхгүй</span>. 那个, 我不知道
+</p>
+<p>
+<span class="uline">Би</span> <span class="uline">мэдэхгүй</span>, <span class="uline">тэрийг чинь</span>. 我不知道那个
+</p>
+<p>
+<span class="uline">Би</span> <span class="uline">өвс</span> <span class="uline">хадъя</span>. 我割草
+</p>
+<p>
+<span class="uline">Өвсийг</span> <span class="uline">би</span> <span class="uline">хадъя</span>. 草，我割
+</p>
+<p>
+<span class="uline">Би</span> <span class="uline">хадъя</span>, <span class="uline">өвсийг нь</span>. 我割草吧
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+关于直接宾语与间接宾语的词序，以及间接宾语之间的词序，因为蒙古语里都有形态标志，所以比较自由一些。可以根据读者的角度，而有所不同。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бөсийг хөвөнгөөр хийдэг. 布是用棉花做的
+</p>
+<p>
+Хөвөнгөөр бөс хийдэг. 用棉花可以做布
+</p>
+<p>
+Үүнийг түүнтэй зөвдье. 这事和他商量一下
+</p>
+<p>
+Түүнтэй энэ хэргийг зөвдье.
+</p>
+<p>
+和他把这个事商量一下
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（3）状语：说明行为或特征的性质、程度，指出述语进行的性质、数量、方式方法时间、地点、原因目的、情况条件等等。状语一般以副词、摹拟词、形容词、副动词、形动词以及名词的状宾格形式出现。静词 (包括形动词) 的状宾
+格有时构成间接宾语，有时构成状语。那么它们的区别在哪里呢？如果该静词是个实体名词，或者该静词在句子里是表示客体意义的 (也参照动词的要求)，那么它就是宾语。如果该静词不是实体名词，从前后看也不是表示客体意义
+的，而是表示述语的性质、数量、方式方法、时间地点、原因目的、情况条件，那么它就是状语。在个别情况下，同样一个形式有时也可表示宾语，有时也可表示状语，这也是应该承认的。如：сургуульд очжээ 到学校去了，сургуульд
+өгчээ 给学校了。前者属于状语，后者属于宾语。关于状述关系的各种形式可参见前述状述关系词组。在句法分析中，状语旁边划“<span
+class="makebox"
+style="display:inline-block ; text-align:left ; "
+> </span> <span
+class="makebox"
+style="display:inline-block ; text-align:left ; "
+> </span> <span
+class="makebox"
+style="display:inline-block ; text-align:left ; "
+> </span> ”线表示，与它相对的述语用“- - - -”线表示。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бүгдээрээ <span class="uline">оргилсон зоригоор</span> <span class="uline">ажиллаж байна</span>.
+</p>
+<p>
+大家正在以冲天的干劲工作
+</p>
+<p>
+<span class="uline">Сэр сэр</span> <span class="uline">салхилж</span> сэрүүн бороо орлоо.
+</p>
+<p>
+风在习习吹，冷雨在下
+</p>
+<p>
+Бороо <span class="uline">шивэр шивэр гэж</span> <span class="uline">орж байна</span>.
+</p>
+<p>
+雨在淅淅沥沥地下
+</p>
+<p>
+Чи <span class="uline">яагаад</span> <span class="uline">ийм яаралтай</span> <span class="uline">ирж явна </span>вэ?
+</p>
+<p>
+你为什么这样匆忙走来？
+</p>
+<p>
+Бид <span class="uline">ажиллах тутам</span> <span class="uline">эрч чадал нэмэгдэж</span>, <span class="uline">удсан ч үгүй</span> <span class="uline">үүргээ биелүүлэв</span>.
+</p>
+<p>
+我们越干劲头越大，任务很快就完成了
+</p>
+<p>
+<span class="uline">Өчигдөр</span> <span class="uline">орой болтол</span> <span class="uline">хурал хийв</span>.
+</p>
+<p>
+昨天开会开到很晚
+</p>
+<p>
+<span class="uline">Дараа сарын арвадаар</span> <span class="uline">хөдөө бууна</span>.
+</p>
+<p>
+下月十号左右下乡
+</p>
+<p>
+Хүний зөв үзэл санаа <span class="uline">хаанаас</span> <span class="uline">ирдэг вэ</span>?
+</p>
+<p>
+人的正确思想是从哪里来的？
+</p>
+<p>
+<span class="uline">Тэнгэрээс</span> <span class="uline">унаж ирдэг үү</span>? Тийм биш.
+</p>
+<p>
+是从天上掉下来的吗？不是
+</p>
+<p>
+<span class="uline">Хүний тархинд</span> <span class="uline">төрөлх</span> <span class="uline">байдаг уу</span>? Тийм биш.
+</p>
+<p>
+是自己头脑里固有的吗？不是
+</p>
+<p>
+Манай зуслан <span class="uline">баруунтай</span> <span class="uline">байна</span>.
+</p>
+<p>
+我们的夏营地在西边
+</p>
+<p>
+<span class="uline">Миний нүд муу учраас</span> <span class="uline">сайн олж үзэхгүй байна</span>.
+</p>
+<p>
+因我的眼睛不好，所以看不清楚
+</p>
+<p>
+Тэр хүн <span class="uline">эрүй хуруйгүй</span> <span class="uline">ярьснаас</span> ийм олон яршиг гарчихлаа. 由于那个人胡说一气，所以引起了这些麻烦. (эрүй хуруйгүй 乱七八糟的)
+</p>
+<p>
+Амьдралыг <span class="uline">сайн</span> <span class="uline">мэдэхгүй</span>，тухайгийн зөрчлийг <span class="uline">ёстой сайн</span> <span class="uline">ойлгохгүй бол</span> <span class="uline">зөв
+оновчтой</span> <span class="uline">задлан шинжилж чадахгүй юм</span>.
+</p>
+<p>
+不熟悉生活，对于所说的矛盾不真正了解，就不可能有中肯的分析
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+状语和述语的词序，一般状语在前，述语在后。加上主语的话，一般词序是：主语—状语—述语。但是需要强调状语时，或者状语比较复杂比较长时，往往提到主语前边，相反有时为了表达需要也可以把状语放到主语、述语后边。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span class="uline">Тэр хүн</span> <span class="uline">зурвас зурвасаар</span> <span class="uline">тайлбарлаж байна</span>.
+</p>
+<p>
+那个人在逐条地解释
+</p>
+<p>
+<span class="uline">Зурвас зурвасаар</span> <span class="uline">тэр хүн</span> <span class="uline">тайлбарлаж байна</span>.
+</p>
+<p>
+在逐条地解释，那个人
+</p>
+<p>
+<span class="uline">Тэр хүн</span> <span class="uline">тайлбарлаж байна</span>, <span class="uline">зурвас зурвасаар</span>.
+</p>
+<p>
+那个人在解释，逐条地。
+</p>
+<p>
+<span class="uline">Би</span> <span class="uline">маргааш</span> <span class="uline">ирнэ</span>. 我明天来
+</p>
+<p>
+<span class="uline">Маргааш</span> <span class="uline">би</span> <span class="uline">ирнэ</span>. 明天我来
+</p>
+<p>
+<span class="uline">Би</span> <span class="uline">ирнэ</span> <span class="uline">маргааш</span>. 我明天来
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+一个述语的几个状语的词序。一般关系密切的放在近处。一般词序是性质数量、方式方法、时间地点、原因目的等。但这种词序并不很严格 (状语的层次关系这里暂不涉及)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэнд хүрсэн хойно сайн чармай.
+</p>
+<p>
+到那里以后好好努力
+</p>
+<p>
+Далд газраас хоёр буудав. 从隐蔽处打了两枪
+</p>
+<p>
+Би галт тэргэнд суухаар маргааш эрт таван цагт гэрээсээ явганаар гарна.
+</p>
+<p>
+我为了乘火车明早五点从家里步行出发
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4) 体语：处于述语前边的体语，与处于谓语前边的主语一样，是述语的陈述对象。句子里边的体述关系词组一般构成成分句，起句中一个成分的作用，而且其体语与句子主语不同，的是以主格形式出现的较少，而用属格、宾格、凭
+借格形式出现的较多。在句法分析中体语、述语的划线与主语谓语相同。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span class="uline">Миний</span> <span class="uline">ирс</span>нийг та яаж мэдэв?
+</p>
+<p>
+您怎么知道我来了？
+</p>
+<p>
+<span class="uline">Чиний</span> <span class="uline">хэлсэн</span> чинь зөв байна. 你说得对
+</p>
+<p>
+<span class="uline">Намайг</span> <span class="uline">буцаж иртэл</span> та нар энд хүлээж байгаарай.
+</p>
+<p>
+你们在这里等到我回来
+</p>
+<p>
+<span class="uline">Чамайг</span> <span class="uline">ажилд явсан</span> хооронд тэд ирэв.
+</p>
+<p>
+你去工作期间他们来过
+</p>
+<p>
+<span class="uline">Зоригоор</span> <span class="uline">төгөлдөр</span> боловч <span class="uline">ухаанаар</span> <span class="uline">дутмаг</span>. 有勇无谋
+</p>
+<p>
+<span class="uline">Тэд хоёулын</span> <span class="uline">хэлэх</span>ээр <span class="uline">улаан өнгөтэй нь</span> <span class="uline">сайн</span> гэнэ.
+</p>
+<p>
+他俩说红的好
+</p>
+<p>
+<span class="uline">Хэлэх нь</span> <span class="uline">сайхан</span> боловч <span class="uline">хийх нь</span> <span class="uline">барагтай</span>.
+</p>
+<p>
+说的好听，做的差劲儿
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 句中附带成分......
+-->
+<h6 id="autosec-287"><span class="sectionnumber">2.1.1.3&#x2003;</span>句中附带成分</h6>
+<a id="cyrillic-grammar-autopage-287"></a>
+
+<p>
+句子结构中除了句子整体成分 (句子成分)、句子局部成分 (词组成分) 外，还有些零星的附带的成分。它们当中有的辅助某一成分明确其身份，有的表示强调某一成分，有的附在句子后面表示整个句子的语气。还有些词不直接参加句
+子结构，浮游在句子结构之外，表示感叹、注释等。在句法分析中与某一成分关系密切的可划在一起，不与某个成分发生密切关系的，如浮游成分，可以不划。
+</p>
+<p>
+<b> 第一类 </b>：与某一成分关系密切的辅助成分
+</p>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+(1) 帮助主语 (或体语) 明确其身份的：нь чинь бол
+</p>
+
+</li>
+<li>
+
+<p>
+(2) 强调某一成分或表示让步的：л, хү, өл, даруй, сая, гэгч, ч, чиг , я, ч гээд, ч гэсэн
+</p>
+
+</li>
+<li>
+
+<p>
+(3) 表示语气的：уу үү, бэ вэ, ба, юм, шүү, даа дээ, шид, билээ, биз, байх, буй за, гэнэ, аа ээ
+</p>
+
+</li>
+<li>
+
+<p>
+(4) 表示否定的：бүү, битгий, үгүй, эдүй, үл, эс, биш
+</p>
+
+</li>
+<li>
+
+<p>
+(5) 表示连接关系的：ба, хийгээд, жич, бөгөөд
+</p>
+</li>
+</ul>
+<p>
+<b> 第二类 </b>：不与某个成分发生密切关系的浮游成分
+</p>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+(1) 呼语：Цэцэг ээ! Навч аа! Нөхөд өө! Санбуу аа! Аа мөмө өө! аа Баатар! Анхаараарай! Сонсогчид оо!
+</p>
+
+</li>
+<li>
+
+<p>
+(2) 插入语：мэдээжээр (мэдээж) 众所周知，би үзэхэд, миний үзэхэд 依我看，хэлсэнгүйгээр, яриангүйгээр 不用说，дээр хэлсэн мэтээр 如上所说，үнэндээ, чухамдаа 实际上，өөрөөр хэлбэл 换句话说，завшаан бусаар 不幸的是（不幸地）
+, харамсалтай нь 遗憾的是，наад зах нь 最低限度，аль багадаа 至少，хамгийн олондоо 至多，бодоход, бараглахад 估计，юуны өмнө 首先，нэгдүгээрт 第一，дараа нь 其次，хоёрдугаарт 第二，гуравдугаарт 第三
+</p>
+
+</li>
+<li>
+
+<p>
+(3) 感叹词：хүүе! ай даа! аа ? ай! жэ! Ва лам аа! Ёо ёо! уухай!
+</p>
+
+</li>
+<li>
+
+<p>
+(4) 注释语：放在括号里注释，读时可以不读的词句。
+</p>
+</li>
+</ul>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Нөхөд өө дөрвөн мөрөөр зогсоцгоо!
+</p>
+<p>
+同志们, 排四行站.
+</p>
+<p>
+Бат гуай чөлөөгөөрөө манайд тойрч ир дээ.
+</p>
+<p>
+巴图先生！有空到我们这里串门
+</p>
+<p>
+Чиний хэлэхээр энэ хэрэг чинь таарахгүй шид.
+</p>
+<p>
+照你说，这个事情不对啦
+</p>
+<p>
+Үнэнийг хэлэхэд бид нэг хүн ч гаргах дургүй.
+</p>
+<p>
+说实在，我们一个人也不愿出
+</p>
+<p>
+Наад зах нь чи дугуйлангийн даргадаа хэлнэ ба?
+</p>
+<p>
+最低限度你应该和组长说吧？
+</p>
+<p>
+За сайн ирэв үү? 噢，一路顺风啊？
+</p>
+<p>
+Хүүе тэр чинь юу юм бэ? 喂, 那是什么呀？
+</p>
+<p>
+Өнөөдөр (долоон сарын нэгэн)-ээс эхлээд гурван сарын дотор толь бичиг найруулах ажлаа дуусгана.
+</p>
+<p>
+从今天 (七月一日) 算起三个月内结束辞书的编写工作
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsection 句模......
+-->
+<h5 id="autosec-288"><span class="sectionnumber">2.1.2&#x2003;</span>句模</h5>
+<a id="cyrillic-grammar-autopage-288"></a>
+
+<p>
+从句子的组成成分方面，从句子的各种可能的规模方面观察句子时，句子可以分成几种类型。
+</p>
+<p>
+从句子整体成分的具备情况，也就是说，从是否具备主语部分和谓语部分方面，可以分为单部句和双部句。从句子成分的省略与否，可以分为完整句与省略句。从句子局部成分 (词组成分) 的有无及层次多少，可以分为单层句与多层
+句。从句子里是否包含体述关系词组及其连接的情况可把句子分为单纯句、包孕句、复合句等。
+</p>
+
+<!-...... subsection 1．单部句和双部句......
+-->
+<h5 id="autosec-289"><span class="sectionnumber">2.1.3&#x2003;</span>1．单部句和双部句</h5>
+<a id="cyrillic-grammar-autopage-289"></a>
+
+<p>
+具备主语部分和谓语部分的叫做双部句。只有一个部分的叫做单部句，单部句里边可分：无主句、主格句、独词句。
+</p>
+<p>
+(1) 无主句是没有主语的句子，其中有的根本不可能有主语，有的主语不定或泛指，因此不用主语；有的从意义分析有主语，但是一般习惯上不用主语。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span class="uline">Хүнд зориг байвал</span> <span class="uline">дэлхийд бэрх үгүй</span>.
+</p>
+<p>
+世上无难事，只怕有心人
+</p>
+<p>
+<span class="uline">Өвөр бусдыг мэдвээс</span>, <span class="uline">зуунтаа байлдавч айлгүй</span>.
+</p>
+<p>
+知己知彼百战不殆＃〖өөрөө〗
+</p>
+<p>
+<span class="uline">Хоёр талыг сонсвоос</span> <span class="uline">гэгээн боломуй</span>, <span class="uline">ганц талыг үнэмшвээс</span> <span class="uline">харанхуй боломуй</span>.
+</p>
+<p>
+兼听则明偏信则暗＃
+</p>
+<p>
+<span class="uline">Байцаасангүй бол</span> <span class="uline">үг хэлэх эрхгүй</span>.
+</p>
+<p>
+没有调查就没有发言权
+</p>
+<p>
+<span class="uline">Сайтар суралцаж</span> <span class="uline">өдрөөс өдөр өөдөлнө</span>.
+</p>
+<p>
+好好学习天天向上
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(2) 主格句是以静词的主格形式出现的句子。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span class="uline">Гал</span>! 火！
+</p>
+<p>
+<span class="uline">Түймэр</span>! 野火！
+</p>
+<p>
+<span class="uline">гуу</span>! 山谷! 沟！
+</p>
+<p>
+<span class="uline">Энэ муу</span> <span class="uline">дээрэмүүд</span>! 这一群强盗！
+</p>
+<p>
+<span class="uline">Өвлийн эхний</span> <span class="uline">нэг шөнө</span>. 初冬之夜。
+</p>
+<p>
+<span class="uline">Шувуу</span>, <span class="uline">сүүн цагаан</span> <span class="uline">шувуу</span>! 鸟, 乳白色的鸟！
+</p>
+<p>
+<span class="uline">Галт тэрэгний</span> <span class="uline">уурын шуугилын</span> <span class="uline">дуу</span>. 火车汽笛声。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(3) 独词句。蒙古语中有些词单独能够成最小的完整的言语单位。这些词中有的形式上以谓语形式出现，但主语已经以词素形式包涵在里边。还有某些语气词和感叹词也能单独构成最小的完整的言语单位。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span class="uline">Хаваршиж байна</span>. 入春，开春
+</p>
+<p>
+<span class="uline">Бороошив</span>. 连雨, 雨多起来
+</p>
+<p>
+<span class="uline">Намаршижээ</span>. 入秋了
+</p>
+<p>
+<span class="uline">Мөн</span>. 对，是。<span class="uline">Биш</span>. 不是。<span class="uline">Үгүй</span>. 不。
+</p>
+<p>
+<span class="uline">Тийм</span>. 对, 是那样。<span class="uline">Харин гэм</span>. 可不是。
+</p>
+<p>
+<span class="uline">Юу гэнэ</span>? 什么？(说什么？)
+</p>
+<p>
+<span class="uline">Аа</span> ? 啊？<span class="uline">За</span>. 是。<span class="uline">Май</span>. 给你！<span class="uline">Аль</span> 给我！
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2．完整句和省略句
+</p>
+<p>
+应该有的各种成分都有的句子叫做完整句。由于特定的客观环境、言语环境，把某一成分省略掉的句子叫做省略句。<b> 如：</b>
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Та очихгүй юу? 您不去吗？
+</p>
+<p>
+(би) Очихгүй. (我) 不去。
+</p>
+<p>
+Танай малын тарга сайн уу?
+</p>
+<p>
+你们牲畜的膘情好吗？
+</p>
+<p>
+(манай малын тарга) Сайн байна.
+</p>
+<p>
+(我们牲畜的膘情) 好。
+</p>
+<p>
+Би нэг очоод ирье. 我去一下回来。
+</p>
+<p>
+Хаа (очоод ирэх юм). 到哪里 (去回来)？
+</p>
+<p>
+(та) Хийж барав уу? (您) 做完了吗？
+</p>
+<p>
+(би)(хийж) Барсан. (我)(做) 完了。
+</p>
+<p>
+(та) Тэр хүнд өгчихсөн үү? (您) 给那个人了吗？
+</p>
+<p>
+(би)(тэр хүнд) Өгчихсөн. (我) 给 (那个人) 了。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3．单层句和多层句句子的主语和谓语，可以各由一个词汇单位组成，这样的句子称为单层句。联合关系词组和辅助关系词组虽不属一个词汇单位，但也属同一层次。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span class="uline">Нар</span> <span class="uline">гарав</span>. 太阳出来了。
+</p>
+<p>
+<span class="uline">Үүл</span> <span class="uline">арилав</span>. 云散了 (天晴了)。
+</p>
+<p>
+<span class="uline">Багш нар ба сурагчид</span> <span class="uline">цуглаж байна</span>.
+</p>
+<p>
+老师和学生们正在集合
+</p>
+<p>
+<span class="uline">Тэр чинь</span> <span class="uline">ажилчин байсан билээ</span>.
+</p>
+<p>
+他曾是个工人
+</p>
+<p>
+<span class="uline">Хүн ам нь</span> <span class="uline">олон</span>. 人口众多
+</p>
+<p>
+<span class="uline">Нутаг дэвсгэр нь</span> <span class="uline">уудам</span>. 土地广阔
+</p>
+<p>
+<span class="uline">Өвөөд ахмад нь</span> <span class="uline">ууж л байна</span>, <span class="uline">дуулж л байна</span>.
+</p>
+<p>
+长辈们一边喝一边唱歌
+</p>
+<p>
+<span class="uline">Хүүхэд багачууд нь</span> <span class="uline">үймэлдэж байна</span>, <span class="uline">инээлдэж байна</span>.
+</p>
+<p>
+
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+晚辈们吵吵嚷嚷说说笑笑
+</p>
+<p>
+主语和谓语，或其中一个，如果由一个词组构成，就能构成二层句。这种情况下，不论主语或谓语，如果它是由一个静词构成，在它前面可以有一个定语，如果由一个动词构成，在它前面可以有宾语和状语。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span class="uline">Алтан наран</span> <span class="uline">дорнодоос мандав</span>.
+</p>
+<p>
+金色的太阳从东方升起
+</p>
+<p>
+<span class="uline">Бүрхэсэн үүл</span> <span class="uline">хийсэн арилав</span>.
+</p>
+<p>
+遮天的乌云被吹散了. (хийсэх 飘动飘行; 飘落飘走，арилах 变洁净; 消失消弭消除; 停止 (指雨等))
+</p>
+<p>
+<span class="uline">Үндэстний хэлийг хэрэглэж хөгжүүлэх нь</span> <span class="uline">ард түмэнд ашигтай</span>.
+</p>
+<p>
+使用与发展民族语言对人民群众有利
+</p>
+<p>
+<span class="uline">Дундад сургуулийн сурагч</span> <span class="uline">гадаад хэл сурч байна</span>.
+</p>
+<p>
+中学生正在学习外语
+</p>
+<p>
+<span class="uline">Бага охин дүү</span> <span class="uline">чармайн суралцаж байна</span>.
+</p>
+<p>
+小妹妹正在努力学习
+</p>
+<p>
+<span class="uline">Миний ах бол</span> <span class="uline">энгийн малчин</span>.
+</p>
+<p>
+我的哥哥是普通牧民 ( энгийн 普通的)
+</p>
+<p>
+<span class="uline">Шургуу ажиллах нь</span> <span class="uline">сайшаалтай хэрэг</span>.
+</p>
+<p>
+顽强地工作是值得称赞的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+不但主语部分和谓语部分可以由词组构成而且词组本身的成分，也可以由词组构成，这样就构成三层句。句子由二层句扩展为三层句，也和单层句扩展为二层句一样。如果有关的词和词组是静词性的，它前面可以有定语，如果有关
+的词和词组是动词性的，它前面可以有宾语、状语。这些定语、宾语、状语又可以是静词性的或是动词性的。如果是静词性的它前面还可以有定语，如果是动词性的它前面还可以有宾语状语。这样循环下去层次也就不断增加，以至四
+层句、五层句 � 更多的层次。如一个 «охин нь надтай уулзав» (他姑娘见了我) 这样一个较短的句子，可以一层一层加到 «багаасаа | их | дасалцаж байсан | манай нутгийн | нэг | сайн найзын | үрийн ганц | охин нь, Бээжингийн | нэг |
+сургуулиас | төгсөөд | Хөх хотын | нэг | байгууллагад | ажиллахаар | өчигдөр | манай | гэрт | ирж | надтай уулзав» （从小很熟悉的家乡的一个好朋友的独生女，从北京的一所学校毕业后为了在呼和浩特的一个单位工作昨天来到我们家见
+了我）
+。这样一个很长的句子。需要说明的是这里说的 “层层加” 不一定是直接一个一个地加在单词前边。有的直接加在一个单词前边，有的则加在后面的一个词组上面。
+</p>
+<p>
+这样看来，词组或句子的规模似乎是无止境的，但是实际上由于词义搭配和句的语法功能的限制，以及实际表达需要的限制等原因，层次不可能太多，长度也不可能太长。当然在另一方面，如果想故意制造一个很长很长的句子，也
+是可以制造出来的。尤其是关于联合关系的定语、状语可以随意制造下去，可是这就不是正常的句子了。这里列举少数多层句的例子
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Өглөөний улаан нар саруул талыг өвч гэрэлтүүлэн мандлаа. (өвч 整个的)
+</p>
+<p>
+早晨的红太阳普照大地 (主语部分三个层次, 谓语部分四个层次)
+</p>
+<p>
+Хөдөө хонь хариулж байсан миний охин дүү одоо Өвөр Монголын Их Сургуульд суралцаж байна.
+</p>
+<p>
+曾在牧区牧羊的我的妹妹现在在内蒙古大学学习 (主语部分为四层, 谓语部分为三层)
+</p>
+<p>
+Хүний зөв үзэл санаа бол нийгмийн үйлдлэгээс л ирдэг.
+</p>
+<p>
+人的正确思想只能从社会实践中来．(主语部分谓语部分都是三层)
+</p>
+<p>
+Манай үйлдвэрийн ажилчин мэргэжил техникийн өөрчлөлтийг ихээр хийж байна.
+</p>
+<p>
+我们工厂的工人正在大力进行技术改革。(主语部分谓语部分都是三层)
+</p>
+<p>
+Бид үүрэг дурдаж гаргахаар барахгүй үүргээ биелүүлэх аргын асуудлыг ч шийдвэрлэх хэрэгтэй.
+</p>
+<p>
+我们不但要提出任务，而且要解决完成任务的方法问题。(谓语部分是联合词组, 是五层)
+</p>
+<p>
+Сэцэн хийгээд Чимэг шөнө турш хөөж явсан малаа өглөө болоод дахин дахин бүртгэж тоолов.
+</p>
+<p>
+斯琴和其木格到了早晨把通宵赶的牲畜数了一遍又一遍。(主语部分是联合词组，谓语部分是五层)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+蒙古语句子里，尤其是长句里，常常把宾语、状语提到主语前边。从常规句型看，它们似乎移到了主要句子外边。但从句法关系说，它们仍然是该句的宾语和状语，也就是说，它们仍和谓语发生直接关系。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Монгол гэрийн дэнгийн доор Санжай өвгөн соёл сурна.
+</p>
+<p>
+在蒙古包的灯光下桑杰爷爷学文化
+</p>
+<p>
+Манай сургуулийн ойрын байдлыг та нар сонсов уу?
+</p>
+<p>
+你们听说我们学校的近况了吗？
+</p>
+<p>
+Өвөл зун гэсэнгүй тасралтгүй биеэ боловсруулбал бие махбодын байдал лав сайжирна.
+</p>
+<p>
+如果不分冬夏不间断地锻炼身体健康状况一定会改善<sup>3</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-290"></a>
+<p>
+<sup>3</sup>&nbsp;(бие махбод 身体肌体)
+</p>
+
+</div>
+</div>
+
+<!-...... subsubsection 单纯句和包孕句......
+-->
+<h6 id="autosec-291"><span class="sectionnumber">2.1.3.1&#x2003;</span>单纯句和包孕句</h6>
+<a id="cyrillic-grammar-autopage-291"></a>
+
+<p>
+如果句子里只有一个主语谓语结构，称之为单纯句。如果除了一个主语谓语结构外，还包含其它的体述结构，则称之为包孕句。包孕句中的体述关系词组起一种句子成分作用，因此把它叫做成分句。包孕句中可以有一个成分句，也
+可以有几个成分句。成分句可以有各种不同的功能。有主语成分句 (体语成分句)、谓语成分句 (述语成分句)、定语成分句、宾语成分句、状语成分句等。这些成分句既可以是句子整体的一个成分，也可以是某个词组的一个成分。成分
+句除了在体述关系方面与句子主语谓语的关系相似而外，无论在功能方面，或在体语、述语的形态以及语调等方面都与主语谓语有所不同。
+</p>
+<p>
+主语成分句 (体语成分句)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чи хариад ирсэн чинь сайн болжээ.
+</p>
+<p>
+你回来这就好了
+</p>
+<p>
+Хэл бол суурийн дээрх давхарга гэдэг нь зөв үү?
+</p>
+<p>
+说语言是基础的上层建筑，是正确吗？
+</p>
+<p>
+Өнгөөр сайхан нь чанараар барагтай.
+</p>
+<p>
+颜色好的质量不太好
+</p>
+<p>
+谓语成分句 (述语成分句)：
+</p>
+<p>
+Миний санаа бол та очно. 我的意见是您去
+</p>
+<p>
+Энэ газрын нэг онцлог нь ой шугуйгаар баялаг.
+</p>
+<p>
+这个地区的一个特点是森林资源丰富
+</p>
+<p>
+Эхийн нь санаа болж байх учир нь хүү нь явснаас аваад захидал чимээ ирүүлсэнгүй.
+</p>
+<p>
+他母亲担心的是，儿子走后一直没来信
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+定语成分句：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Байгалийн шинжлэх ухаан бол хүмүүсийн эрх чөлөөгөө тэмцэн олох нэг зүйлийн зэвсэг болно.
+</p>
+<p>
+自然科学是人们争取自由的一种武器
+</p>
+<p>
+Багшийн зааж сургасан үгийг би хэзээд дотроо бодож явдаг.
+</p>
+<p>
+老师的教导我一直记在心里
+</p>
+<p>
+Хэлний үгсийн сангийн гол нь гэвэл бүх язгуур үг гол зүйл нь болж ордог үгсийн үндсэн сан байдаг.
+</p>
+<p>
+语言的词汇中的主要东西就是基本词汇，其中也包括成为它的核心的全部根词
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+宾语成分句：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Малчид мал сүргийнхээ тарга сайтай болсныг үзээд бүгдээр цөм баярлаж байна.
+</p>
+<p>
+看到牲畜膘情好，大家都很高兴
+</p>
+<p>
+Хэн, чиний ингэж хийнэ гэдгийг чинь би мэдэж байсан юм.
+</p>
+<p>
+啍！我料定你会这么做的！
+</p>
+<p>
+Чиний хурал дээр хэлсэн үг чинь миний бодож байсантай яг адил.
+</p>
+<p>
+你在会上讲的话，和我想的完全一样
+</p>
+<p>
+Та нар өөртөө сонгож авбал миний авч өгөхөөс дээр бишүү ?
+</p>
+<p>
+你们自己选择买总比我给你们买好吧
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+状语成分句：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хүү нь захидал ирүүлсэнд эх нь санаа амар болжээ.
+</p>
+<p>
+儿子来了信，母亲放心了
+</p>
+<p>
+Чамайг яваад иртэл бид энд хүлээж байя.
+</p>
+<p>
+我们在这里等到你去回来
+</p>
+<p>
+Тэднэр маргааш энд ирэх юм бол бид одоо тэнд очсоны хэрэггүй.
+</p>
+<p>
+如果他们明天到这里来，我们现在不必到那里去
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+包孕句中，还有一种特殊的包孕句。一般包孕句的成分句，其体语和述语的形式与一般句的主语、谓语不同，这点前面讲过。但是有一种以联系动词联结的成分句，则可以与一般句子一样。在这种情况下，联系动词的形态标志着该成
+分句的功能<sup>4</sup>。
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-292"></a>
+<p>
+<sup>4</sup>&nbsp;(联系动词 гэх )
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр үед би чадна гэж байгаад одоо болоод би чадахгүй гэдэг чинь яасан муухай хэрэг бэ！
+</p>
+<p>
+当时你说我会做，而到现在又说我不会做，这是多么丢脸的事呀！
+</p>
+<p>
+Тэр хүн та нар санаа амар бай би заавал цагтаа буцаж ирнэ гэж батлан хэлсэн билээ.
+</p>
+<p>
+他曾保证说：“你们放心，我一定按时回来”。
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 复合句......
+-->
+<h6 id="autosec-293"><span class="sectionnumber">2.1.3.2&#x2003;</span>复合句</h6>
+<a id="cyrillic-grammar-autopage-293"></a>
+
+<p>
+一个句子里包含两套以上的体述结构或句子形式，而这些体述结构或句子形式互不构成句子成分时，称之为复合句。复合句里边的各个体述结构或句子形式称之为分句。分句之间的连接形式，有的按先后次序排列起来，它们只在语
+调、停顿方面与独立句之间的关系不同 (文字上表现为标点符号不同)；有的用连接词连接；有的则用单纯连接副动词连接，并在后一个分句末尾接加表示共同的语法意义的附加成分。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Мэдвэл хэлнэ хэлбэл дуусгана хэлэгсэд ялгүй сонсогсод цээрлэл болгоно.
+</p>
+<p>
+知无不言言无不尽。言者无罪闻者足戒
+</p>
+<p>
+Дэлхий дахин давшиж байна ирээдүй бол гэгээн саруул юм.
+</p>
+<p>
+世界是在进步的，未来是光明的
+</p>
+<p>
+Энэ удаа би очно уу эсвэл бас та очно уу ?
+</p>
+<p>
+这次我去呢？或者还是您去呢？
+</p>
+<p>
+Тэр хүн үүнийг авна гэснээс биш би ер нь авна гэж хэлээгүй.
+</p>
+<p>
+是他说要这个的, 我从来没有说要<sup>5</sup>
+</p>
+<p>
+Өчигдөр бүгдээр иржээ, тэгээд энэ өдрөөс хурал хийлээ.
+</p>
+<p>
+昨天大家都来齐了, 这样从今天起开始了会议
+</p>
+<p>
+Үүл арилаад салхин намдав. 天晴了风止了
+</p>
+<p>
+Багш нь хэлээд сурагчид нь тэмдэглэж байна.
+</p>
+<p>
+老师在讲，学生们在记录
+</p>
+<p>
+Мөс цас хайлж модны салаа мөчир ногоорч байна．
+</p>
+<p>
+冰雪融化树枝发绿
+</p>
+<p>
+Ямар мод зайлбал тийм жимс сууж ямар үр таривал тийм цэцэг дэлгэрэнэ.
+</p>
+<p>
+栽什么树苗结什么果，撒什么种子开什么花
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-294"></a>
+<p>
+<sup>5</sup>&nbsp;【-аас(ээс) биш 表示肯定】
+</p>
+
+</div>
+</div>
+
+<!-...... subsection 句子结构的层次分析......
+-->
+<h5 id="autosec-295"><span class="sectionnumber">2.1.4&#x2003;</span>句子结构的层次分析</h5>
+<a id="cyrillic-grammar-autopage-295"></a>
+
+<p>
+〖网页中，句子成分标记很难显示，这一部分推荐看 PDF 版本。〗
+</p>
+<p>
+在前面的句子组成成分和句模的部分里，对句子结构已经作了一些分析，但是这些分析只停留在正在叙述的问题上，与叙述无关的，一般都没有涉及。我们在这个层次分析部分里，想在前面叙述过的章节的基础上，对蒙古语句子做
+一个比较全面的分析。为此首先把句法分析中使用的符号全部排列如下：
+</p>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+(1) <span
+id="lateximage-cyrillic-grammar-1"
+class="lateximagesource"
+><!--
+
+--><img
+src="cyrillic-grammar-images\image-1.svg"
+alt="(-tikz-&nbsp;diagram)"
+style=""
+class="lateximage"
+></span> 定语
+</p>
+
+</li>
+<li>
+
+<p>
+(2) <span
+id="lateximage-cyrillic-grammar-2"
+class="lateximagesource"
+><!--
+
+--><img
+src="cyrillic-grammar-images\image-2.svg"
+alt="(-tikz-&nbsp;diagram)"
+style=""
+class="lateximage"
+></span> 体语
+</p>
+
+</li>
+<li>
+
+<p>
+(3) <span
+id="lateximage-cyrillic-grammar-3"
+class="lateximagesource"
+><!--
+
+--><img
+src="cyrillic-grammar-images\image-3.svg"
+alt="(-tikz-&nbsp;diagram)"
+style=""
+class="lateximage"
+></span> 补语
+</p>
+
+</li>
+<li>
+
+<p>
+(4) <span
+id="lateximage-cyrillic-grammar-4"
+class="lateximagesource"
+><!--
+
+--><img
+src="cyrillic-grammar-images\image-4.svg"
+alt="(-tikz-&nbsp;diagram)"
+style=""
+class="lateximage"
+></span> 状语
+</p>
+
+</li>
+<li>
+
+<p>
+(5) <span
+id="lateximage-cyrillic-grammar-5"
+class="lateximagesource"
+><!--
+
+--><img
+src="cyrillic-grammar-images\image-5.svg"
+alt="(-tikz-&nbsp;diagram)"
+style=""
+class="lateximage"
+></span> 述语
+</p>
+
+</li>
+<li>
+
+<p>
+(6) <span
+id="lateximage-cyrillic-grammar-6"
+class="lateximagesource"
+><!--
+
+--><img
+src="cyrillic-grammar-images\image-6.svg"
+alt="(-tikz-&nbsp;diagram)"
+style=""
+class="lateximage"
+></span> 表示中心词的方向，句子的主语、谓语关系省略不划。
+</p>
+
+</li>
+<li>
+
+<p>
+(7) 辅助成分与主词划在一起。
+</p>
+
+</li>
+<li>
+
+<p>
+(8) 联合成分、并列成分在划线上中断一下, 如— —。用连接词连接的可加一个 + 号或中断一下, 如 — —
+</p>
+
+</li>
+<li>
+
+<p>
+(9) 复合句子以线“|”隔一下。
+</p>
+
+</li>
+<li>
+
+<p>
+(10) 不参与句子成分的可以不划。必要时也可以用括弧（&#x2003;）括起来。
+</p>
+</li>
+</ul>
+<p>
+分析句子的步骤可以根据不同情况采用从大到小，从小到大。或者交替使用两者的办法。采用从大到小的分析法时，首先分开主语部分、谓语部分。然后把它们再从容易切分的地方切开，一直切分到词汇单位。这也就是直接成分分
+析法。不同的是我们每时每刻都在注意其词义和关系的性质，我们切分时不妨采用替代法、扩展法等有助于正确切分的一些方法。采用从小到大的分析法时，我们注意发现哪个词是哪个词的主导词。如果根据词汇意义和语法意义发
+现某个词是主导词，那就要看它是动词还是静词。如果是静词，看它是否有定语。如果是动词，就看它是否有状语、宾语。定语、宾语、状语被确认后，还看它们是属于什么性质的。如果是静词看它是否有定语，如果是动词看它是否
+有状语宾语，这些办法可以重复使用到分析完词汇单位，并分析出它们的层次为止。这样作时，当然也要密切结合其词汇意义和语法意义。
+</p>
+<p>
+下边我们举些例子：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+
+</p>
+<p>
+（1–a）Суралцалгын дайсан бол сэтгэл хангах явдал мөн.
+</p>
+<p>
+<span style="width:28pt; display:inline-block"><!----></span> 学习的敌人是 (自己的) 满足
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+分析〈1〉此句是从大到小进行分析的例子。这句话根据其词汇意义和语法意义首先以 бол 为界线切成主语和谓语两部分。主语部分是属格连接的两个静词，显然是个定体关系词组。谓语部分的中心词是肯定小词 мөн 前面的 явдал, 是
+静词，前边有形动词，显然也是定体关系词组。хангах 前面的静词不外是宾语、状语、体语，根据词义和形态看，它是体述关系词组。如果认为它们是固定词组，也可以不再切分。
+</p>
+<p>
+分析〈2〉是从小到大进行分析的例子。бол 是主语标志，在它前面的 дайсан 应是主语中心词，它的前面是属格静词应是它的定语。最后的是肯定小词 мөн 前边的是一个静词性中心词，它前面的形动词是定语，这个动词性定语前边的
+词是体语。这样 бол 两边的词组构成主语和谓语。
+</p>
+<p>
+<b>Бид таны ирснийг мэдсэнгүй.</b>
+</p>
+<p>
+<b> 我们不知道您来 </b>
+</p>
+<p>
+分析〈1〉从大到小，先切成两部分，前面部分只一个词，后面部分先出一个宾述结构。述语是辅助结构，不再切。宾语部分能分出一个典型的成分句。
+</p>
+<p>
+分析〈2〉从小到大，首先可看出有一个成分句，这个成分句是一个宾语，因此看出一个较大的宾述结构，剩下的一个代词自然就是主语了。
+</p>
+<p>
+<b>Танай гэрт ямар ямар хүн байх вэ?</b>
+</p>
+<p>
+<b> 你们家里都有哪些人？</b>
+</p>
+<p>
+分析〈1〉从整体看，ямар ямар хүн 是主语，其余为谓语，它们构成第一层次。第二层次是 танай гэрт 修饰 байх вэ , 构成状述结构；ямар ямар 修饰 хүн, 构成定体结构，第三层次是 танай 修饰 гэр 构成定体结构。
+</p>
+<p>
+分析〈2〉从细部分析，首先找出最小的两个定体结构。一个辅助结构。其次寻找在这个层次基础上第二次构成词组的成分。找出 танай гэрт 修饰 байх вэ, 构成状述结构。第三步找出整体句子的主语是 ямар ямар хүн, 其余构成谓语。
+</p>
+<p>
+<b>Та нарын маныг тусалсанд бид талархаж байна.</b>
+</p>
+<p>
+<b> 对于你们对我们的帮助，我们表示感谢 </b>
+</p>
+<p>
+分析〈1〉从整体看，第一个层次是主语和其余部分。第二个层次是主语前后部分的宾述关系。第三个层次是宾语部分中的体述关系，是一种成分句。第四个层次是成分句述语部分中的直宾述关系。
+</p>
+<p>
+分析〈2〉从细部分析起，程序与上述相反。首先在第一层找出构成最小词组和不构成词组的成分，然后在第一层次的基础上找出第二个构成和不构成词组的成分，形成第二层次，然后在第二层次的基础上找出第三次构成词组的成分，
+形成第三层次。最后第四层次是整句成分。这样，层次也与上述〈1〉相反。
+</p>
+<p>
+<b>Аав нь хүүхдийнхээ даарч байхыг үзээд гадар дээлээ тайлж өмсөнө.</b>
+</p>
+<p>
+<b> 父亲看到孩子冷，脱下外衣给她穿上 </b>
+</p>
+<p>
+分析〈1〉先把整体句子一分为二。主语无法再分，所以第二步把述语一分为二为状述词组。第三步把状语一分为二为宾述词组，把述语一分为二为状述词组。第四步一分为二的结果分出体述词组和宾述词组，第五步从宾述结构的宾
+语又分出一个定体结构。至此，把全句都切分到了词汇单位。
+</p>
+<p>
+分析〈2〉从细部分析起，第一步找出了两个词组和若干单词，第二步在第二层上又找出了两个结构，第三步在第三层上找出了一个，第四步在第四层上找出了一个，第五步就到了整句的主谓关系。
+</p>
+<p>
+<b>Хүмүүс нийгмийн үйлдлэгийн дунд зүйл бүрийн тэмцэл хийж баялаг туршлагатай болдог.</b>
+</p>
+<p>
+人们在社会实践中进行各种斗争，有了丰富的经验
+</p>
+<p>
+Гэнэт өмнөөс нэгэн зурвас тоос мандан олон морьдын түвэргээн сонстов.
+</p>
+<p>
+突然前方升起一股尘土, 马蹄声大作 (морьд 复数)
+</p>
+<p>
+Аливаа дүннэлт цөм байдлыг байцаасны хойно буй болохоос биш харин байцаахаас өмнө буй болдог биш юм.
+</p>
+<p>
+一切结论产生于调查研究的末尾，而不是它的先头【байцаах 侦查审讯; 检查调查审查监察检验】
+</p>
+<p>
+Арслан хөөж яваа малаа бүртгэж үзсэнд гурван хонь дутжээ.
+</p>
+<p>
+阿尔斯楞数自己赶的牲畜时，少了三只羊
+</p>
+<p>
+Нэг шөнө гэнэт хүйтэн урсгал нөлөөлөн ирээд салхин ширүүсэн цас ихдэж уур амьсгал маш хүйтэн болов.
+</p>
+<p>
+一天夜里寒潮突然来袭，风变猛雪变大，天气变得非常冷。【ширүүсэх 变得更加粗糙; 变得更加严厉; 变得更加激烈】
+</p>
+<p>
+〖参照原著阅读〗
+</p>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

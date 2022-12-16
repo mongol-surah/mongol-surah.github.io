@@ -1,5 +1,10 @@
 *html.html
 *.py
+*.doc
+*.docx
+cyrillic/cyrillic-grammar/media
+cyrillic/cyrillic-grammar/test
+cyrillic/cyrillic-grammar/cyrillic-grammar-images
 
 #lwarp intermediate files
 *.cut
@@ -13,6 +18,7 @@
 *.pdf
 *-images.txt
 *mathjax.txt
+*.cmd
 
 ## Core latex/pdflatex auxiliary files:
 *.aux

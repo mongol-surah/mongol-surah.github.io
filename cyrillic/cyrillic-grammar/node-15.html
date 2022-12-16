@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—语气词 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-192"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... section 语气词......
+-->
+<h4 id="autosec-193"><span class="sectionnumber">3.5&#x2003;</span>语气词</h4>
+<a id="cyrillic-grammar-autopage-193"></a>
+<a id="cyrillic-grammar-autofile-15"></a>
+
+<!-...... subparagraph 1. 语气词的意义......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-194"><span class="sectionnumber">3.5.0.0.0.1&#x2003;</span>1. 语气词的意义</span>
+<a id="cyrillic-grammar-autopage-194"></a>
+本身没有词汇意义，用来表示整个句子的语气，或为某一句子成分增添情态意义的一类虚词叫做语气词。它在增添情态意义方面与情态词有些类似，但比情态词更抽象，虚词化程度更高。语气词没有形态变化。它不能充当句子成分。
+一般依附于句末或某一句子成分后边。
+</p>
+
+<!-...... subparagraph 2. 语气词的分类......
+-->
+
+<p>
+<span class="subparagraph" id="autosec-195"><span class="sectionnumber">3.5.0.0.0.2&#x2003;</span>2. 语气词的分类</span>
+<a id="cyrillic-grammar-autopage-195"></a>
+语气词按其意义和用法可分为：疑问语气词、肯定语气词、否定语气词、回忆语气词、推测语气词、转达语气词，责备、惊叹语气词，强调语气词，让步语气词，呼唤或感叹语气词等。
+</p>
+<p>
+(1) 疑问语气词：уу үү, юу юү , бэ вэ , юм , юм бэ , юм уу , ба , биз , бишүү? гэж үү? (бол уу?)
+</p>
+<p>
+一般疑问语气词：уу үү , юм уу, юм үү，юу юү (不用疑问代词)
+</p>
+<p>
+特殊疑问语气词：бэ вэ , юм бэ , юм , -в? (不用疑问代词)
+</p>
+<p>
+推测疑问语气词：ба , биз (不用疑问代词)
+</p>
+<p>
+反意疑问语气词：бишүү? (不用疑问代词)
+</p>
+<p>
+反问怀疑疑问语气词：гэж үү? (不用疑问代词)<sup>5</sup>
+</p>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-196"></a>
+<p>
+<sup>5</sup>&nbsp;юм бэ? юм уу? юм 口语发音是 йм
+</p>
+
+</div>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Та сайн байна уу? 您好吗？
+</p>
+<p>
+Ажил сурлага чинь амжилттай юу?
+</p>
+<p>
+工作学习有成绩吗?
+</p>
+<p>
+Та сурагч юм уу ажилчин юм уу?
+</p>
+<p>
+您是学生呢还是工人呢？
+</p>
+<p>
+Тэр чинь таны багш юм уу? 他是您的老师吗？
+</p>
+<p>
+Тэр хүний нэр нь хэн бэ? 那个人的名字叫谁呀?
+</p>
+<p>
+Тэр ямар ажил хийж байна вэ?
+</p>
+<p>
+他在做什么工作呢?
+</p>
+<p>
+Тэр чинь хэний ном юм бэ? 那是谁的书呀？
+</p>
+<p>
+Чиний тэр номоо хаа тавьсан юм бэ?
+</p>
+<p>
+你的那本书放在哪里了？
+</p>
+<p>
+Таны нэр чинь хэн гэдэг юм? 您的名字叫什么呀?
+</p>
+<p>
+Таны нутаг чинь хаа байх юм?
+</p>
+<p>
+您的籍贯是哪里呀?
+</p>
+<p>
+Та чинь Баатарын ах нь биз дээ?
+</p>
+<p>
+您是巴特尔的哥哥吧？
+</p>
+<p>
+Таны нэр чинь Мөнх гэж ба? 您的名字是孟和吧?
+</p>
+<p>
+Та ноднин жил энд ирсэн бишүү?
+</p>
+<p>
+您去年不是来过这里吗？
+</p>
+<p>
+Бид Баатартай хамт тойрсон бишүү?
+</p>
+<p>
+我们不是和巴特尔一起逛过吗？
+</p>
+<p>
+Баатар одоо явчихсан гэж үү?
+</p>
+<p>
+巴特尔现在走了吗?
+</p>
+<p>
+Одоо дахиж учраж чадахгүй гэж үү?
+</p>
+<p>
+再不能见面了吗？
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（2）肯定语气词：юм , шүү , даа дээ , шид , мөн , болой, буюу , гэм , аж, тай тэй
+</p>
+<p>
+1）юм 是表示一般的叙述语气的语气词。一般用在句末，也可以用在句中。句末主要出现在静词、形动词后 (以及式动词 лаа лээ 后)，也就是说主要用在没有语气形式的地方。байх 这个形式常常借助它才能构成结束式。句中主要出现
+在 « ийг , чинь , бол , байж » 等形式之前。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Ширүүнцэцэг бол энэ жил арван найман настай оргилсон сэтгэлтэй хүүхэн юм.
+</p>
+<p>
+许仁其其格今年十八岁，是个热心肠的女孩子
+</p>
+<p>
+Зүүн замаар явбал таарч байсан юм.
+</p>
+<p>
+本来走东边的路是对的
+</p>
+<p>
+Эрхбиш шаргуу суралцаж байманжин сая эзэмшиж чадах юм.
+</p>
+<p>
+必须刻苦努力才能掌握
+</p>
+<p>
+Алдаа бол олонхдоо хүмүүсийг зөв замд оруулах замч болдог юм.
+</p>
+<p>
+错误往往是使人们走向正确道路的向导
+</p>
+<p>
+Ийм жишээ түүхэнд гараагүй юм.
+</p>
+<p>
+这样的例子历史上没有发生过
+</p>
+<p>
+Тэр лав явлаа юм. 他一定正在出发
+</p>
+<p>
+Би өөртөө эрсэн юм бол лав эрж олохгүй.
+</p>
+<p>
+如果我自己找的话一定找不见
+</p>
+<p>
+Чухам ямар учиртай юм бол даа？
+</p>
+<p>
+到底有什么事呢？(бол 表达心中的疑惑)
+</p>
+<p>
+Бид очих юмыг та очсоны хэрэггүй.
+</p>
+<p>
+既然我们去嘛，您就不必去了
+</p>
+<p>
+Би бас мэдэхгүй юм чинь чамд юугаа хэлж өгөх вэ?
+</p>
+<p>
+我也不知道嘛，给你说什么呢？
+</p>
+<p>
+Найр наадам болж байгаа юм шиг хөгжөөнтэй үймээнтэй байж билээ.
+</p>
+<p>
+似乎是在举行欢宴，非常热闹
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+在叙述语气词后往往还可以附加别的各种语气词。如：шүү, даа дээ , шуу даа , шүү дээ , шид , аа ээ , билээ , биз , гэнэ 等，至于 юм уу? юм бэ? юм бишүү? 它们都构成了疑问形式，юм байна , юм байжээ , юмсанжээ 构成了助动词的一
+个形式 (见有关各项) Хуримын юмаа бэлдэх бэлтгээд тавьчихвал амар юм шүү.
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Хуримын юмаа бэлдэх бэлтгээд тавьчихвал амар юм шүү.
+</p>
+<p>
+准备举行典礼的东西吧，准备好了就省心了
+</p>
+<p>
+Толгойтой л юм бол бүр хийж чаддаг биш юм шүү.
+</p>
+<p>
+不是每个人 (头) 都能做的
+</p>
+<p>
+Хаа байсан чөлөө юм дээ? 哪里有空闲时间呀?
+</p>
+<p>
+Өдөр шөнөгүй явсан юм даа, өнөө маргаашаа ч мартчихжээ.
+</p>
+<p>
+不分昼夜地走，结果把日子也忘了
+</p>
+<p>
+Би түүнийг ир гэж хэлсэн юм шид.
+</p>
+<p>
+我不是说让他来吗!
+</p>
+<p>
+Ай хүн бүхэн яаруу юм гэнэ, хэдийд нь байшин барина даа.
+</p>
+<p>
+唉, 人们都很忙，哪里有盖房子的时间呀!
+</p>
+<p>
+Өдөртөө яараад ажил нь бас бүтэхгүй юм билээ.
+</p>
+<p>
+每天都忙，工作还没有头绪。
+</p>
+<p>
+Чи бас явах дуртай юм биз дээ?
+</p>
+<p>
+大概你也愿意去吧?
+</p>
+<p>
+Энэ хэрэг уг нь тийм биш юм аа.
+</p>
+<p>
+这个事情原来不是那样
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+2）шүү 表示积极肯定或表示积极想使对方接受的语气。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр чинь эмч шүү. 他是医生呀
+</p>
+<p>
+Энэ бол манай ёс шүү. 这是我们的礼节呀。
+</p>
+<p>
+Сүүлээр ярилцах өдөр байх л шүү.
+</p>
+<p>
+以后交谈的机会很多呀
+</p>
+<p>
+Түүнийг төлөөлөгчөөр сонгосон шүү.
+</p>
+<p>
+把他选为代表啦
+</p>
+<p>
+Үд болоогүй байсаар шүү. 还不到中午呢
+</p>
+<p>
+Би хоолоо идэж амжаагүй шүү.
+</p>
+<p>
+我还没来得及吃饭呢
+</p>
+<p>
+Авахгүй боловч болно шүү. 不要也行啊
+</p>
+<p>
+Тэр чинь Буяны хүү нь байна шүү.
+</p>
+<p>
+他是博音的儿子呀
+</p>
+<p>
+Тэр хэзээний явчихжээ шүү. 他早就走啦
+</p>
+<p>
+Одоо явна шүү. 现在要走啦
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+3）шид 也表示肯定，着重点在于客观地消极地接受。与此相比, шүү дээ 也表示肯定，着重点在于积极地向对方说明，有些说服的口气。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Иш хэрэггүй юманд уурлана шид.
+</p>
+<p>
+咦！为不值得的事情生气呢！
+</p>
+<p>
+Тэр гэртээ байх юм байна шид. 他原来在家呀
+</p>
+<p>
+Тэр чинь хүү нь юм байна шид.
+</p>
+<p>
+他原来是他的儿子呀
+</p>
+<p>
+Явах дуртай юм бол явна шид 愿意走的话走呗
+</p>
+<p>
+Ирэхгүй бол ирэхгүй шид. 不来就不来呗
+</p>
+<p>
+Миний хэлсэн чиний төлөө шүү дээ.
+</p>
+<p>
+我说的是为了你呀
+</p>
+<p>
+Хэдийн ингэж хийсэн бол зүйтэй шүү дээ.
+</p>
+<p>
+早这样做就对了
+</p>
+<p>
+Баруун урагшаа бэлчээр сайн шүү даа.
+</p>
+<p>
+西南方向草场好
+</p>
+<p>
+Хэвтээ мэргэнээс хэссэн тэнэг дээр шүү дээ.
+</p>
+<p>
+见过世面的傻子比躺在屋里 (不出门) 的聪明人强
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+4）даа дээ 表示消积肯定或表示消极地接受客观状态的语气。用在疑问句、希望命令句上则附加一些委婉以及和缓的语气。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Энэ хэрэг сонин даа. 这事奇怪呀
+</p>
+<p>
+Ажиллаж байгаад мэднэ дээ. 工作着再看吧
+</p>
+<p>
+Аав ээжээсээ сонссон байлгүй дээ.
+</p>
+<p>
+一定从父母那里听说了
+</p>
+<p>
+Тийм биз дээ. 可能是吧。也许是那样吧
+</p>
+<p>
+Хүү минь очоод юу юу гэж хэлсэн дээ?
+</p>
+<p>
+儿子你去说了些什么呀？
+</p>
+<p>
+Орой очиж түүнтэй уулзана уу даа?
+</p>
+<p>
+晚上去见他吗?
+</p>
+<p>
+Үгүй бол өөр айлын тугал гэж үү дээ ?
+</p>
+<p>
+不然的话，莫非是别的村子的牛犊？
+</p>
+<p>
+Яаж цаашаа ам нээх вэ дээ.
+</p>
+<p>
+怎么能继续往下说呢。
+</p>
+<p>
+Та залгаад ярь л даа. 您接着说吧。
+</p>
+<p>
+Мэдсэн бол хэлчих дээ. 知道的话说吧！
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+5）мөн , болой , буюу 表示肯定语气，表示“是什么”。мөн 主要用在书面语里。болой (曾经是有过)，буюу(也, 哉) 则只见于旧的书面语言里。мөн 与 биш 相对，它们的基本用法是作为小品词用，但它们有时可作为实词用，尤其是
+мөн 。作为实词用时与形容词很近，如：мөн бие 本身，мөн чанар 本性，мөн биш 是非，мөн дүрс 真面目等。гэм 是很少用的形式，表示“可不是吗”&#x202f;“因为是那样吗”&#x202f;“那样为好”的语气 (参见联系动词)
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр харагдаж байх чинь манай айлын үхэр мөн.
+</p>
+<p>
+那边看到的是我们村子的牛
+</p>
+<p>
+Энэ бол нийтийн хөрөнгө мөн. 这是公共财产
+</p>
+<p>
+Байцаалт хийх бол даруй асуудлыг шийдвэрлэх хэрэг мөн.
+</p>
+<p>
+调查就是解决问题
+</p>
+<p>
+Бичиг судар өгүүлсэн болой. 书籍上说过
+</p>
+<p>
+Арван гэр хэмээгч бага гацаа буюу.
+</p>
+<p>
+十家子是个小村也 ( хэмээгч =гэгч )
+</p>
+<p>
+Бид түүнийг нуучихсан гэм (юм чинь ) та яагаад мэдэх бэ даа.
+</p>
+<p>
+我们把他藏起来了吗，你怎么会知道
+</p>
+<p>
+Өчигдөр очсонгүй алджээ. 昨天没有去失算了
+</p>
+<p>
+Харин тийм гэм. 可不是吗。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+6）аж 主要用在书面语里，表示原来如此的意义。用在具有疑问代词的句子里则表示“哪里还”&#x202f;“哪里会”&#x202f;“哪能”等意思。这是旧书面语的形式，同样意义的还有 ажгуу 。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Нэг мэдсэнд наран өндөр мандсан аж.
+</p>
+<p>
+一看太阳已经升得很高
+</p>
+<p>
+Тэр амьтан хүн буюу малаас огт айдаггүй аж.
+</p>
+<p>
+原来那个东西一点不怕人和牲畜
+</p>
+<p>
+Гэнэт түүний чихэнд хүний ёолох дуу сонсдсон аж.
+</p>
+<p>
+突然在他耳朵里听见有人喊哎哟的声音
+</p>
+<p>
+Нохой нь хүний үгийг сонссоор бага сага үг мэддэг болсон аж.
+</p>
+<p>
+原来他的狗在听人话的过程中已经懂得了一点人话
+</p>
+<p>
+Энэ мэт хууль бас буй аж. 原来还有这样的法律
+</p>
+<p>
+Хэрэг нэгэнт ийм болсон тулд очоод ямар тус гарах аж.
+</p>
+<p>
+事情已经到了这步田地，去有什么用？
+</p>
+<p>
+Тэр надаас дээр байгаад болсонгүй юмыг намайг юу өгүүлэх аж.
+</p>
+<p>
+比我强的他还不行，何况我呢？
+</p>
+<p>
+Юуны худал ажгуу 哪里会是假的。
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+7）тай тэй 是语气词中独具特点的一种。它的意义与 буй бүхий (有、具有) 相近, 但它们能独立运用，而 тай тэй 不能独立运用。тай тэй 的一部分用法与 үгүй 的一部分用法形成反义对照，一个表示肯定的虚词 « 有 »，另一个表示否定
+的虚词 « 没有 »。但它们都有互相不能对称的用法。үгүй 有时能独立运用，тай тэй 任何时候都不能独立运用。тай、тэй 在述语 (谓语) 中附加 « 有 » 的意义外，也可在其它成分附加 « 有 » 的意义，形成一个具有形容词性质的实虚词组。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Өвөр Монголд энэ зун наадамтай.
+</p>
+<p>
+内蒙古今年夏天有那达慕大会
+</p>
+<p>
+Манай нутагт уултай устай модтой.
+</p>
+<p>
+我们家乡有山有水有树木
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(3) 否定语气词：бүү битгий үгүй өдүй үл эс биш бус 。бүү битгий (不要) 用在祈使式动词前边表示禁止。үгүй өдүй үл эс (没有) 表示动词的否定形式, 其中 өдүй 用在形动词 аа ээ 后 (аадүй, ээдүй)，使用范围狭小；үл , эс 用在时间式及
+形动词的前边，而且主要用在书面语中。Биш, бус 主要用在静词类后边，表示“不是”。表示“没有”则用 үгүй 。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Бүлгэмдэлд ашиггүй хэргийг бүү хийе.
+</p>
+<p>
+不利于团结的事不要做
+</p>
+<p>
+Түүний үгийг бүү сонс. 不要听他的话
+</p>
+<p>
+Та нар битгий үймээд бай. 你们不要吵
+</p>
+<p>
+Би түүний явсныг мэдсэнгүй. 我不知道他走了
+</p>
+<p>
+Чиний явах учирыг би бас мэдэхгүй.
+</p>
+<p>
+我也不知道你走的原因
+</p>
+<p>
+Тэр манайд ирдэггүй юм. 他平常不来我们这里
+</p>
+<p>
+Би түүнтэй учраадүй (учраагүй). 我还没遇到他
+</p>
+<p>
+Тэр үл мэдэх (мэдэхгүй) маягтай сууж байна .
+</p>
+<p>
+他装作不知道在那里坐着
+</p>
+<p>
+Миний захидал бичсэнгүйд та уурлаж байна уу?
+</p>
+<p>
+您对我没有写信生气吗？
+</p>
+<p>
+Хэн ч оройтож үл болно. 谁也不能迟到
+</p>
+<p>
+Би эс мэдэв. 我没有知道
+</p>
+<p>
+Зарчмын бус асуудал. 非原则问题
+</p>
+<p>
+Тэр чинь зарчмын асуудал биш. 那不是原则问题
+</p>
+<p>
+Бид чингэж хэлсэн биш ээ. 我们没有那样说
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）回忆语气词：билээ билүү 可以用在静词、形动词结束的句尾，也可以用在以 саар (сээр), ж(ч), на(нэ) 结尾的句尾。一般是表示回忆语气或本来如此的语气 (用在否定句就变成本来不是如此，从来不是如此)。用在 -х , даг дэг 之后，
+表示应如何，前边有疑问代词则表示“到底应该如何”的意思。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Цогмандал бол угаас гар урантай хүн билээ.
+</p>
+<p>
+朝克满都拉原来是个手巧的人
+</p>
+<p>
+Танай хамар цагаан хонины чинь халзан хурга биш билүү (билээ үү)?
+</p>
+<p>
+不是你们的白鼻子羊的有白斑点的羊羔吗？
+</p>
+<p>
+Зүглүүрийг эрт үед манай улс нээн гаргасан юм билээ.
+</p>
+<p>
+我国在古代发明了指南针
+</p>
+<p>
+Харанхуй шөнө өнгөрвөл үүр цайж гэгээн наран манддаг билээ.
+</p>
+<p>
+黑夜过去，就要黎明，太阳要升起来
+</p>
+<p>
+Энэ насандаа олж сонсоогүй билээ.
+</p>
+<p>
+这一生没有听说
+</p>
+<p>
+Хаврын тунгалаг өглөө байж билээ
+</p>
+<p>
+是个春天的晴朗的早晨
+</p>
+<p>
+Энэ талаар бид бас ч бага сурагч байсаар билээ.
+</p>
+<p>
+在这方面我们还是一个小学生
+</p>
+<p>
+Хоршооны зарим хүн чингэж хэлж байна билээ.
+</p>
+<p>
+合作社的有些人那样说
+</p>
+<p>
+Одоо бид яадаг билээ ? 这回我们该怎么办？
+</p>
+<p>
+Чанагш юу хэлэх билээ. 往下还能说什么呢！
+</p>
+<p>
+Үүнийг хүн асуувал юу гэж хэлдэг билээ?
+</p>
+<p>
+如果有人问这个, 该怎么说呢？
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（5）推量语气词：биз , биз дээ , байх (байхаа), бий, буй за , ба 。推量语气词这几个形式的基本意义相同，而只有细微的差别。биз, биз дээ 表示推测，但是这种推测往往有一定把握，或者自己在一定程度上肯定以后，征询对方同意。
+байх 比较起来只是一种估计。Бий (口语) 也表示估计，在同意对方的看法时常使用。буй за 是旧书面语言中常用的一种形式。ба 则是现代口语中常用的一种形式。ба 可以身兼 биз , бий , байх , 三种形式的意义。在疑问句里，ба 和 биз
+是疑问语气词，在非疑问句里，ба 和 биз 就是推量语气词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Эртхэн хариад ирвэл дээр биз дээ.
+</p>
+<p>
+早点回来好吧
+</p>
+<p>
+Та лав сонссон биз дээ. 您一定听见了吧
+</p>
+<p>
+Хошууны дарга аймаг дээр байх биз.
+</p>
+<p>
+旗长在盟里呢吧
+</p>
+<p>
+Та хоёр эндүүрч байна биз. 你们两个误会了吧
+</p>
+<p>
+Би…цахилгаан мэдээ илгээсэн (явуулсан) бодоход та олсон байхаа.
+</p>
+<p>
+我…去了电报，估计你们已经收到了吧
+</p>
+<p>
+Тийм хүнд биш байхаа , гайгүй байх аа.
+</p>
+<p>
+不是那么重吧, 可以吧
+</p>
+<p>
+Бараг тийм бий. 大概是那样吧
+</p>
+<p>
+Хүү минь одоо өлсөж байна бий?
+</p>
+<p>
+我儿子现在可能饿了吧
+</p>
+<p>
+Хүүхдийн их нь чи буй за. 儿子中大的是你呀
+</p>
+<p>
+Тэгээд та юмаа санаж ба? 所以您有意见了吧?
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(6) 转述语气词: гэнэ , гэнэ лээ (参见联系动词 гэх)
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Тэр заавал одоо нүүнэ гэнэ. 他一定现在就要搬家
+</p>
+<p>
+Хэдийд ирнэ гэнэ вэ ? 什么时候来呢？
+</p>
+<p>
+Тэр хүн биеэрээ очиж гэнэ сайн устай гэнэ лээ.
+</p>
+<p>
+据说他亲自去过，说是有好水
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（7）不耐烦、责备、惊叹语气词：гэдэг чинь, гэж ээ, гэдэг нь, гэх л
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Чамайг хүлээж бай гэх л .
+</p>
+<p>
+让你等一等呢。(гэх л 和 гэхлээ 哪个对?)
+</p>
+<p>
+Бараа таваарын элбэг гэж ээ ！
+</p>
+<p>
+物资多么丰富呀！(таваар 商品, 货物)
+</p>
+<p>
+Тэр зургийн сайхан гэдэг нь !
+</p>
+<p>
+那幅画多好看呀！
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(8) 强调语气词：л , өл, хү(хө), сая , лгүй , даруй (即, 就是) , гэж, гэгч � 等。用在某一成分前或后，表示强调某一成分，同时各有自己的一些特殊意义 (关于 гэж гэгч 等 гэх 的形式，参见联系动词 гэх)。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Би л очихгүй. 我才不去呢
+</p>
+<p>
+Чи очиж л болохгүй. 你可不要去
+</p>
+<p>
+Мал нь жилээс жил өсөж л байна.
+</p>
+<p>
+牲畜一年比一年增长
+</p>
+<p>
+Тэр хүн өөрийн үл мэдэлгүй дээ.
+</p>
+<p>
+那个人自己会知道的!
+</p>
+<p>
+Уяад л байвал өл муудалгүй.
+</p>
+<p>
+老是拴着，当然瘦了<sup>6</sup><a id="cyrillic-grammar-autopage-197"></a>
+</p>
+<p>
+Энэ даруй миний эрж байсан тэр бичиг мөн.
+</p>
+<p>
+这就是我找的那本书
+</p>
+<p>
+Сайхан чармайж сурвал сурч чадахгүй гэж үгүй.
+</p>
+<p>
+好好努力学的话，没有学不会的
+</p>
+<p>
+Тийм ёсгүй хэрэг гэж хаа байх юм.
+</p>
+<p>
+哪里有那样不合理的事情
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-198"></a>
+<p>
+<sup>6</sup>&nbsp;муудах 变坏, 恶化
+</p>
+
+</div>
+</div>
+<p>
+（9) 让步、叠用语气词: ч, чиг, бас, я, е, ч...ч, ч гээд, ч гэсэн 这些都表示让步或退一步的意思，相当于“也”。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Маргааш та ирсэн ч болно, өөр хүн ирсэн ч болно.
+</p>
+<p>
+明天您来也可以，别人来也可以
+</p>
+<p>
+Энэ хэрэгийг түүнээс өөр хэн ч л мэдэхгүй.
+</p>
+<p>
+这个事情除他以外谁也不知道
+</p>
+<p>
+Боорцог ч болно жимс ч болно бага аваад ир. Боорцог чиг(е) болно жимс чиг(е) болно бага аваад.
+</p>
+<p>
+点心也行，水果也行，拿一点来
+</p>
+<p>
+Энэ тухай нарийн зүйлийг би мэдэхгүй тэр ч гээд мэдэхгүй.
+</p>
+<p>
+这方面的详细情况，我不知道他也不知道
+</p>
+<p>
+Зөвшөөрөлгүйгээр хэнийг гээд оруулж болохгүй .
+</p>
+<p>
+未经许可，谁也不许进来
+</p>
+<p>
+Хэн ирлээ гээд энэ байдлыг өөрчлөхөд хэцүү .
+</p>
+<p>
+谁来也很难改变这个情况
+</p>
+<p>
+Хүн хэдий хавсрал ч гэсэн өөрийн чармайхгүй бол болохгүй.
+</p>
+<p>
+无论别人如何帮助，自己不努力还是不行
+</p>
+<p>
+Та очиход би бас очно уу?
+</p>
+<p>
+您去的时候我也去吗？
+</p>
+<p>
+Энэ хэргийг бас танд найдая.
+</p>
+<p>
+这个事情也委托给您吧
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(10) 呼唤或感叹语气词：аа оо ээ өө
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Баатар аа наашаа ирээдэх.
+</p>
+<p>
+巴特尔! 请往这边来一下
+</p>
+<p>
+Нөхөд өө найз нар аа. 同志们！朋友们！
+</p>
+<p>
+Аа баатар аа мөнх аа гуа аа! 巴特尔！孟克！高娃！
+</p>
+<p>
+Замдаа хичээж яв аа. 一路小心！
+</p>
+<p>
+Та баахан удаан унш аа. 您读得慢一点！
+</p>
+<p>
+Энэ морины хурдан гэж ээ ! 这马多快呀！
+</p>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

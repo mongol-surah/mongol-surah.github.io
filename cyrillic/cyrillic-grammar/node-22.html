@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—第四篇构词法 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-320"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... part 第四篇构词法......
+-->
+<h2 id="autosec-321"><span class="sectionnumber">第四部分&nbsp;&#x2003;</span>第四篇构词法</h2>
+<a id="cyrillic-grammar-autopage-321"></a>
+<a id="cyrillic-grammar-autofile-22"></a>
+
+<!-...... chapter 构词法概说......
+-->
+<h3 id="autosec-322"><span class="sectionnumber">第一章&nbsp;&#x2003;</span>构词法概说</h3>
+<a id="cyrillic-grammar-autopage-322"></a>
+
+<!-...... section 构词法与构形法......
+-->
+<h4 id="autosec-323"><span class="sectionnumber">1.1&#x2003;</span>构词法与构形法</h4>
+<a id="cyrillic-grammar-autopage-323"></a>
+
+<p>
+语言和人的社会活动有直接的联系。社会生活的发展变化，社会制度的改变，政治、经济、文化的发展，都在经常不断地影响着词汇的发展变化。词汇的发展变化表现为新词的不断增加和一些词的逐渐消亡。语言中产生的新词，除有
+一部分是借自外语以外，其余都是在原有词汇 (尤其是基本词汇) 基础上，通过该语言既有的构词法而产生的。因此，构词法研究的是该语言词汇发展丰富的途径，该语言的词汇如何在原有词汇的基础上不断产生新词的方法。
+</p>
+<p>
+构词法研究的是词汇问题，因此它和词汇学有密切关系，但在同时，作为方法来说，构词法使用的方法又和词法、句法是相同的方法。广义的形态变化，有时是构形的，有时是构词的。同样，广义的组词法，有时是组词造句的，有时
+是构成复合词的。因此语法里也研究构词法。
+</p>
+<p>
+那么构词法和一般的形态变化 (构形法)、句法有什么不同呢？
+</p>
+<p>
+构形法和构词法的不同在于：构形法研究的是一个词的不同的语法变化的形式，它并不涉及词汇意义的改变。如：малын 牲畜的，малыг 把牲畜，малд 给牲畜，малаар 用牲畜…。在这些变化中，“牲畜” 这个词的词汇意义并没有变化。
+构词法研究的是如何在一个词的基础上产生另外一个新词，这里涉及的正是词汇意义的改变。如：мал 牲畜—малчин 牧民，эм 药—эмч 医生，яв 走—явдал 事情。它们表达的是不同的概念。这些新产生的词都有相应的自己的语法变
+化形式。
+</p>
+<p>
+此外，构形法有普遍适用性，构词法则有很大的局限性和独特性。如名词的格的变化适用于一切名词，动词的体、态、式的变化适用于一切实义动词。但是相比之下，构词附加成分有的只限于少数几个词，有的虽然多一些，但局限性
+很大。而且构词法在每种情况下都有一定的独特性。从词根和附加成分的情况，，至多只能知道它的大致意义，至于确切的词汇意义，都是历史地、具体地形成的。因此需要一个一个地掌握才行。如：тогоо 锅 + ч —тогооч 炊事员，
+барь 抓 +лга —барилга 建筑物，төр 生 +л —төрөл 亲属，яв 走 +дал —явдал 事情，而不能是别的什么东西。
+</p>
+<p>
+由于上述这个情况，如果某些语法成分失去了它本来的语法意义而表示独特的词汇意义时，我们就把它看作是转化的构词附加成分。如：хүү 儿子—хүүхэн 女儿，даг 跟—дагагсад 随从，ор 进入—орогсод 进士，сур 学—сурагч 学生，
+төлөөлө 代理—төлөөлөгч 代表等，这里这些后缀失去了本来的语法意义，转化成了构词附加成分。
+</p>
+<p>
+至于复合词构词法和一般的组词法的不同点则在于，复合词构词法指的是利用词的组合来表示新的词汇意义，一般的组词法是研究在句中哪些词和哪些词可以发生联系以及联系的性质。因此：
+</p>
+<p>
+(一) 从意义方面看，在构词时，两个词融合的结果产生出具有特殊词汇意义的第三个词。有些这类词很难从原来的两个词推断出它的确切意义。因此它不同于都按原义使用的一般的句法关系。如：төмөр зам 铁路，галт тэрэг 火车，
+морьт цэрэг 骑兵，都是构成另外一个词的，都有独特的涵义，都不是简单由原来两个词的意义所能完全理解的。这不同于一般的 галт зуух 有火的灶，галгүй зуух 无火的灶，морьтой хүн 骑马的人，явган хүн 步行的人。至于下边一些
+词更是很难从原来的词义推断出来：(括号里是直译)
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ямаа хөх —白薇 (植物)
+</p>
+<p>
+(山羊 &#x2003; 乳房)
+</p>
+<p>
+үхэрийн нүд —茅滕子, (茶惠子)(植物)
+</p>
+<p>
+( 牛 &#x2003; 眼睛)
+</p>
+<p>
+туулайн хөөр —栗子
+</p>
+<p>
+(兔子 &#x2003; 腰子）
+</p>
+<p>
+муу сайн —不好的 (муусайн)
+</p>
+<p>
+(坏的 &#x2003; 好的)
+</p>
+<p>
+хар архи —白酒
+</p>
+<p>
+(黑 &#x2003; 酒)
+</p>
+<p>
+цагаан толгой —字母
+</p>
+<p>
+(白 &#x2003; 头)
+</p>
+<p>
+өр өвдөх —өрөвдөх 同情
+</p>
+<p>
+(心窝 &#x2003; 疼)
+</p>
+<p>
+босч явах —逃走
+</p>
+<p>
+(起来 &#x2003; 走)
+</p>
+<p>
+хүйс тэмтрэх —满门抄斩
+</p>
+<p>
+(肚脐 &#x2003; 摸)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(二) 从结合关系看，在构词时，两个词结合得很紧密，形式固定，不能随意调换或增减。有些这类词语音形式也起变化。在句法分析时一般不作进一步分析，当作一个成分看待。如：гар хөдлөх 动手，说成 гараа хөдөлгөх 动自己的手，
+就变为一般词组。又如：санаанд орох 想起，是个复合词，所以可以说 би тэр хэргийг санаанд оржээ 我想起了那件事情，如果不是复合词，而是一般词组的话，这种说法是不合乎句法规则的。在一般句法规则里这类句只能说成 тэр
+хэрэг миний санаанд оржээ 那件事出现在我的心里。再如 би хар даржээ 我梦魇了，因为 хар дарах 是复合词，所以可以这样说。如果按照一般词组的规律说成 намайг хар даржээ , хар намайг даржээ (直译为：) 黑把我压了, би хард
+дарагджээ 直译：我被黑压了，反而就不对了。
+</p>
+<p>
+总之，一般词组是自由词组，可以随时根据需要组织，根据需要调换，各个成分的原来意义不变。复合词是固定词组，是词汇体系中既有的现成形式，不能在句中随便调换其成分，它有与原义不同的新的词汇意义。
+</p>
+
+<!-...... subsection 蒙古语词的结构......
+-->
+<h5 id="autosec-324"><span class="sectionnumber">1.1.1&#x2003;</span>蒙古语词的结构</h5>
+<a id="cyrillic-grammar-autopage-324"></a>
+
+<p>
+蒙古语词一般可以分解为词根和词缀两个部分。蒙古语是具有粘着语特点的语言，它没有中缀，一般也没有前缀，而只有后缀。蒙古语后缀可以依次相加。一个词组一般只含有一种意义，它或者具有构词意义，或者具有构形意义。还
+有一部分则具有构词—构形双重意义。处于词末位置而又表示单纯语法意义 (主要是关系意义) 的一部分后缀，也可以叫做结尾词缀，它和其它语言 (如俄语) 的词尾有些相似，而又不完全相同。
+</p>
+<p>
+蒙古语的词根一般由一个或两个音节构成。有的词根可以单独使用。如：гар 手，хөл 脚，ав 要，өг 给，үйл 活儿, 事，这样的词根叫做独立词根或根词。有的词根单独不能使用，这样的词根叫做非独立词根。如：цагаан 白，цас 雪，
+цаас 纸的 ца ；дээр 上，дээш 往上，дээдэс 祖先的 дээ 。个别情况下也遇到由两个独立的词根缩合而成的复合词根。如：авчирах 拿来，是由 авч (拿) 和 ирэх (来) 缩写而成，дуугарах (作声, 响动)，是由 дуу (声) 和 гарах (出) 缩写而成。
+</p>
+<p>
+词根上添加构词词缀，可以构成新词。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ус 水 + лах —услах 饮，浇水
+</p>
+<p>
+хэрэг 事 + сэх —хэрэгсэх 需要
+</p>
+<p>
+захь 吩咐 + аа —захиа 嘱托, 信
+</p>
+<p>
+хура 收集 + л —хурал 会议
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+前两个由名词派生了动词，后两个由动词派生了名词。
+</p>
+<p>
+在派生词上添加构词词缀或构形词缀，还可以构成新词或增添语法意义。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хэрэгсэ 需要 + л —хэрэгсэл 材料, 需要品
+</p>
+<p>
+усла 饮, 浇 + лт —услалт 灌溉
+</p>
+<p>
+захиа 嘱咐, 信 + лах —захиалах 订购
+</p>
+<p>
+хурал 会议 + дах —хуралдах 召开会议
+</p>
+<p>
+хэрэгсэл 需要品 + ийн —хэрэгслийн 需要品的
+</p>
+<p>
+захиалах 订购 + жээ —захиалжээ 订购了
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+前两个是从派生的动词又派生了名词，中间两个是从派生的名词又派生了动词，后两个则是在派生的名词和动词上增添了语法意义的例子。
+</p>
+<p>
+蒙古语中较长的多音节词一般都是几个构词词缀和构形词缀依次相加的结果。如：
+</p>
+<p>
+боловсруулах анги 训练班，和 үйлдвэрлэлийн хүчин 生产力的前一词都是多词缀的词。关于这两个词的结构可作如下分析。
+</p>
+<p>
+第一词 боловсруулах:
+</p>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 词根 бол , 意为熟，是动词
+</p>
+
+</li>
+<li>
+
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 加 васан，боловсон 意为成熟的, 或文明的，成了形容词
+</p>
+
+</li>
+<li>
+
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 加 рох 成 боловсрох 意为成熟, 熟练，成了动词
+</p>
+
+</li>
+<li>
+
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 加 уул , 成 боловсруул 意为使之成熟，使之熟练, 练习, 训练，是使动态动词
+</p>
+
+</li>
+<li>
+
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 加 х , 成 боловсруулах 意同前，是形动词, 可作定语
+</p>
+</li>
+</ul>
+<p>
+Боловсруулах анги 则专指训练班
+</p>
+<p>
+第二个词 үйлдвэрлэлийн
+</p>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 词根 үйл , 意为事，活儿，是名词
+</p>
+
+</li>
+<li>
+
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 加 дэх 成 үйлдэх , 意为做，是动词
+</p>
+
+</li>
+<li>
+
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 加 вэр 成 үйлдвэр 意为工业, 工厂，是名词
+</p>
+
+</li>
+<li>
+
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 加 лэх 成 үйлдвэрлэх 意为制做, 生产，成了动词
+</p>
+
+</li>
+<li>
+
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 加 л 成 үйлдвэрлэл, 意为生产，又成了名词
+</p>
+
+</li>
+<li>
+
+<p>
+<span
+class="textcircled"
+style="border: 1px solid black"
+>1</span> 加 ийн 成 үйлдвэрлэлийн, 意为生产的, 可作定语
+</p>
+</li>
+</ul>
+<p>
+Үйлдвэрлэлийн хүчин 则专指生产力
+</p>
+<p>
+上例中，бол 和 үйл 是词根，同时也是第一次词干，боловсон 和 үйлд 是第二次词干，боловсро 和 үйлдвэр 第三次词干，以下类推。ийн 是结尾词缀 (或尾随词缀)。
+</p>
+<p>
+蒙古语中的一部分词缀，具有构形作用的同时，还具有构词作用。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+сайн 好 + чуул —сайчуул 模范人物
+</p>
+<p>
+бага 小 + чууд —багачууд 少年
+</p>
+<p>
+хөгшин 老 + д (复数后缀)—хөгшид 老龄人
+</p>
+<p>
+хүүхэн 女儿 + д (复数后缀)—хүүхэд 子女
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+在上面这些例词里，有关的后缀除了附加复数这个语法之外，还起了改变其词义的作用。又如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+бай 存在 + гуул (使动态后缀)—байгуул 建设
+</p>
+<p>
+барь 抓, 握 + лд (互动态后缀)—барилд 摔跤
+</p>
+<p>
+яв 走, 去 + уул (使动态后缀)—явуул 派遣
+</p>
+<p>
+идэ 吃 + гд (被动态后缀)—идэгд 腐蚀
+</p>
+<p>
+хүр 到 + гэ (使动态后缀)—хүргэ 送
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+在这些例词里，有关的后缀除了附加动词态的语法意义之外还起了构成新词的作用。
+</p>
+<p>
+蒙古语词干后缀，属于静词的有复数后缀，数词、时位词、形容词的专有后缀等。属于动词的有态和体的后缀。
+</p>
+<p>
+关于结尾后缀，属于静词的有格的后缀，领属 (物主) 的后缀。属于动词的有式 (时间、人称) 后缀，副动词后缀。至于形动词后缀，该形动词充当主句的谓语时可以认为是结尾后缀，当作静词用时 (尤其后边接加格后缀时) 可以认为是
+词干后缀。
+</p>
+<p>
+构词后缀可以重叠接加，同样，构形后缀也可以重叠接加。如：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+багш нартайгаа 与老师们，
+</p>
+<p>
+амсхийтэлээ 一直到休息
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+在一般情况下，词缀的次序是构词词缀在前，构形词缀在后，结尾词缀在最后。构词词缀和构形词缀都可以一个以上，但结尾词缀一般只是一个。
+</p>
+<p>
+关于词根、词缀与词干的关系，即蒙古语词的词素之间的关系，以简表表示如下：
+</p>
+<p>
+
+<a href="media/image1.jpeg" target="_blank" ><img
+src="media/image1.jpeg"
+style="
+width:377pt;
+height:118pt ;
+"
+class="inlineimage"
+alt="(image)"
+></a>
+</p>
+<p>
+在少数情况下，构词后缀可在某些构形后缀 (构词构形后缀) 之后。如在动词态的后缀之后，接加纯构词后缀。在极个别的情况下，结尾词缀之后还出现构词构形后缀。如：танайхан 你们的人。
+</p>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—句法构词法 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-352"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... chapter 句法构词法......
+-->
+<h3 id="autosec-353"><span class="sectionnumber">第三章&nbsp;&#x2003;</span>句法构词法</h3>
+<a id="cyrillic-grammar-autopage-353"></a>
+<a id="cyrillic-grammar-autofile-26"></a>
+<p>
+句法构词法，也就是指以词组方式构成的复合词。它是以两个或两个以上的词来表达一个概念，构成一个词汇单位。复合词在蒙古语中很早就有的，但它在后来逐渐发展，而且日益占重要地位。新的政治术语、科技术语，以及各种名
+称，常常以这种形式来表达。
+</p>
+
+<!-...... section 根据词性的分类......
+-->
+<h4 id="autosec-354"><span class="sectionnumber">3.1&#x2003;</span>根据词性的分类</h4>
+<a id="cyrillic-grammar-autopage-354"></a>
+
+<p>
+在复合词中，常用词占很重要的地位，许多常用词，尤其是多义的常用词，每个词就是一个积极的构词手段，以它为基础或以它为一个成分，可以构成几个，十几个，多则数十个派生词。如：ам 口，амь 生命，бие 身体，хувь 份儿，
+гар 手，толгой 头，цэрэг 军，цус 血，нүд 眼，сэтгэл 心…等名词。алдах 失，орох 入，үзэх 看，барих 捉，болох 成，гарах 出，суух 坐，төлөх 支付，давтах 重复，дарах 压…等动词。улаан 红，цагаан 白，хар 黑，шар 黄，их 大，
+халуун 热，сул 松的，зөв 正确的…等形容词。нэг 一，хоёр 二，дөрөв 四，тав 五，дээр 上，доор 下，дотор 内，гадна 外等数词和时位词都是可以构成几十个派生词的常用词。
+</p>
+<p>
+现在我们从这类名词、动词、形容词、数词、时位词中各举一两个例子，以见其一斑。
+</p>
+<p>
+（1）ам 是常用名词，本义是 “口”，以 ам 为基础，或以 ам 为成分，可以构成下列各种复合词。
+</p>
+<p>
+复合名词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+уулын ам 山口，буугийн ам 枪口，голын ам 河口，ам бүл 家口，ам хамар 话语，ам хэл 口齿，хэл ам 口舌，ам сээр 榫卯，аман аялгуу 方言土语，аман орчуулга 口译，амны эрдэм 口技，амны хөндий 口腔，амны зууш 话把，аман
+хишиг 口福，аман хүнс 口分，аман хуур 口琴，аман хүзүү (第一颈椎)，аман шалгалт 口试，аман тангараг 誓言，аман тоо 人口，аман дохио 口令，аман захиа 口信，аман зарлиг 口头命令，аман зохиол 口头文学…
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ам ангах 口渴，ам авах 取得允诺，ам алдах 失言，ам асуух 质问，ам нийлэх 话语投机，ам нээх 开口，амаа өгөх 允诺，амаа барах 说破嘴 (барах 结束用尽耗完)，амаа барих 掩嘴，амаа мэдэх (马) 嘴顺，амаа бөглөх 住口，амаа хамхих
+闭口，ам боох 制止说话，ам буцах 食言，ам бөглөх 堵住嘴，ам хаах 堵住口，ам хавчих 欲言又止，ам халах 微醉; 愉快，ам халсах 说话来劲，ам хатах 口干渴，ам хазайх 口气转变，ам хүлээх 允诺, 看别人口气，ам харах 看别人口气，
+ам хүрэх 尝，ам муудах 众人责难, 言语不和，ам таглах 敷衍搪塞，ам таарах 投合，ам тулгах 对质，ам дагах 人云亦云，ам цангах 口渴，ам заваарах 嘴发干，ам зуурах 噤口，ам жишилэх 稍润一下嘴，ам зөрөх 发生口角，ам сүүл нь
+нийлэх 前后照应，ам сээр таарах 榫卯相合
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合形容词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ам удаан 言语迟钝的，ам бардам 夸口的，ам бөх 口紧的，ам сул 嘴松的，ам түргэн 嘴快的，ам чанга 嘴严的，ам чагтуун (马) 嘴硬的, 嘴犟的，ам задгай 嘴碎的，ам зөөлөн 嘴软的，ам ихтэй 说大话的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合副词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ам мэдэн 信口，аманд орохоор 信口开河地
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(2）гар 也是常用名词，本义是 “手”，以 гар 为基础，或以 гар 为一个成分，可以构成下列各种复合词。
+</p>
+<p>
+复合名词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гар арчуур 手锄，гар ооль 手斧，гар элдүүр 人工制革，гарын алга 手掌, 手心，гарын алчуур 手帕，гарын ар 手背，гарын эрдэм 手艺，гарын үсэг 签字，гарын бичиг 手书，гарын хөлс 报酬，гарын гүйцэтгэл 手续，гарын дугтуй 手套，
+гарын дохио 手势，гарын захидал 手信，гарын урлал 工艺，гар урчууд 工匠，гар үйлдвэр 手工业，гар нэхмэл 手工纺织，гар бичмэл 手抄本，гар дамжигч 经手人，гар дэн 手提灯，гар дэвтэр 手册，гар бөмбөг 排球，гар буу 手枪，гар
+тээрэм 手磨，гар хээлтүүлэг 手工配种，гар хөрөө 手锯，гар хөл 手足, 爪牙，сайн гар 好手, 能手，зүүн гар 左侧, 左翼，баруун гар 右侧, 右翼
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гар барих 握手，гар атгах 握手，гараас гарах 脱手，гар оруулах 着手，гарын үсэг зурах 签字，гар нийлэх 协调，гар хаях 甩手，гар хаялах 甩手，гар халсах 手熟, 手来劲，гар харах 依赖，гар хөл болох 当爪牙，гар хүрэх 着手, 触动，гар
+гаргах 显能，гар мухардах 变得束手无策，гар сажих 摆手 (拒绝)，гар сарвайх 伸手 (要)，гар солих 换人手，гар тэнцэх 势均力敌，гар тулгах 比手艺，гарт орох 入手，гар дамжуулах 经手，гар дасах 手熟，гар дүрэх 插手，гар сунгах 插手
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合形容词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гар уран 手巧的，гар богино 低能的，гар хатуу 手硬的 (容易弄坏的)，гар хоосон 空手，гар хөнгөн 手轻的，гар хүнд 手重的手笨的，гар мухар 困窘，гар салан 手松的，гар сул 手松的 (随便花钱)，гар татах 手头紧，гарт эвтэй 顺手的，
+гар чанга 手紧, 吝啬，гар зөөлөн 手软，гар ихтэй 大手大脚
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合副词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гарын аяар 顺手 (干什么)，гар дээр 在手中，гар доор 在手下，гар зуур 在手头，гар үзүүр 在手头 #
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+从上述 ам гар 两个名词的情况看，以名词为基础，或以名词为一个成分，可以构成复合名词、复合动词、复合形容词。
+</p>
+<p>
+构成复合名词时，除并列关系外，一般以后边的名词为中心构成复合名词。如果 ам, гар 在后边，就以 ам, гар 为中心构成复合名词，如果 ам, гар 在前边，则以后边的其它名词为中心构成复合名词。
+</p>
+<p>
+构成复合动词时，后边一定要有动词作为构词的中心，ам, гар 等名词自然都到前边去。
+</p>
+<p>
+构成复合形容词时，后边也要有形容词，作为构词的中心，ам, гар 等名词也自然都到前边去。
+</p>
+<p>
+至于复合副词数量较少，一般是从复合名词、复合动词转来的。
+</p>
+<p>
+(3) орох 是常用动词，本义是 “进入”，以 орох 为基础，可以构成下列复合动词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+орох эгэх 进退，орох гарах 出入，цэрэгт орох 参军，сургуульд орох 入学，намд орох 入党，санаанд орох 想起，эмд орох 入药 (可以当药)，зүүдэнд орох 梦见，хэвтэлгэнд орох 卧床不起，чихэнд орох 听到, 入耳，довтлон орох 入侵，
+шургуулан орох 钻进，усанд орох 洗澡，үгэнд орох 听话, 服从，дээр орох 占上风，доор орох 属于下游，тэргүүнд орох 列头名，суудалд орох 入席, 就席，оронд орох 代替，далд орох 隐藏起来，өмнө нь орох 名列前矛，хойноос нь
+орох 关照, 操心 #，орж өгөх 投降，шавь орох 入徒，шашинд орох 入教，архинд орох 沉湎于酒，эрхэнд орох 被控制，эрхэндээ оруулах 控制，гарт орох 落在手里，аргад орох 上当，мэхэнд орох 上当，ухаан орох 懂事了, 觉悟了，
+сэхээ орох 懂事了，мэдрэл орох 有了感觉，санаа орох 有了想法，амтанд нь орох 尝到了甜头＃，хоолонд орох 变得胃口好，үйл утсанд орох 开始会作针线活儿，ногоонд орох 开始吃到青菜，үсэгт орох 开始识字，хөлд орох 开始走步，
+бороо орох 下雨，хур орох 下雨，мөндөр орох 下雹，цас орох 下雪，цаг орох 费时间，хүч орох 费力气，зоос орох 费钱，будаг орох 颜色染透，будаг оруулах 染色，амь орох 复苏，зориг орох 增加志气，зүрх орох 胆子大起来，
+амьсгаа орох (窒息后) 开始呼吸，ашиглалтад орох 投入生产, 开始利用，хүйтэн орох 转冷，дулаан орох 转暖，хавар орох 入春，жил орох 到本命年，онд орох 过冬 (安全过冬)，гэгээ орох 天发亮，үнэр орох 发出气味，үнэр оруулах 搞
+臭，өвчин орох 发病，идээ орох 灌浆，сүү орох 有奶了，царай орох 脸色好转，нүд орох 复明，тэнхээ орох 复元，үнэ орох 涨价，буур орох 公驼发情，ясанд орох 刺骨，хэнээ орох 发昏聩, 智力衰退 (精神病)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(4) алдах 是常用动词，本义是 “丢失”，以 алдах 为基础，可构成下列复合动词。
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ухаа алдах 失去理智，мэдээ алдах 失去知觉，зориг алдах 泄气，урам алдах 扫兴，тэнхээ алдах 丧失元气，тамир алдах 精疲力尽，нойр алдах 失眠，царай алдах 憔悴，сүнс алдах 失魂落魄，өнгө алдах 褪色，тарга алдах 掉膘，тариа
+алдах 欠收，арга алдах 无计可施，арга аашаа алдах 坐卧不宁 #，барьж тавихаа алдах 不知所措，сэрэмж алдах 失去警惕，дуу алдах 失声，инээд алдах 失笑，хөл алдах 失足，үг алдах 失言，нүд алдах 眼花缭乱，шээс алдах 小便失禁，
+чацга алдах 泻肚，баас алдах 泻肚，хөлс алдах 出虚汗，буу алдах 枪走火，гал алдах 失火，баримжаа алдах 乱了标准，барил алдах 摸不着门道，жолоо алдах 管不住，ёс алдах 失礼，итгэл алдах 失信，сүсэг алдах 失去信仰，замбараа
+алдах 紊乱，сахил санваар алдах 破戒，сахилга алдах 违犯纪律，томоо алдах 淘气，тохиол алдах 错过机会，цаг алдах 错过时机，мөр алдах 迷路，зам алдах 迷路，зүгээ алдах 迷失方向，зүг чигээ алдах 迷失方向，мэлзээ алдах 赌输，
+ашиг алдах 失利，бэлээ алдах 赔本，санаа алдах 叹气，сүүрс алдах 叹息，зүрх алдах 气馁，санамж алдах 没有想到，алдаж асгах 撤掉, 掉落，алдаж орхих 失掉, 丢三拉四，алдаж унагах 掉落，алдаж олох 得失，алдах олох 得失
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+从上述 орох алдах 两个动词的情况看，以动词为基础构成的复合词，一般都是复合动词（少数动词可以用形动词、副动词的形式处在复合词的前半部，因而可以构成 нисэх онгоц 飞机，зохион байгуулалт 组织，这样的复合名词，详见
+后）
+</p>
+<p>
+（5）хар 是常用形容词，本义是 “黑”，以 хар 为基础或以 хар 为一个成分可以构成下列各种复合词。
+</p>
+<p>
+复合名词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хар агаруу 沉香，хар уур 暴躁，хар амь 自身，хар ам 原粮，хар ажил 粗活, 苦工，хар ажилчин 苦力，хар аюул 横祸，хар арилжаа 黑市，хар арьстан 黑人，хар архи 白酒，хар өвөл 严冬, 无雪的冬天，хар өдөр 大白天，хар ус 白水, 酸
+水，хар өглөө 大清早，хар үйл 坏事, 恶行，хар үнэг 玄狐，хар үг 白话, 俗话，хар үзэм 紫葡萄，хар шаваг 沙蒿 (油蒿)，хар орхоодой 玄参，хар буудай 黑麦，хар бургас 乌柳，хар хайлс 黑榆 (柏)，хар хус 黑桦，хар чавга 君迁子 (黑
+枣)，хар суль 沙鞭 #，хар гурвалж 黑三棱，хар замаг 黑藻，хар амар 青鱼，хар баавгай 黑熊 (狗熊)，хар буга 水鹿 (黑鹿)，хар хөхөө 四声杜鹃，хар галуу 鸬鹚，хар могой 乌风蛇，хар тогоруу 青鹤，хар тоть 八哥, 鸲鹆，хар цондуул
+黑啄木鸟，хар нүгэл 罪孽，хар болор 黑晶，хар булга 黑貂，хар будаа 原粮，хар бүрий 傍晚，хар хамуу 疥疮, 癣，хар яриа 俗话，хар хор 恶毒＃，хар хор 嫉妒心，хар хөлс 大汗，хар хүн 世俗人，хар хүч 蛮力, 全力，хар хөрс 黑土，
+хар газар (雪化后露出的) 地皮，хар гэр 牢房，хар гөр 狠毒，хар манан 浓雾，хар мэнгэ 黑痣，хар мах 瘦肉, 精肉，хар мөөг 黑蘑菇，хар санаа 黑心肝，хар сэтгэл 黑心肝，хар шуурга 特大风暴，хар салхи (刮得天昏地暗的) 大风，хар
+самбар 黑板，хар чихэр 红糖，хар шил 墨镜，хар шүлс 酸水，хар шөл 肉汤，хар төмөрлөг 黑色金属，хар тугалга 铅，хар данс 黑名单，хар тамхи 鸦片，хар цай 红茶，хар зуд 黑灾 (冬季不下雪成灾)，хар ёр 恶兆，хар ваар 黑陶，хар
+феодал 世俗封建，хар цагаан 是非
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合形容词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хар алаг 黑花，хар алагч 黑花 (母畜色)，хар эрээн 黑纹，хар үгүй 无恶意的，хар ногоон 深绿色的，хар бага 很小，хар бараан 乌黑的，хар бор 铁青色的，хар борогч 深青 (母畜色)，хар халтар 黑粉嘴枣骝，хар халтагч 黑粉嘴枣骝 (母
+畜色)，хар хээр 黑枣骝，хар хээгч 黑枣骝 (母畜色)，хар хортой 恶毒的, 毒辣的，хар хөх 深蓝色，хар хүрэн 茶褐色，хар хүрэгч 茶褐色 (母畜色)，хар мунайд 粗鲁的，хар мугуйд 顽固的蛮横的，хар санаатай 怀有恶意的，хар дотортой
+怀有恶意的，хар саарал 黑灰色，хар саарагч 黑灰色 (母畜色)，хар цоохор 黑斑色，хар ёртой 有恶兆的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хар буух 甚为惋惜，хар болох 还俗，хар бодох 怀恶意，хар санах 怀恶意，хар дарах 魇, 梦魇，хар чийг орох 下露水
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合副词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хар албаар 强行，хар мугуйд 生硬地
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(6) халуун 是常用形容词，本义是 “热”，以 халуун 为基础，或以 халуун 为一个成分可以构成下列复合词。
+</p>
+<p>
+复合名词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+халуун амь 性命，халуун рашаан 温泉，халуун эгэх 处暑，халуун сэрэл 热觉，халуун баяр 热烈的祝贺，халуун бүс 热带，халуун булга 温泉，халуун хижиг 伤寒病，халуун томуу 伤寒病，халуун хүйтэн 温度，халуун мөр 刚留下的痕
+迹，халуун сэтгэл 热心, 热情，халуун тогоо 火锅，халуун чимээ 新消息，халуун цөм 热核子，халуун жин 热敷 (医)，халуун элэгтэн 热心肠的人（элэг 肝）
+，халуун уурын зуух 暖气炉，халуун агаарын зуух 热风炉，халуун усны
+таарцаг 热水袋，халуун дайн 热战
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合形容词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+халуун ээлтэй 热心肠的，халуун элэгсэг 热心的，халуун бүлээн 温热的，халуун хүйтэнтэй 忽冷忽热的，халуун дотно 亲热的，халуун дотносог 亲热的，халуун чанартай 热性的，халуун царайтай 顺眼的，халуунтай 热情的，
+халуунтай хүйтэнтэй 忽冷忽热的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+халуун эргэх 天气转暖，халуун харих 退热, 转凉，халуунаас зайлах 避暑，халуун буулгах 退烧 (及物)，халуун буурах 退烧 (不及物)，халуунг шингээх 吸热，халуун орох 变热, 变辣，халуун оргох 发热, 发烧，халуун болох (小孩) 得
+病，халуун хөөх 驱热，халуун буцах 退热, 转凉，халуун дарах 解热, 退烧，халуун суух (内脏) 积热，халуун санагдах 感到亲切，халуун шургах 热郁结 (医)，(халуунд даамгай 耐热的)，халуун хүйтэн хавсрах 伤风, 感冒，халуун
+хүйтэн харгах 伤风, 感冒，халуун жин барих 热敷 (医)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合副词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+халуун нягтаар 面对面地, 当着面 #，халуун дээр нь 在热头上, 趁着热劲儿，халуун зуураа 在亲人之间，
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+从上述 хар халуун 两个形容词的情况看，以它们为一个成分，可以构成复合名词、复合动词、复合形容词等。它们的词性分别由复合词的后半部的名词动词形容词来决定。
+</p>
+<p>
+(7) нэг 是基本数词 “一”，以 нэг 为基础也可以构成各种复合词。
+</p>
+<p>
+复合名词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+нэг аймаг 同种, 同类，нэг үе 同辈, 一个时期，нэг хөлөлгөө 一套犁的功夫＃，нэг сэтгэл 一条心, 专心，нэг гишүүнт 单项式 (数) ＃，нэг эшт онол 一元论 (哲学)，нэг үзэгдэл жүжиг 独幕剧，нэг сэтгэл нэг санаа 一心一意, 同心同德
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合量词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+нэг нас 一生，нэг цаг 一时，нэг удаа 一回，нэг алхам 一步，нэг хувь 一份，нэг гэр 满屋子, 一屋子，нэг зам 一路, 同路，нэг атга 一把，нэг тэвэр 一抱，нэг үмх 一口，нэг өрөг 一盘 (棋)，нэг ооч 一口，нэг уух 一服 (药)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合副词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+Нэг амиар 一口气地，нэг амьсгаагаар 一股劲儿地，нэг насандаа 一生，нэг насаараа 终生，нэг л хэвээр 一个劲儿地，нэг л хөгөөр 一个劲儿地＃，нэг л доор 一下子, 一起，нэг мөр 一致, 一列，нэг талаар 一方面，нэг дуугаар 一致地，
+нэг доор 一同, 一起，нэг зэрэг 一度, 同时，нэг янзаар 一律，нэг өдөр 有一天, 一天，нэг нэгээр 一个一个地，нэг нь нэгэндээ 互相
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+нэг мөр болох 就绪，нэг тийш болгох , нэг зүг болгох 弄出头绪, 处理，нэг жиг болох 出事, 要出事，нэг нь хоёрлагдах 一分为二，нэгээ үзэх 争高低, 吃苦头 (口)#
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+复合形容词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+нэгэн адил 同样的，нэг эштэй 一元的, 同源的，нэг л хэсэг 稀里糊涂
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+其它：нэг л үгээр хэлбэл 一句话, 总而言之，нэг бол 或者
+</p>
+<p>
+从上述数词 нэг 的情况看，在它的参与下，可以构成复合名词、复合形容词、复合动词、复合副词。它的词性分别由复合词的后半部的名词、动词、形容词决定。复合副词的后半部，或是名词的变格形式，或是一种时位词。
+</p>
+<p>
+从上述这些词的复合词派生情况，我们可以看出以下几点。
+</p>
+<p>
+1）常用词，尤其是多义的常用词，不论是名词、动词或形容词，都可以产生出许多复合词。名词、时位词、形容词、数词可以派生出复合名词、复合动词、复合形容词、复合副词，而动词主要派生动词。
+</p>
+<p>
+2) 常用的多义词在派生复合词时，在本义以外的派生意义的基础上派生的较多，在派生意义上形成的复合词由于有意义的特殊性和用法上的局限性，所以容易固定下来成为一个固定词组 (关于如何从本义产生派生意义，又如何在派
+生意义基础上形成复合词，是词汇学、词义学领域的问题，我们在这里不作专门分析)。
+</p>
+<p>
+3) 在蒙古语复合词里，在一般情况下，后边的词是中心词，复合词的词性是由后边词的词性来决定的。复合词在句子里的词形变化，也就是后边那个词的词性变化。
+</p>
+<p>
+4）复合词内部的结构关系，是一般组词法的一种运用。复合词内部的结构关系都可见之于组词法，但也不是所有的组词法都能成为构词法。这说明构词的结构关系也有一定的特点 (下边我们就要具体研究这些结构关系)。
+</p>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

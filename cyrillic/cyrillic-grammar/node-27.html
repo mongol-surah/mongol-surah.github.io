@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="author" content=" 清格尔泰" />
+<meta name="generator" content="LaTeX Lwarp package" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<title> 蒙古语语法（西里尔）—根据内部关系的分类 </title>
+<link rel="stylesheet" type="text/css" href="mongolian-book.css" />
+<script>
+// Lwarp MathJax emulation code
+//
+// Based on code by Davide P. Cervone.
+// Equation numbering: https://github.com/mathjax/MathJax/issues/2427
+// Starred and ifnextchar macros: https://github.com/mathjax/MathJax/issues/2428
+// \left, \right delimiters: https://github.com/mathjax/MathJax/issues/2535
+//
+// Modified by Brian Dunn to adjust equation numbering and add subequations.
+//
+// LaTeX can use \seteqnumber{subequations?}{section}{number} before each equation.
+// subequations? is 0 usually, 1 if inside subequations.
+// section is a string printed as-is, or empty.
+// number is auto-incremented by MathJax between equations.
+//
+MathJax = {
+subequations: "0",
+section: "",
+loader: {
+load: ['[tex]/tagformat', '[tex]/textmacros'],
+},
+startup: {
+ready() {
+//
+
+These would be replaced by import commands if you wanted to make
+
+//
+
+a proper extension.
+
+const Configuration = MathJax._.input.tex.Configuration.Configuration;
+const CommandMap = MathJax._.input.tex.SymbolMap.CommandMap;
+const Macro = MathJax._.input.tex.Symbol.Macro;
+const TexError = MathJax._.input.tex.TexError.default;
+const ParseUtil = MathJax._.input.tex.ParseUtil.default;
+const expandable = MathJax._.util.Options.expandable;
+//
+
+Insert the replacement string into the TeX string, and check
+
+//
+
+that there haven't been too many maxro substitutions (prevents
+
+//
+
+infinite loops).
+
+const useArgument = (parser, text) => {
+parser.string = ParseUtil.addArgs(parser, text, parser.string.slice(parser.i));
+parser.i = 0;
+if (++parser.macroCount > parser.configuration.options.maxMacros) {
+throw new TexError('MaxMacroSub1',
+'MathJax maximum macro substitution count exceeded; ' +
+'is there a recursive macro call?');
+}
+}
+//
+
+Create the command map for:
+
+//
+
+\ifstar, \ifnextchar, \ifblank, \ifstrequal, \gsub, \seteqnumber
+
+new CommandMap('Lwarp-macros', {
+ifstar: 'IfstarFunction',
+ifnextchar: 'IfnextcharFunction',
+ifblank: 'IfblankFunction',
+ifstrequal: 'IfstrequalFunction',
+gsubstitute: 'GsubstituteFunction',
+seteqnumber: 'SeteqnumberFunction'
+}, {
+//
+
+This function implements an ifstar macro.
+
+IfstarFunction(parser, name) {
+const resultstar = parser.GetArgument(name);
+const resultnostar = parser.GetArgument(name);
+const star = parser.GetStar();
+
+// true if there is a *
+
+useArgument(parser, star ? resultstar : resultnostar);
+},
+//
+
+This function implements an ifnextchar macro.
+
+IfnextcharFunction(parser, name) {
+let whichchar = parser.GetArgument(name);
+if (whichchar.match(/^(?:0x[0-9A-F]+|[0-9]+)$/i)) {
+// $ syntax highlighting
+whichchar = String.fromCodePoint(parseInt(whichchar));
+}
+const resultnextchar = parser.GetArgument(name);
+const resultnotnextchar = parser.GetArgument(name);
+const gotchar = (parser.GetNext() === whichchar);
+useArgument(parser, gotchar ? resultnextchar : resultnotnextchar);
+},
+// This function implements an ifblank macro.
+IfblankFunction(parser, name) {
+const blankarg = parser.GetArgument(name);
+const resultblank = parser.GetArgument(name);
+const resultnotblank = parser.GetArgument(name);
+const isblank = (blankarg.trim() == "");
+useArgument(parser, isblank ? resultblank : resultnotblank);
+},
+// This function implements an ifstrequal macro.
+IfstrequalFunction(parser, name) {
+const strequalfirst = parser.GetArgument(name);
+const strequalsecond = parser.GetArgument(name);
+const resultequal = parser.GetArgument(name);
+const resultnotequal = parser.GetArgument(name);
+const isequal = (strequalfirst == strequalsecond);
+useArgument(parser, isequal ? resultequal : resultnotequal);
+},
+// This function implements a gsub macro.
+GsubstituteFunction(parser, name) {
+const gsubfirst = parser.GetArgument(name);
+const gsubsecond = parser.GetArgument(name);
+const gsubthird = parser.GetArgument(name);
+let gsubresult=gsubfirst.replace(gsubsecond, gsubthird);
+useArgument(parser, gsubresult);
+},
+//
+
+This function modifies the equation numbers.
+
+SeteqnumberFunction(parser, name) {
+//
+
+Get the macro parameters
+
+const star = parser.GetStar();
+
+// true if there is a *
+
+const optBrackets = parser.GetBrackets(name);
+
+// contents of optional brackets
+
+const newsubequations = parser.GetArgument(name);
+const neweqsection = parser.GetArgument(name);
+
+// the subequations argument
+
+// the eq section argument
+
+const neweqnumber = parser.GetArgument(name);
+
+// the eq number argument
+
+MathJax.config.subequations=newsubequations ;
+
+// a string with boolean meaning
+
+MathJax.config.section=neweqsection ;
+
+// a string with numeric meaning
+
+parser.tags.counter = parser.tags.allCounter = neweqnumber ;
+}
+});
+//
+
+Create the Lwarp-macros package
+
+Configuration.create('Lwarp-macros', {
+handler: {macro: ['Lwarp-macros']}
+});
+MathJax.startup.defaultReady();
+// For forward references:
+MathJax.startup.input[0].preFilters.add(({math}) => {
+if (math.inputData.recompile){
+MathJax.config.subequations = math.inputData.recompile.subequations;
+MathJax.config.section = math.inputData.recompile.section;
+}
+});
+MathJax.startup.input[0].postFilters.add(({math}) => {
+if (math.inputData.recompile){
+math.inputData.recompile.subequations = MathJax.config.subequations;
+math.inputData.recompile.section = MathJax.config.section;
+}
+});
+// For \left, \right with unicode-math:
+const {DelimiterMap} = MathJax._.input.tex.SymbolMap;
+const {Symbol} = MathJax._.input.tex.Symbol;
+const {MapHandler} = MathJax._.input.tex.MapHandler;
+const delimiter = MapHandler.getMap('delimiter');
+delimiter.add('\\lBrack', new Symbol('\\lBrack', '\u27E6'));
+delimiter.add('\\rBrack', new Symbol('\\rBrack', '\u27E7'));
+delimiter.add('\\lAngle', new Symbol('\\lAngle', '\u27EA'));
+delimiter.add('\\rAngle', new Symbol('\\rAngle', '\u27EB'));
+delimiter.add('\\lbrbrak', new Symbol('\\lbrbrak', '\u2772'));
+delimiter.add('\\rbrbrak', new Symbol('\\rbrbrak', '\u2773'));
+delimiter.add('\\lbag', new Symbol('\\lbag', '\u27C5'));
+delimiter.add('\\rbag', new Symbol('\\rbag', '\u27C6'));
+delimiter.add('\\llparenthesis', new Symbol('\\llparenthesis', '\u2987'));
+delimiter.add('\\rrparenthesis', new Symbol('\\rrparenthesis', '\u2988'));
+delimiter.add('\\llangle', new Symbol('\\llangle', '\u2989'));
+delimiter.add('\\rrangle', new Symbol('\\rrangle', '\u298A'));
+delimiter.add('\\Lbrbrak', new Symbol('\\Lbrbrak', '\u27EC'));
+delimiter.add('\\Rbrbrak', new Symbol('\\Rbrbrak', '\u27ED'));
+delimiter.add('\\lBrace', new Symbol('\\lBrace', '\u2983'));
+delimiter.add('\\rBrace', new Symbol('\\rBrace', '\u2984'));
+delimiter.add('\\lParen', new Symbol('\\lParen', '\u2985'));
+delimiter.add('\\rParen', new Symbol('\\rParen', '\u2986'));
+delimiter.add('\\lbrackubar', new Symbol('\\lbrackubar', '\u298B'));
+delimiter.add('\\rbrackubar', new Symbol('\\rbrackubar', '\u298C'));
+delimiter.add('\\lbrackultick', new Symbol('\\lbrackultick', '\u298D'));
+delimiter.add('\\rbracklrtick', new Symbol('\\rbracklrtick', '\u298E'));
+delimiter.add('\\lbracklltick', new Symbol('\\lbracklltick', '\u298F'));
+delimiter.add('\\rbrackurtick', new Symbol('\\rbrackurtick', '\u2990'));
+delimiter.add('\\langledot', new Symbol('\\langledot', '\u2991'));
+delimiter.add('\\rangledot', new Symbol('\\rangledot', '\u2992'));
+delimiter.add('\\lparenless', new Symbol('\\lparenless', '\u2993'));
+delimiter.add('\\rparengtr', new Symbol('\\rparengtr', '\u2994'));
+delimiter.add('\\Lparengtr', new Symbol('\\Lparengtr', '\u2995'));
+delimiter.add('\\Rparenless', new Symbol('\\Rparenless', '\u2996'));
+delimiter.add('\\lblkbrbrak', new Symbol('\\lblkbrbrak', '\u2997'));
+delimiter.add('\\rblkbrbrak', new Symbol('\\rblkbrbrak', '\u2998'));
+delimiter.add('\\lvzigzag', new Symbol('\\lvzigzag', '\u29D8'));
+delimiter.add('\\rvzigzag', new Symbol('\\rvzigzag', '\u29D9'));
+delimiter.add('\\Lvzigzag', new Symbol('\\Lvzigzag', '\u29DA'));
+delimiter.add('\\Rvzigzag', new Symbol('\\Rvzigzag', '\u29DB'));
+delimiter.add('\\lcurvyangle', new Symbol('\\lcurvyangle', '\u29FC'));
+delimiter.add('\\rcurvyangle', new Symbol('\\rcurvyangle', '\u29FD'));
+delimiter.add('\\Vvert', new Symbol('\\Vvert', '\u2980'));
+}
+
+// ready
+
+},
+
+// startup
+
+tex: {
+packages: {'[+]': ['tagformat', 'Lwarp-macros', 'textmacros']},
+tags: "ams",
+tagformat: {
+number: function (n) {
+if(MathJax.config.subequations==0)
+return(MathJax.config.section + n);
+else
+return(MathJax.config.section + String.fromCharCode(96+n));
+},
+},
+}
+}
+</script>
+<script
+id="MathJax-script"
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+></script>
+
+</head>
+<body>
+
+<a id="cyrillic-grammar-autopage-356"></a>
+<nav class="topnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+
+<div class="bodyandsidetoc">
+
+<div class="sidetoccontainer">
+
+<nav class="sidetoc">
+
+<div class="sidetoctitle">
+<p>
+<span class="sidetocthetitle"> 蒙古语语法（西里尔）</span>
+</p>
+<p>
+目录
+</p>
+</div>
+
+<div class="sidetoccontents">
+<p>
+<a href="index.html" class="linkhome" >
+本书首页 </a>
+</p>
+<p>
+<a href="node-1.html#autosec-6" class="tocpart" >
+<span class="sectionnumber">I</span>&#x2003;语音和文字（略）</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-8" class="tocpart" >
+<span class="sectionnumber">II</span>&#x2003;词法</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-9" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;静词类</a>
+</p>
+
+<p>
+<a href="node-2.html#autosec-10" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;名词</a>
+</p>
+
+<p>
+<a href="node-3.html#autosec-41" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;形容词</a>
+</p>
+
+<p>
+<a href="node-4.html#autosec-59" class="tocsection" >
+<span class="sectionnumber">1.3</span>&#x2003;数量词</a>
+</p>
+
+<p>
+<a href="node-5.html#autosec-78" class="tocsection" >
+<span class="sectionnumber">1.4</span>&#x2003;时位词</a>
+</p>
+
+<p>
+<a href="node-6.html#autosec-90" class="tocsection" >
+<span class="sectionnumber">1.5</span>&#x2003;代词</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-109" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;动词类</a>
+</p>
+
+<p>
+<a href="node-7.html#autosec-110" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;动词类及其语法特征</a>
+</p>
+
+<p>
+<a href="node-8.html#autosec-112" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;动词词尾形态</a>
+</p>
+
+<p>
+<a href="node-9.html#autosec-135" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词词干形态</a>
+</p>
+
+<p>
+<a href="node-10.html#autosec-147" class="tocsection" >
+<span class="sectionnumber">2.4</span>&#x2003;动词的类别</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-175" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;无变化词类</a>
+</p>
+
+<p>
+<a href="node-11.html#autosec-176" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;副词</a>
+</p>
+
+<p>
+<a href="node-12.html#autosec-182" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;情态词</a>
+</p>
+
+<p>
+<a href="node-13.html#autosec-186" class="tocsection" >
+<span class="sectionnumber">3.3</span>&#x2003;摹拟词</a>
+</p>
+
+<p>
+<a href="node-14.html#autosec-189" class="tocsection" >
+<span class="sectionnumber">3.4</span>&#x2003;后置词</a>
+</p>
+
+<p>
+<a href="node-15.html#autosec-193" class="tocsection" >
+<span class="sectionnumber">3.5</span>&#x2003;语气词</a>
+</p>
+
+<p>
+<a href="node-16.html#autosec-200" class="tocsection" >
+<span class="sectionnumber">3.6</span>&#x2003;连接词</a>
+</p>
+
+<p>
+<a href="node-17.html#autosec-204" class="tocsection" >
+<span class="sectionnumber">3.7</span>&#x2003;感情词</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-208" class="tocpart" >
+<span class="sectionnumber">III</span>&#x2003;句法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-209" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;组词法</a>
+</p>
+
+<p>
+<a href="node-18.html#autosec-210" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;组词法及词组</a>
+</p>
+
+<p>
+<a href="node-19.html#autosec-225" class="tocsection" >
+<span class="sectionnumber">1.2</span>&#x2003;蒙古语词组类别</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-281" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;造句法</a>
+</p>
+
+<p>
+<a href="node-20.html#autosec-282" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;句法结构</a>
+</p>
+
+<p>
+<a href="node-21.html#autosec-309" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;句类句式</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-321" class="tocpart" >
+<span class="sectionnumber">IV</span>&#x2003;第四篇构词法</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-322" class="tocchapter" >
+<span class="sectionnumber">1</span>&#x2003;构词法概说</a>
+</p>
+
+<p>
+<a href="node-22.html#autosec-323" class="tocsection" >
+<span class="sectionnumber">1.1</span>&#x2003;构词法与构形法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-326" class="tocchapter" >
+<span class="sectionnumber">2</span>&#x2003;形态学构词法</a>
+</p>
+
+<p>
+<a href="node-23.html#autosec-327" class="tocsection" >
+<span class="sectionnumber">2.1</span>&#x2003;名词的派生</a>
+</p>
+
+<p>
+<a href="node-24.html#autosec-335" class="tocsection" >
+<span class="sectionnumber">2.2</span>&#x2003;形容词的派生</a>
+</p>
+
+<p>
+<a href="node-25.html#autosec-342" class="tocsection" >
+<span class="sectionnumber">2.3</span>&#x2003;动词的派生</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-353" class="tocchapter" >
+<span class="sectionnumber">3</span>&#x2003;句法构词法</a>
+</p>
+
+<p>
+<a href="node-26.html#autosec-354" class="tocsection" >
+<span class="sectionnumber">3.1</span>&#x2003;根据词性的分类</a>
+</p>
+
+<p>
+<a href="node-27.html#autosec-357" class="tocsection" >
+<span class="sectionnumber">3.2</span>&#x2003;根据内部关系的分类</a>
+</p>
+
+<p>
+<a href="node-28.html#autosec-366" class="tocchapter" >
+后记</a>
+</p>
+
+</div>
+</nav>
+</div>
+
+<main class="bodycontainer">
+
+<section class="textbody">
+<h1> 蒙古语语法（西里尔）</h1>
+<!--MathJax customizations:-->
+
+<div class="hidden">
+\(\newcommand{\footnotename}{footnote}\)
+\(\def \LWRfootnote {1}\)
+\(\newcommand {\footnote }[2][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\newcommand {\footnotemark }[1][\LWRfootnote ]{{}^{\mathrm {#1}}}\)
+\(\let \LWRorighspace \hspace \)
+\(\renewcommand {\hspace }{\ifstar \LWRorighspace \LWRorighspace }\)
+\(\newcommand {\mathnormal }[1]{{#1}}\)
+\(\newcommand \ensuremath [1]{#1}\)
+\(\newcommand {\LWRframebox }[2][]{\fbox {#2}} \newcommand {\framebox }[1][]{\LWRframebox } \)
+\(\newcommand {\setlength }[2]{}\)
+\(\newcommand {\addtolength }[2]{}\)
+\(\newcommand {\setcounter }[2]{}\)
+\(\newcommand {\addtocounter }[2]{}\)
+\(\newcommand {\arabic }[1]{}\)
+\(\newcommand {\number }[1]{}\)
+\(\newcommand {\noalign }[1]{\text {#1}\notag \\}\)
+\(\newcommand {\cline }[1]{}\)
+\(\newcommand {\directlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\luatexdirectlua }[1]{\text {(directlua)}}\)
+\(\newcommand {\protect }{}\)
+\(\def \LWRabsorbnumber #1 {}\)
+\(\def \LWRabsorbquotenumber &quot;#1 {}\)
+\(\newcommand {\LWRabsorboption }[1][]{}\)
+\(\newcommand {\LWRabsorbtwooptions }[1][]{\LWRabsorboption }\)
+\(\def \mathchar {\ifnextchar &quot;\LWRabsorbquotenumber \LWRabsorbnumber }\)
+\(\def \mathcode #1={\mathchar }\)
+\(\let \delcode \mathcode \)
+\(\let \delimiter \mathchar \)
+\(\def \oe {\unicode {x0153}}\)
+\(\def \OE {\unicode {x0152}}\)
+\(\def \ae {\unicode {x00E6}}\)
+\(\def \AE {\unicode {x00C6}}\)
+\(\def \aa {\unicode {x00E5}}\)
+\(\def \AA {\unicode {x00C5}}\)
+\(\def \o {\unicode {x00F8}}\)
+\(\def \O {\unicode {x00D8}}\)
+\(\def \l {\unicode {x0142}}\)
+\(\def \L {\unicode {x0141}}\)
+\(\def \ss {\unicode {x00DF}}\)
+\(\def \SS {\unicode {x1E9E}}\)
+\(\def \dag {\unicode {x2020}}\)
+\(\def \ddag {\unicode {x2021}}\)
+\(\def \P {\unicode {x00B6}}\)
+\(\def \copyright {\unicode {x00A9}}\)
+\(\def \pounds {\unicode {x00A3}}\)
+\(\let \LWRref \ref \)
+\(\renewcommand {\ref }{\ifstar \LWRref \LWRref }\)
+\( \newcommand {\multicolumn }[3]{#3}\)
+\(\require {textcomp}\)
+\(\newcommand {\tcbset }[1]{}\)
+\(\newcommand {\tcbsetforeverylayer }[1]{}\)
+\(\newcommand {\tcbox }[2][]{\boxed {\text {#2}}}\)
+\(\newcommand {\tcboxfit }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcblower }{}\)
+\(\newcommand {\tcbline }{}\)
+\(\newcommand {\tcbtitle }{}\)
+\(\newcommand {\tcbsubtitle [2][]{\mathrm {#2}}}\)
+\(\newcommand {\tcboxmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\tcbhighmath }[2][]{\boxed {#2}}\)
+\(\newcommand {\intertext }[1]{\text {#1}\notag \\}\)
+\(\let \Hat \hat \)
+\(\let \Check \check \)
+\(\let \Tilde \tilde \)
+\(\let \Acute \acute \)
+\(\let \Grave \grave \)
+\(\let \Dot \dot \)
+\(\let \Ddot \ddot \)
+\(\let \Breve \breve \)
+\(\let \Bar \bar \)
+\(\let \Vec \vec \)
+\(\newcommand {\LWRsubmultirow }[2][]{#2}\)
+\(\newcommand {\LWRmultirow }[2][]{\LWRsubmultirow }\)
+\(\newcommand {\multirow }[2][]{\LWRmultirow }\)
+\(\newcommand {\mrowcell }{}\)
+\(\newcommand {\mcolrowcell }{}\)
+\(\newcommand {\STneed }[1]{}\)
+\(\newcommand {\LWRldelimtwo }[1][]{\text {#1}~\LWRbigdelim }\)
+\(\newcommand {\LWRldelimone }[2][]{\LWRldelimtwo }\)
+\(\def \ldelim #1#2{\def \LWRbigdelim {#1}\LWRldelimone }\)
+\(\newcommand {\LWRrdelimtwo }[1][]{\LWRbigdelim ~\text {#1}}\)
+\(\newcommand {\LWRrdelimone }[2][]{\LWRrdelimtwo }\)
+\(\def \rdelim #1#2{\def \LWRbigdelim {#1}\LWRrdelimone }\)
+\(\newcommand {\toprule }[1][]{\hline }\)
+\(\let \midrule \toprule \)
+\(\let \bottomrule \toprule \)
+\(\def \LWRbooktabscmidruleparen (#1)#2{}\)
+\(\newcommand {\LWRbooktabscmidrulenoparen }[1]{}\)
+\(\newcommand {\cmidrule }[1][]{\ifnextchar (\LWRbooktabscmidruleparen \LWRbooktabscmidrulenoparen }\)
+\(\newcommand {\morecmidrules }{}\)
+\(\newcommand {\specialrule }[3]{\hline }\)
+\(\newcommand {\addlinespace }[1][]{}\)
+</div>
+<p>
+<!-...... section 根据内部关系的分类......
+-->
+<h4 id="autosec-357"><span class="sectionnumber">3.2&#x2003;</span>根据内部关系的分类</h4>
+<a id="cyrillic-grammar-autopage-357"></a>
+<a id="cyrillic-grammar-autofile-27"></a>
+<p>
+复合词的结构关系，也如同一般的词组关系那样，是由组成复合词的词类，以及用什么方式连接而决定，根据什么词类后边接加什么词类，用什么形式连接，可以看出它们的结构关系是什么。
+</p>
+<p>
+我们在下边按复合词的词类，看看它们的内部结构关系。
+</p>
+
+<!-...... subsubsection 复合名词的结构关系......
+-->
+<h6 id="autosec-358"><span class="sectionnumber">3.2.0.1&#x2003;</span>复合名词的结构关系</h6>
+<a id="cyrillic-grammar-autopage-358"></a>
+
+<p>
+(1) 并列结构复合名词：
+</p>
+<p>
+反义词或对立词并列：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+жаргалан зовлон 苦乐，орлого зарлага 收支，эх адаг 始末，арга билэг 阴阳，өдөр шөнө 日夜，өглөө үдэш 旦夕，эр эм 夫妻，эх хүү 母子，эцэг эх 父母，ах дүү 兄弟，гал ус 水火，энэ тэр 这个那个，үнэн худал 真假 (是非)，хол ойр 远
+近, 距离，халуун хүйтэн 冷热, 温度，их бага 大小, 尺寸
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+相关词并列：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хэл ам 口舌，сайшаал шагнал 奖赏，үзэл суртал 思想，эм үр 妻孩子，үр ач 子孙，эд ашиг 利益，зэрэг тушаал 职务，ор дэвсгэр 行李，ширээ сандал 桌椅，эрдэм шинжилгээ 科学研究，эрх чөлөө 自由，арга хэмжээ 措施，бие байдал
+体态，өвс бордоо 草料，эх баялаг 资源，мэдэл чадал 才能，идэш ууш 饮食 (品)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+近义词并列：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хувь заяа 命运，орон нутаг 地方，багаж зэвсэг 工具，цаг улирал 季节，мөнгө зоос 金钱，ном судар 书籍，дээл хувцас 衣服，дайн байлдаан 战争，ач тус 意义, 利益，адуу мал 牲畜，эндүү буруу 过错，өвөг дээдэс 祖先，эрэл хүсэл 要
+求，байдал төлөв 情形，эв найрамдал 和睦，дэс дараа 次序，орд харш 宫殿，ойр орчим 附近，зай завсар 间隙，ухаан санаа 意义，утга санаа 意义，уг үндэс 根由, 来源
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(2) 辅助结构复合名词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хувцас хунар 衣服，шөнө дөл 半夜，зан ааль 性格，өнцөг са нчиг 边角 #，өр шир 债务，үзүүр сэжүүр 尖尖棱棱，юм хум 东西，хүүхэд шувуу 儿童＃，сав суулга 器具，торго дурдан 绸缎，үнэр танир 气味，өвчин тахир 疾病
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(3) 定体结构复合名词：
+</p>
+<p>
+名词 + 名词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+төмөр зам 铁路，ноён шиш 玉米，гар үйлдвэр 手工业，газрын зураг 地图，мал аж ахуй 畜牧业，агаарын цэрэг 空军，намын гишүүн 党员，дотоодын дайн 内战，өвлийн туйл 冬至，нийгэм журам 社会主义，авиа зүй 语音学，
+ургамалын судлал 植物学，төрийн бодлого 政策，хүүхдийн цэцэрлэг 幼儿园，нүдний шил 眼镜，туулайн бөөр 板栗，үхрийн нүд 茶蕉子【茅藤子 (植)】
+，хурган чих (柳叶菜) 臭根菜，хонин гөрөөс 盘羊，могой гүрвэл 蛇蜥，морин
+мэлхий 青蛙，морин зөгий 马蜂
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+形容词 + 名词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+гүн ухаан 哲学，хөнгөн цагаан 铝，хүнд үүрэг 重担, 重任，их сургууль 大学，улаан мөчир 乌兰牧骑，алаг нугас 花鸭，хөх түрүү 牛虻，улаан шаралж 蒙古蒿 #，улаан чагирам 朱兰＃，бор уд 红皮柳，бор хус 紫桦，шар буурцаг 大豆，
+шар тогоруу 黄鹤，шар олс 黄麻，цагаан ногоо 白菜，цагаан баавгай 白熊，цагаан толгой 字母表，хар архи 白酒，морьт цэрэг 骑兵，түгшүүрт байдал 险情，зоригт баатар 勇士，жаргалант амьдрал 幸福生活，хол харц 远见，ойр үе 近
+代，бага нас 幼年少年
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+形动词 + 名词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ухуулах ажил 宣传工作，байлдах арга 战术，нисэх онгоц 飞机，шинжлэх ухаан 科学，чөлөөлөгдсөн орон 解放区，дарангуйлах засаг 专政，чөлөөлөх цэрэг 解放军，шийдвэрлэгч зангилгаа 决定性的环节，төрсөн хүү 亲儿子，тэжээсэн
+охин 养女，зуудаг нохой 咬人的狗，ургах мод 生长着的树，босоо дөрвөлжин 立方，хавтгай дөрвөлжин 平方，орлох дугаар 代号，орлох газар 代理处
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(4) 宾述结构的复合名词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+тоо бодлого 算术，тариа хураалт 收割 (庄稼)，цэрэг татлага 征兵，ус төрөгч (устөрөгч) 氢，хүчилтөрөгч 氧，усан ашиглалт 水利，сонин сурвалжлагч 采访人员，үсэг өрөгч 拣字工，ажил хаях 罢工，эм найруулагч 药剂师 (найрагч)，
+эм баригч 药剂师，эрүүл хамгаалал 保健卫生，эрүүл хамгаалагч 保健员，эрх баригч 掌权者，улсаа хайрлагчид 爱国人士，улсаа худалдагчид 卖国贼，агаар сорох машин 吸气筒, 抽气筒，агаар шинжигч 气象员，агаар шинжилгээ 气
+象，албан хаагч 公职人员，ашиг идэгч 食利者，аянга зайлуулагч 避雷针避雷器，эх баригч 助产士
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(5) 状述结构的复合名词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+зохион байгуулалт 组织，задлан шинжлэл 分析，бүтээн босголт 建立，үүдэн бүтээл 创立发明，үүдэн байгуулагч 创立者, 创办人，үүдэн бүтээгч 创造者, 发明者，орлон гүйцэтгэгч 代理者, 代办 <sup>1</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-359"></a>
+<p>
+<sup>1</sup>&nbsp;【үүдэх = үүсэх 起源, 起始, 产生】
+</p>
+
+</div>
+</div>
+<p>
+(6) 主述结构的复合名词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+усгүйшэл 脱水 (усгүйжих 脱水 (动)），урам үгүйдэл 精神不振 # <sup>2</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-360"></a>
+<p>
+<sup>2</sup>&nbsp;〖үгүйтэх 变穷, 贫乏, 变赤贫 (үгүйдэх 没有, 缺少, 贫乏)〗
+</p>
+
+</div>
+</div>
+
+<!-...... subsubsection 复合形容词的结构关系......
+-->
+<h6 id="autosec-361"><span class="sectionnumber">3.2.0.2&#x2003;</span>复合形容词的结构关系</h6>
+<a id="cyrillic-grammar-autopage-361"></a>
+
+<p>
+(1) 并列结构复合形容词：
+</p>
+<p>
+反义词并列：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+илүү дутуу 多少，хөндлөн гулд 横竖, 凌乱，улаан ногоон 红的绿的，хэрэгтэй хэрэггүй 有用无用，муу сайн 不好的, 无用
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+相关词并列：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хар улаан 黑红的，бор улаан 紫红的，харанхуй ногоон 暗绿的，шарангуй ногоон 黄绿的，хөх цэнхэр 蔚蓝的，хар хүрэн 栗棕色的，хөгшин зэмдэг 老弱，ядуу хоосон 一穷二白，сайн сайхан 美好，эрхэм хүнд 贵重，зөөлөн буурай 软
+弱，бачим чухал 紧要
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+近义词并列：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+эв найртай 和睦的，эе эвтэй 和气的，үзүүр хязгааргүй 无边无际的，алс хол 遥远，алгуур аажим 缓慢，сэцэн сэргэлэн 聪明，гуа үзэсгэлэнт 美丽，эргүүл тойруу 迂回 #，тархай бутархай 散乱的, 零散的，зусар зальхай 狡诈，агуу их 伟
+大，дутуу доргон 残缺，уужуу тавиу 宽敞 (уудам тавиу 宽阔的)，үни удаан 永久，нарийн тодорхой 详细，бат бөх 坚固，эрүүл чийрэг 健康
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(2) 辅助结构复合形容词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+зэвүүн 可憎的, 可怕的，ором торомгүй 紊乱的，муруй сарий 弯弯曲曲的，элбэг дэлбэг 丰富，бага сага 少许，нам гүм 寂静, 恬静
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(3) 定体结构复合形容词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+цоо (шив) шинэ 崭新，үдтэр түргэн 赶快，гал улаан 火红，дүн цагаан 洁白，цас цагаан 雪白，төмөр хөх 铁青的，номин хөх 碧青的，гүйлсэн шар 杏黄的
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(4) 主述结构复合形容词：
+</p>
+<p>
+名词 + 形容词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хөл хүнд 怀孕的，хөл хөнгөн 腿勤的，санаа амар 安心的，ам сул 嘴松的，эв муутай 不和睦的，үзэмж сайтай 景色好的, 好看的，чих хатуу 耳背, 听觉迟钝的，чих зөөлөн 耳软的 (好信人言)，гар хатуу 手硬的 (容易弄坏东西)，гар
+зөөлөн 手软的，нүд дүүрэн 满眼的，эх адаггүй 杂乱无章的，эх захгүй 没有次序的
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 复合动词的结构关系......
+-->
+<h6 id="autosec-362"><span class="sectionnumber">3.2.0.3&#x2003;</span>复合动词的结构关系</h6>
+<a id="cyrillic-grammar-autopage-362"></a>
+
+<p>
+(1) 并列结构复合动词：
+</p>
+<p>
+反义词并列：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ирэх очих (ирж очих) 来回，орох гарах (орж гарах) 出入，мөхөх мандах 盛衰，бүтэх эвдрэх 成败，орж эгэх 进退，өгөх авах 授受，олох алдах 得失，дийлж дийлэгдэх 胜败，үхэж эдгэх 存亡<sup>3</sup>
+</p>
+</li>
+</ul>
+</div>
+
+<div role="note" class="footnotes">
+<a id="cyrillic-grammar-autopage-363"></a>
+<p>
+<sup>3</sup>&nbsp;(эдгэрэх=эдгэх 痊癒复元康复复苏愈合)
+</p>
+
+</div>
+</div>
+<p>
+相关词并列：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+үхэж унах 死亡，хөдөлж барих 动作，өмсөж зүүх 穿戴，идэж уух 吃喝，сурч судлах 学习研究，хонож дэвтэх 住宿，явж суух 住行，алдаж асгах 掉落，алдаж орхих 丢失
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+近义词并列：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+аашлаж дөрлөх 作为＃，бодож санах 思索，магтаж сайшаах 奖励，үзэж ширтэх 凝视，хайрлаж харамлах 爱护，хатгаж оёх 刺绣，унаж тусах 跌倒，айж эмээх 害怕，зарж хэрэглэх 使用，мөхөж сөнөх 衰亡
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(2）宾述结构复合动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хүйс тэмтрэх 斩尽杀绝，үйлээ үзэх 受罪，элээ барих 欺侮，шар хусах 烧心，яс барих 整骨, 埋葬，нүүр өгөх 留面子, 给脸，нүүр олох 讨好, 得脸，нүүр гээх 丢脸，зам хөөх 赶路，үг дагах 听话，хундага өргөх 举杯，амар эрэх 请安，үг
+булаалдах 争吵，ам алдах 失言，ёс алдах 失礼，сүүрс алдах 叹息，найр тавих 谦让，зүрх алдах 失魂, 胆怯，сэтгэл тавих 注意，гал хийх 烧火，амь зуух 过日子，өвчин олох 得病，уур гаргах 出气，ааш үзүүлэх 耍态度，тарга авах 抓
+膘，сэжиг авах 起疑心，зураг авах 照相，үг идүүлэх 用话刺人，амыг нь асуух 质问, 诘问，түүшийг нь алгадах 打耳光，(авах)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(3）主述结构复合动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хар дарах 梦魇，өр өвдөх 可怜, 同情，нүд улаан 眼红，сүнс гарах 失魂落魄，ноён суух 坐官，толгой эргэх 头昏，элээ эмтрэх 心酸，элээ өвдөх 心疼，өвчин тусах 得病 (тусах 打中击中)，өвчин хүрэх 生病，нойр хүрэх 睏，уур хүрэх 生
+气，царай хувилах 变脸，амь орох 复活，дур гутах 嫌弃, 恶心，зориг мэдэх 任意，зориг мохох 灰心丧气，нүд орох 复明，гар хөдлөх 动手，гэгээ тасрах 黄昏，мөр зэрэгцэх 并肩，гар чичрэх 手颤抖，гэдэс өвдөх 肚子疼，зүрх догдлох
+心跳，нус гоожих 流鼻涕，цэр гарах 出痰，зүрх үхэх 死心，орой болох 到晚上，үд болох 到中午
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(4) 状述结构复合动词：
+</p>
+<p>
+静词 + 动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хөнгөнд үзэх 轻视, 看轻，ажлаар гарах 出差，гэрээс гарах 出家，сард суух 坐月子，ураг унагаах 流产，дотор мушгих 心口绞痛
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+副词 + 动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+хага цохих 打破，бут цохих 打烂，суга татах 猛力抽出，мулт татах 猛力拔出
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+动词 + 动词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+задлан шинжлэх 分析，зохион байгуулах 组织，хянан байцаах 审查，нягтлан бодох 仔细计算, 会计，бүтээн байгуулах 建设，бүтээн босгох 建立，үүдэн бүтээх 创造，босч явах 逃走，буулгаж авах 娶，буулгаж өгөх 嫁，орж өгөх 投降，
+оруулж авах 受降，довтлон орох 侵入，шургалан орох 钻入
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<!-...... subsubsection 复合副词的结构关系......
+-->
+<h6 id="autosec-364"><span class="sectionnumber">3.2.0.4&#x2003;</span>复合副词的结构关系</h6>
+<a id="cyrillic-grammar-autopage-364"></a>
+
+<p>
+(1) 并列结构复合副词 (反义词、近义词并列)：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+урьд хожид 先后，өөд уруу 往上往下，мэндүү зөндөө 好容易＃，дураараа таваараа 随便，энд тэндгүй 到处，байн байн 再三，байн дахин 再三，энэлэн шаналан 悲伤, 呻吟＃,(энэлэл шаналал 悲痛悲哀)
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(2) 辅助结构副词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+арай царай 勉勉强强，санд мэнд 匆匆忙忙，хааш яаш 潦潦草草，дөнгөж дангаж 勉勉强强
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(3）定体结构副词：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+цаг зуур 暂时，агшин зуур 瞬间，ас дээшээ 直上，ас дунд 正中，энэхэн зуур 即刻，энэ зуур 这当儿，энэ хир 这时候
+</p>
+</li>
+</ul>
+</div>
+</div>
+<p>
+（4）其它：
+</p>
+
+<div
+class="tcolorbox"
+style=" border: 1px solid #404040; background: #F2F2F2; "
+>
+
+<div
+class="tcolorboxupper"
+style=" color: #000000; "
+>
+<ul style="list-style-type:none">
+
+<li>
+<p>
+ор доороо 立刻，шөнө дуусан 整夜，үе улиран 世世代代 (祖祖辈辈)
+</p>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+</div>
+<footer>
+<p>
+翻译：巴·达赖；网页制作：<a href="mailto:yabuhu@proton.me" target="_blank" >yabuhu@proton.me</a> 如发现错误请联系邮箱
+</p>
+</footer>
+
+<nav class="botnavigation"><a href="index.html" class="linkhome" >
+本书首页 </a></nav>
+</body>
+</html>
+

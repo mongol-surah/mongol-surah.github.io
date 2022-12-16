@@ -55,6 +55,17 @@
   border-image: url(/files/web-resources/uul3.svg) 25% round;
 }
 
+ruby {
+  ruby-align: center;
+  white-space: pre;
+  ruby-position: over;
+}
+
+ruby rt{
+  text-align: center;
+}
+
+
 audio {
 	display: block;
 	margin-bottom: 20px;
@@ -89,11 +100,27 @@ hr {
 }
 
 h2 {
-	padding: 0px;
+	padding: 2px;
 	border-style: outset;
 	border-width: 3px;
 	border-color: rgb(238,238,238);
-	background-image: linear-gradient(to bottom, #f8f8ff, #c0c0c6);
+	#background-image: linear-gradient(to bottom, #f8f8ff, #c0c0c6);
+}
+
+
+
+h2~h3:not(:first-of-type) {
+    margin-top: 40px;
+}
+
+h3 {
+	display:inline-block;
+	text-align:center;
+	padding: 3px;
+	border-style: outset;
+	border-width: 3px;
+	border-color: rgb(238,238,238);
+	background-color:#c0c0f1;
 }
 
 footer {
