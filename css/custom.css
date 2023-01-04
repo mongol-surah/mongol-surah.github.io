@@ -115,6 +115,7 @@ h2~h3:not(:first-of-type) {
 
 h3 {
 	display:inline-block;
+	font-weight: 600;
 	text-align:center;
 	padding: 3px;
 	border-style: outset;
