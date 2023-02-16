@@ -124,6 +124,25 @@ h3 {
 	background-color:#c0c0f1;
 }
 
+table.tabled-list thead {
+	display: none;
+}
+table.tabled-list td{
+	padding-top: 0;
+	padding-bottom: 0;
+}
+table.tabled-list tr{
+	background: none;
+}
+table.tabled-list tr td:first-child {
+	display: list-item;
+	list-style-position: inside;
+}
+table.tabled-list {
+	border: none;
+	margin-right:auto;margin-left:0px
+}
+
 footer {
     font-size: .85em ;
     line-height: 1.2 ;
