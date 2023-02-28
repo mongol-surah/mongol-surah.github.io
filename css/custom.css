@@ -124,21 +124,24 @@ h3 {
 	background-color:#c0c0f1;
 }
 
-table.tabled-list thead {
+.tabled-list thead, .tabled-list-no-marker thead {
 	display: none;
 }
-table.tabled-list td{
+.tabled-list td, .tabled-list-no-marker td{
 	padding-top: 0;
 	padding-bottom: 0;
 }
-table.tabled-list tr{
+.tabled-list tr, .tabled-list-no-marker tr{
 	background: none;
 }
-table.tabled-list tr td:first-child {
+.tabled-list tr td:first-child {
 	display: list-item;
 	list-style-position: inside;
 }
-table.tabled-list {
+.tabled-list-no-marker tr td:first-of-type {
+	padding-left:0;
+}
+.tabled-list, .tabled-list-no-marker {
 	border: none;
 	margin-right:auto;margin-left:0px
 }
