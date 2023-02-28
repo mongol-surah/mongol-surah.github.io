@@ -5,6 +5,25 @@
     <link>http://mongol-surah.github.io/categories/</link>
     <description>Recent content in Categories on </description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language><atom:link href="http://mongol-surah.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 27 Feb 2023 10:07:40 +0000</lastBuildDate><atom:link href="http://mongol-surah.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>语法</title>
+      <link>http://mongol-surah.github.io/categories/%E8%AF%AD%E6%B3%95/</link>
+      <pubDate>Mon, 27 Feb 2023 10:07:40 +0000</pubDate>
+      
+      <guid>http://mongol-surah.github.io/categories/%E8%AF%AD%E6%B3%95/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>阅读材料</title>
+      <link>http://mongol-surah.github.io/categories/%E9%98%85%E8%AF%BB%E6%9D%90%E6%96%99/</link>
+      <pubDate>Sat, 25 Feb 2023 10:07:40 +0000</pubDate>
+      
+      <guid>http://mongol-surah.github.io/categories/%E9%98%85%E8%AF%BB%E6%9D%90%E6%96%99/</guid>
+      <description></description>
+    </item>
+    
   </channel>
 </rss>
