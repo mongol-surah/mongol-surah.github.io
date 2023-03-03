@@ -154,8 +154,11 @@ html body {
 	padding-left:0;
 }
 .tabled-list, .tabled-list-no-marker {
-	border: none;
-	margin-right:auto;margin-left:0px
+	border: none ;
+	margin-right: auto;
+	margin-left: 0px;
+	margin-top: 0.3em;
+	margin-bottom: 1em;
 }
 
 footer {
