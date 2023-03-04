@@ -101,6 +101,24 @@ ul li {
   border-image: url(/files/web-resources/uul3.svg) 25% round;
 }
 
+span.h-mongol-text {
+	font-family: 'Mongolian Title';
+	line-height: 200em;
+	writing-mode: lr;
+	
+}
+
+span.mongol-word {
+	-moz-writing-mode: vertical-lr;
+	writing-mode: vertical-lr;
+	-webkit-writing-mode: vertical-lr;
+	-o-writing-mode: vertical-lr;
+	-ms-writing-mode: tb-lr;
+	writing-mode: tb-lr;
+	vertical-align: middle;
+	-webkit-text-orientation: sideways-right;
+}
+
 ruby {
   white-space: normal;
   ruby-position: over;
