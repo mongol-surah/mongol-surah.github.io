@@ -1,3 +1,5 @@
+@import "ios-toggle.css";
+
 @font-face {
   font-family: 'Menk-Hawang-Tig';
   src: url('/files/web-resources/MHW8103.ttf')
@@ -27,6 +29,7 @@
   font-family:'Menksoft2012';
   src: url('/files/web-resources/Menksoft2012.woff') format('woff');
 }
+
 
 body {
 	font-family: Songti SC, STZhongsong, Minion Pro, Palatino, Palatino Linotype, Garamond, Ubuntu, AR PL UMing HK, Open Sans, serif;
@@ -99,15 +102,16 @@ ul li {
 }
 
 ruby {
-  ruby-align: center;
-  white-space: pre;
+  white-space: normal;
   ruby-position: over;
+  line-height: 2.5;
 }
 
 ruby rt{
   text-align: center;
+  margin-top: 0ex;
+  line-height: 1;
 }
-
 
 audio {
 	display: block;
@@ -161,6 +165,9 @@ html body {
 	margin-bottom: 1em;
 }
 
+.footnotes {
+	margin-top: 20ex;
+}
 footer {
     font-size: .85em ;
     line-height: 1.2 ;
@@ -170,3 +177,6 @@ footer {
     clear: both ;
     text-align: center ;
 }
+
+
+
