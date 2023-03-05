@@ -54,14 +54,18 @@
     
 	
     <input type="checkbox" id="toggly" Checked>
-    <label for="toggly" onclick="toggleRuby()" onload="getRubyLineHeight()"><i></i></label>
+    <label for="toggly" onclick="toggleRuby()"><i></i></label>
 	<span>←注释开关</span>
 </div>
 
 <script>
+var lineHeight;
 function getRubyLineHeight() {
- var lineHeight = document.querySelector(".ruby-word").style["line-height"];
+  lineHeight = document.querySelector(".ruby-word").style["line-height"];
 }
+
+window.onload = getRubyLineHeight;
+
 function toggleRuby() {
  let displayProp = "block";
  if(CSS.supports("display: ruby-text")) {
@@ -77,7 +81,7 @@ function toggleRuby() {
 		rt = rbWords[i].querySelector("rt");
 	  if (rt.style.display === "none") {
 		rt.style.display = displayProp;
-		ruby.style["line-height"] = 2.5;
+		ruby.style["line-height"] = lineHeight;
 	  } 
 	  else {
 		rt.style.display = "none";
@@ -86,7 +90,7 @@ function toggleRuby() {
   }
 }
 </script>
-<p><ruby class='ruby-word'><rb>Даваа</rb><rt>星期一[藏语]</rt></ruby> <ruby class='ruby-word'><rb>мягмар</rb><rt>星期二[藏语]</rt></ruby>, <ruby class='ruby-word'><rb>лхагва</rb><rt>星期三[藏语]</rt></ruby>, <ruby class='ruby-word'><rb>пүлэв</rb><rt>星期四[藏语]</rt></ruby>, <ruby class='ruby-word'><rb>баасан</rb><rt>星期五[藏语]</rt></ruby> <ruby class='ruby-word'><rb>таван</rb><rt>五个</rt></ruby> <ruby class='ruby-word'><rb>өдөр</rb><rt>天</rt></ruby> <ruby class='ruby-word'><rb>бүр</rb><rt>每个</rt></ruby> <ruby class='ruby-word'><rb>сургуульд</rb><rt>学校сургууль[给在]</rt></ruby> <ruby class='ruby-word'><rb>явна</rb><rt>走явах[现将]</rt></ruby>. <ruby class='ruby-word'><rb>Гэвч</rb><rt>гэх&#43;вч但是</rt></ruby> <ruby class='ruby-word'><rb>бямба</rb><rt>星期六[藏语]</rt></ruby> <ruby class='ruby-word'><rb>болоод</rb><rt>还有</rt></ruby> <ruby class='ruby-word'><rb>ням</rb><rt>星期日[藏语]</rt></ruby> <ruby class='ruby-word'><rb>хоёр</rb><rt></rt></ruby> <ruby class='ruby-word'><rb>өдөр</rb><rt></rt></ruby> <ruby class='ruby-word'><rb>бол</rb><rt>至于[提示主语]</rt></ruby> бид нар гэртээ <ruby class='ruby-word'><rb>наадах</rb><rt>玩耍</rt></ruby> <ruby class='ruby-word'><rb>буюу</rb><rt>或者</rt></ruby> <ruby class='ruby-word'><rb>нөхрийнхөө</rb><rt>нөхөр&#43;ийн&#43;өө我们朋友的</rt></ruby> гэрт <ruby class='ruby-word'><rb>айлчилна</rb><rt>做客айлчил[现将]</rt></ruby>.</p>
+<p><ruby class='ruby-word'><rb>Даваа</rb><rt><span>星期一[藏语]</span></rt></ruby> <ruby class='ruby-word'><rb>мягмар</rb><rt><span>星期二[藏语]</span></rt></ruby>, <ruby class='ruby-word'><rb>лхагва</rb><rt><span>星期三[藏语]</span></rt></ruby>, <ruby class='ruby-word'><rb>пүлэв</rb><rt><span>星期四[藏语]</span></rt></ruby>, <ruby class='ruby-word'><rb>баасан</rb><rt><span>星期五[藏语]</span></rt></ruby> <ruby class='ruby-word'><rb>таван</rb><rt><span>五个</span></rt></ruby> <ruby class='ruby-word'><rb>өдөр</rb><rt><span>天</span></rt></ruby> <ruby class='ruby-word'><rb>бүр</rb><rt><span>每个</span></rt></ruby> <ruby class='ruby-word'><rb>сургуульд</rb><rt><span>学校сургууль[给在]</span></rt></ruby> <ruby class='ruby-word'><rb>явна</rb><rt><span>走явах[现将]</span></rt></ruby>. <ruby class='ruby-word'><rb>Гэвч</rb><rt><span>гэх&#43;вч但是</span></rt></ruby> <ruby class='ruby-word'><rb>бямба</rb><rt><span>星期六[藏语]</span></rt></ruby> <ruby class='ruby-word'><rb>болоод</rb><rt><span>还有</span></rt></ruby> <ruby class='ruby-word'><rb>ням</rb><rt><span>星期日[藏语]</span></rt></ruby> <ruby class='ruby-word'><rb>хоёр</rb><rt></rt></ruby> <ruby class='ruby-word'><rb>өдөр</rb><rt></rt></ruby> <ruby class='ruby-word'><rb>бол</rb><rt><span>至于[提示主语]</span></rt></ruby> бид нар гэртээ <ruby class='ruby-word'><rb>наадах</rb><rt><span>玩耍</span></rt></ruby> <ruby class='ruby-word'><rb>буюу</rb><rt><span>或者</span></rt></ruby> <ruby class='ruby-word'><rb>нөхрийнхөө</rb><rt><span>нөхөр&#43;ийн&#43;өө我们朋友的</span></rt></ruby> гэрт <ruby class='ruby-word'><rb>айлчилна</rb><rt><span>做客айлчил[现将]</span></rt></ruby>.</p>
 <p>Нэг хаврын сайхан өдөр, би дүүтэйгээ хамг Доржийн гэрт хүрэн гэж, миний хамаг дуртай морио эмээллэв. Миний дүү, тэр бас түүний дуртай нэг номхон морио эмээллээд, Доржийн зүг явав.</p>
 <p>Хагас цагийн хойно, бид Доржийн гэрт хүрлээ. Нөхөр Дорж үүдэндээ зогсож биднийг хүлээж байжээ. Учир нь өцөгдөр сургууль тарахаас өмнө, бид бямбад түүний гэрт хүрээд, тэр нямд манай гэрт ирнэ гэж болзсон юм.</p>
 <p>Дорж: &ldquo;Заа, ирсэн чинь сайн болжээ. Би та нарыг ириэ гэж аав ээжид хэлсэн. Тэд та нарыг хүлээж байна.&rdquo; гэнэ. Бид морио уяад, тэдний гэрт ороод, Доржийн аав ээжид нь золгоод: &ldquo;Та сайн байна уу?&rdquo; гэж мэндэлсэнд, Доржийн аав ээж: &ldquo;Хүүхэд маань сайн ирэв үү?&rdquo; гэв. Бид: &ldquo;Заа, сайн ирлээ&rdquo; гэж хэдэн үг хэлээд, би Доржид: Чиний таслаганд явах уу?&quot; гэж асуухлаар, Дорж: &ldquo;Заа явъя&rdquo; гэж хэлэв.</p>

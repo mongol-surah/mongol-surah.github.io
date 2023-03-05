@@ -2,37 +2,40 @@
 
 @font-face {
   font-family: 'Menk-Hawang-Tig';
-  src: url('/files/web-resources/MHW8103.ttf')
+  src: url('/web-resources/MHW8103.ttf')
 }
 
 @font-face {
   font-family: 'Menk-Qimed-Tig';
-  src: url('/files/web-resources/Menk-Qimed-Tig-MQD8101.ttf')
+  src: url('/web-resources/Menk-Qimed-Tig-MQD8101.ttf')
 }
 
 @font-face {
   font-family: 'Menk-QingMing-Tig';
-  src: url('/files/web-resources/Menk-QingMing-Tig-MQI8101.ttf')
+  src: url('/web-resources/Menk-QingMing-Tig-MQI8101.ttf')
 }
 
 @font-face {
   font-family: 'Menk-Lhundb-Tig';
-  src: url('/files/web-resources/MenkLhundbTig.ttf')
+  src: url('/web-resources/MenkLhundbTig.ttf')
 }
 
 @font-face {
   font-family: 'MongBaiti';
-  src: url('/files/web-resources/monbaiti.ttf')
+  src: url('/web-resources/monbaiti.ttf')
 }
 
 @font-face {
   font-family:'Menksoft2012';
-  src: url('/files/web-resources/Menksoft2012.woff') format('woff');
+  src: url('/web-resources/Menksoft2012.woff') format('woff');
 }
 
-
+:root {
+	--general-font: Songti SC, STZhongsong, Minion Pro, Palatino, Palatino Linotype, Garamond, Ubuntu, AR PL UMing HK, Open Sans, serif, MongBaiti;
+	--mon-general-font: Menk-Hawang-Tig, Songti SC, STZhongsong, Minion Pro, Palatino, Palatino Linotype, Garamond, Ubuntu, AR PL UMing HK, Open Sans, serif;
+}
 body {
-	font-family: Songti SC, STZhongsong, Minion Pro, Palatino, Palatino Linotype, Garamond, Ubuntu, AR PL UMing HK, Open Sans, serif;
+	font-family: var(--general-font);
 }
 
 hr {
@@ -76,16 +79,16 @@ ul li {
 
 .mongol-text {
   margin: 10px;
+  max-height: min(95ex,70vh);
   writing-mode: vertical-lr;
   text-orientation: sideways;
   line-height: 140%;
-  font-family: Menk-Hawang-Tig;
+  font-family: var(--mon-general-font);
   font-size: 120%;
   padding: 0px;
 }
 
 .mongol-box {
-  
   box-sizing: content-box;
   background-color: #E6F2FF;
   margin: 0px;
@@ -98,7 +101,7 @@ ul li {
   margin-bottom: 10px;
   box-sizing: border-box;
   border: 10px solid transparent;
-  border-image: url(/files/web-resources/uul3.svg) 25% round;
+  border-image: url(/web-resources/uul3.svg) 25% round;
 }
 
 span.h-mongol-text {
@@ -129,6 +132,24 @@ ruby rt{
   text-align: center;
   margin-top: 0ex;
   line-height: 1;
+}
+
+.mongol-text ruby {
+	line-height: 2;
+}
+.mongol-text ruby>rb {
+	line-height: 1;
+	/* text-decoration-thickness: 0.0008em; */
+	/* text-decoration-line: overline; */
+}
+.mongol-text ruby>rt {
+	font-size: 45%;
+	font-family: var(--general-font);
+	text-orientation: mixed;
+	-webkit-transform: translateX(0.25em);
+}
+.mongol-text ruby>rt>span:nth-of-type(2){
+	letter-spacing: -.35ex;
 }
 
 audio {
