@@ -82,6 +82,8 @@ ul li {
   max-height: min(95ex,70vh);
   writing-mode: vertical-lr;
   text-orientation: sideways;
+  text-align: justify;
+  text-justify: inter-word;
   line-height: 140%;
   font-family: var(--mon-general-font);
   font-size: 120%;
@@ -139,7 +141,7 @@ ruby rt{
 }
 .mongol-text ruby>rb {
 	line-height: 1;
-	/* text-decoration-thickness: 0.0008em; */
+	/* text-decoration-thickness: 0.02em; */
 	/* text-decoration-line: overline; */
 }
 .mongol-text ruby>rt {
@@ -149,7 +151,7 @@ ruby rt{
 	-webkit-transform: translateX(0.25em);
 }
 .mongol-text ruby>rt>span:nth-of-type(2){
-	letter-spacing: -.35ex;
+	letter-spacing: -.3ex;
 }
 
 audio {
