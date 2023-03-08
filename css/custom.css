@@ -1,6 +1,11 @@
 @import "ios-toggle.css";
 
 @font-face {
+  font-family: 'Menk Ujug';
+  src: url('/web-resources/MWJ-Ujug-8102.ttf')
+}
+
+@font-face {
   font-family: 'Menk-Hawang-Tig';
   src: url('/web-resources/MHW8103.ttf')
 }
@@ -32,25 +37,40 @@
 
 :root {
 	--general-font: Songti SC, STZhongsong, Minion Pro, Palatino, Palatino Linotype, Garamond, Ubuntu, AR PL UMing HK, Open Sans, serif, MongBaiti;
-	--mon-general-font: Menk-Hawang-Tig, Songti SC, STZhongsong, Minion Pro, Palatino, Palatino Linotype, Garamond, Ubuntu, AR PL UMing HK, Open Sans, serif;
+	--mon-general-font: Menk Ujug, MongBaiti, Menk-Qimed-Tig, Menk-QingMing-Tig, Menk-Hawang-Tig, Songti SC, STZhongsong, Minion Pro, Palatino, Palatino Linotype, Garamond, Ubuntu, AR PL UMing HK, Open Sans, serif;
 }
 body {
 	font-family: var(--general-font);
 }
-
+nav {
+	margin-bottom: 2em;
+}
 hr {
-	background-color: silver;
-	height: 1px;
+	border-style: dashed;
+	background-color: #888888;
+	height: 0.0000001ex;
+	opacity: 0.4; 
 	/* color: #304070; */
 }
 
 h2 {
-	padding-top: 2px;
-	padding-bottom: 2px;
-	border-style: outset;
-	border-width: 3px;
-	border-color: rgb(238,238,238);
-	#background-image: linear-gradient(to bottom, #f8f8ff, #c0c0c6);
+	width: inherit;
+	/* padding-top: 2px; */
+	/* padding-bottom: 2px; */
+	/* border-style: outset; */
+	/* border-width: 3px; */
+	/* border-color: rgb(238,238,238); */
+	/* #background-image: linear-gradient(to bottom, #f8f8ff, #c0c0c6); */
+	font-family: var(--general-font);
+	background: none;
+	margin-top: 5em;
+	margin-bottom: 1.4em;
+	padding: 5px 0 5px 5px;
+	border-left: 10px solid #888888;
+	/* border-right: 10px solid #888888; */
+	border-bottom: 1px solid #888888;
+	/* border-top: 1px solid #888888; */
+	text-align: left;
 }
 
 
@@ -71,7 +91,7 @@ h3 {
 }
 
 ul {
-	padding-left: 5px;
+	padding-left: 0.4em;
 }
 ul li {
 	list-style-position: inside;
@@ -168,8 +188,8 @@ html body {
 .menu a {
 	background: #FAF7F4;
 	border-style: outset;
+	border-radius: 0.4em;
 	border-color: rgb(238,238,238);
-	
 }
 
 .title { 
