@@ -2,37 +2,37 @@
 
 @font-face {
   font-family: 'Menk Ujug';
-  src: url('/web-resources/MWJ-Ujug-8102.ttf')
+  src: url('/resources/MWJ-Ujug-8102.ttf')
 }
 
 @font-face {
   font-family: 'Menk-Hawang-Tig';
-  src: url('/web-resources/MHW8103.ttf')
+  src: url('/resources/MHW8103.ttf')
 }
 
 @font-face {
   font-family: 'Menk-Qimed-Tig';
-  src: url('/web-resources/Menk-Qimed-Tig-MQD8101.ttf')
+  src: url('/resources/Menk-Qimed-Tig-MQD8101.ttf')
 }
 
 @font-face {
   font-family: 'Menk-QingMing-Tig';
-  src: url('/web-resources/Menk-QingMing-Tig-MQI8101.ttf')
+  src: url('/resources/Menk-QingMing-Tig-MQI8101.ttf')
 }
 
 @font-face {
   font-family: 'Menk-Lhundb-Tig';
-  src: url('/web-resources/MenkLhundbTig.ttf')
+  src: url('/resources/MenkLhundbTig.ttf')
 }
 
 @font-face {
   font-family: 'MongBaiti';
-  src: url('/web-resources/monbaiti.ttf')
+  src: url('/resources/monbaiti.ttf')
 }
 
 @font-face {
   font-family:'Menksoft2012';
-  src: url('/web-resources/Menksoft2012.woff') format('woff');
+  src: url('/resources/Menksoft2012.woff') format('woff');
 }
 
 :root {
@@ -123,7 +123,7 @@ ul li {
   margin-bottom: 10px;
   box-sizing: border-box;
   border: 10px solid transparent;
-  border-image: url(/web-resources/uul3.svg) 25% round;
+  border-image: url(/resources/uul3.svg) 25% round;
 }
 
 span.h-mongol-text {
@@ -148,6 +148,7 @@ ruby {
   white-space: normal;
   ruby-position: over;
   line-height: 2.5;
+  box-sizing: border-box;
 }
 
 ruby rt{
@@ -155,7 +156,12 @@ ruby rt{
   margin-top: 0ex;
   line-height: 1;
 }
-
+.ruby-box {
+	box-sizing:border-box;
+	margin:0;
+	padding:0; 
+	display:inline-block;
+}
 .mongol-text ruby {
 	line-height: 2;
 }
@@ -217,6 +223,9 @@ html body {
 }
 .tabled-list-no-marker tr td:first-of-type {
 	padding-left:0;
+}
+.tabled-list-no-marker tr th:nth-of-type(odd) {
+	
 }
 .tabled-list, .tabled-list-no-marker {
 	border: none ;
