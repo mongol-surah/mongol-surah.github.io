@@ -2,13 +2,14 @@
 
 label {
     display: inline-block;
-    width: 5.4ex;
-    height: 3.2ex;
+    width: 2.6em;
+    height: 1.2em;
     margin: .0ex;
     border-radius: 10.0ex;
     transition: all 0.2s ease-in-out;
     -webkit-transition: all 0.2s ease-in-out;
     background-color: #E6E9EC;
+    vertical-align: middle;
 }
 
 input {
@@ -19,13 +20,13 @@ input {
 /* The toggle */
 
 i {
-    height: 2.8ex;
-    width: 2.8ex;
+    height: 1.0em;
+    width: 1.0em;
     background: #ffffff;
     display: inline-block;
     border-radius: 10.0ex;
-    margin-top: .2ex;
-    margin-left: .2ex;
+    margin-top: .1em;
+    margin-left: .1em;
     transition: all 0.2s ease-in-out;
     /* -webkit-transition: all 0.2s ease-in-out; */
     /* pointer-events: none; */
@@ -38,7 +39,7 @@ label:hover>i {
 }
 
 input:checked+label>i {
-    margin-left: 2.4ex;
+    margin-left: 1.5em;
 }
 
 label:active {

@@ -1,44 +1,11 @@
 @import "ios-toggle.css";
-
-@font-face {
-  font-family: 'Menk Ujug';
-  src: url('/resources/MWJ-Ujug-8102.ttf')
-}
-
-@font-face {
-  font-family: 'Menk-Hawang-Tig';
-  src: url('/resources/MHW8103.ttf')
-}
-
-@font-face {
-  font-family: 'Menk-Qimed-Tig';
-  src: url('/resources/Menk-Qimed-Tig-MQD8101.ttf')
-}
-
-@font-face {
-  font-family: 'Menk-QingMing-Tig';
-  src: url('/resources/Menk-QingMing-Tig-MQI8101.ttf')
-}
-
-@font-face {
-  font-family: 'Menk-Lhundb-Tig';
-  src: url('/resources/MenkLhundbTig.ttf')
-}
-
-@font-face {
-  font-family: 'MongBaiti';
-  src: url('/resources/monbaiti.ttf')
-}
-
-@font-face {
-  font-family:'Menksoft2012';
-  src: url('/resources/Menksoft2012.woff') format('woff');
-}
+@import "fonts.css";
 
 :root {
-	--general-font: Songti SC, STZhongsong, Minion Pro, Palatino, Palatino Linotype, Garamond, Ubuntu, AR PL UMing HK, Open Sans, serif, MongBaiti;
+	--general-font: Roboto, 'Source Han Sans', sans-serif, MongBaiti;
 	--mon-general-font: Menk Ujug, MongBaiti, Menk-Qimed-Tig, Menk-QingMing-Tig, Menk-Hawang-Tig, Songti SC, STZhongsong, Minion Pro, Palatino, Palatino Linotype, Garamond, Ubuntu, AR PL UMing HK, Open Sans, serif;
 }
+
 body {
 	font-family: var(--general-font);
 }
@@ -55,21 +22,13 @@ hr {
 
 h2 {
 	width: inherit;
-	/* padding-top: 2px; */
-	/* padding-bottom: 2px; */
-	/* border-style: outset; */
-	/* border-width: 3px; */
-	/* border-color: rgb(238,238,238); */
-	/* #background-image: linear-gradient(to bottom, #f8f8ff, #c0c0c6); */
 	font-family: var(--general-font);
 	background: none;
 	margin-top: 5em;
 	margin-bottom: 1.4em;
 	padding: 5px 0 5px 5px;
 	border-left: 10px solid #888888;
-	/* border-right: 10px solid #888888; */
 	border-bottom: 1px solid #888888;
-	/* border-top: 1px solid #888888; */
 	text-align: left;
 }
 
@@ -95,6 +54,10 @@ ul {
 }
 ul li {
 	list-style-position: inside;
+}
+
+ul > li > ul {
+	padding-bottom: 1rem;
 }
 
 .mongol-text {
@@ -167,8 +130,6 @@ ruby rt{
 }
 .mongol-text ruby>rb {
 	line-height: 1;
-	/* text-decoration-thickness: 0.02em; */
-	/* text-decoration-line: overline; */
 }
 .mongol-text ruby>rt {
 	font-size: 45%;
@@ -177,7 +138,7 @@ ruby rt{
 	-webkit-transform: translateX(0.25em);
 }
 .mongol-text ruby>rt>span:nth-of-type(2){
-	letter-spacing: -.3ex;
+	letter-spacing: -.2ex;
 }
 
 audio {
@@ -189,6 +150,16 @@ audio {
 
 html body {
 	background: #FAF7F4;
+}
+
+html > body > main > p {
+	text-align: justify;
+	text-justify:inter-word;
+}
+
+a {
+	text-underline-offset: .2rem;
+	text-decoration-skip-ink: none;
 }
 
 .menu a {
@@ -224,15 +195,21 @@ html body {
 .tabled-list-no-marker tr td:first-of-type {
 	padding-left:0;
 }
+
 .tabled-list-no-marker tr th:nth-of-type(odd) {
 	
 }
+
 .tabled-list, .tabled-list-no-marker {
 	border: none ;
 	margin-right: auto;
 	margin-left: 0px;
 	margin-top: 0.3em;
 	margin-bottom: 1em;
+}
+
+.tabled-list-no-marker {
+	background-color: #eae5e5fb;
 }
 
 .footnotes {
@@ -249,4 +226,32 @@ footer {
 }
 
 
+.vocabulary-column {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr); /* Creates two columns */
+	column-gap: 5ex;
+  }
+  
+.vocabulary-item {
+	display: flex;
+	flex-direction: row;
+	/* padding: 15px; */
+	border-bottom: 1px solid #f0f0f0;
+}
 
+.word {
+	flex: 1;
+	/* font-weight: 600; */
+	/* font-size: 18px; */
+	padding-right: 15px;
+	font-weight: normal;
+
+}
+
+.definition {
+	flex: 2;
+	/* font-size: 16px; */
+	color: #535353;
+	text-align: left;
+	font-style: normal;
+}

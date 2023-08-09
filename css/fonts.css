@@ -1,12 +1,44 @@
-body {
-	font-family: Minion Pro, Palatino, Palatino Linotype, Garamond, Ubuntu, AR PL UMing HK, Open Sans, Microsoft Yahei, Kaiti, Simsun, serif;
+@font-face {
+  font-family: 'Menk Ujug';
+  src: url('/resources/MWJ-Ujug-8102.ttf')
 }
 
-code {
-	font-family: Ubuntu Mono, Fira Mono, Lucida Console, Courier New, Monaco, Kaiti, monospace;
-  font-size: 95%;
+@font-face {
+  font-family: 'Menk-Hawang-Tig';
+  src: url('/resources/MHW8103.ttf')
 }
 
-h2 {
-	font-family: Minion Pro, Palatino, Palatino Linotype, Microsoft Yahei,  Alegreya, AR PL UMing HK, Open Sans, Arial,sans-serif;
+@font-face {
+  font-family: 'Menk-Qimed-Tig';
+  src: url('/resources/Menk-Qimed-Tig-MQD8101.ttf')
+}
+
+@font-face {
+  font-family: 'Menk-QingMing-Tig';
+  src: url('/resources/Menk-QingMing-Tig-MQI8101.ttf')
+}
+
+@font-face {
+  font-family: 'Menk-Lhundb-Tig';
+  src: url('/resources/MenkLhundbTig.ttf')
+}
+
+@font-face {
+  font-family: 'MongBaiti';
+  src: url('/resources/monbaiti.ttf')
+}
+
+@font-face {
+  font-family:'Menksoft2012';
+  src: url('/resources/Menksoft2012.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Roboto';
+	src: url('/resources/Roboto-Regular.ttf');
+}
+
+@font-face {
+	font-family:'Source Han Sans';
+	src: url('/resources/SourceHanSansCN-VF.ttf.woff2');
 }
