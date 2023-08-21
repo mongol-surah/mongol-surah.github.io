@@ -229,7 +229,7 @@ footer {
 .vocabulary-column {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr); /* Creates two columns */
-	column-gap: 5ex;
+	column-gap: 3ex;
   }
   
 .vocabulary-item {

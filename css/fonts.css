@@ -41,4 +41,5 @@
 @font-face {
 	font-family:'Source Han Sans';
 	src: url('/resources/SourceHanSansCN-VF.ttf.woff2');
+	font-display: swap;
 }
