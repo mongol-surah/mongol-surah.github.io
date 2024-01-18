@@ -17,7 +17,7 @@ var addNavLinks = function () {
             document.body.insertBefore(topNavigation, document.body.firstChild);
         }
         backToMainLink.setAttribute('class', 'topnavlink');
-        backToMainLink.href = "/cyrillic/";
+        backToMainLink.href = "/";
         backToMainLink.innerHTML = "回到主站";
         topNavigation.insertBefore(backToMainLink, topNavigation.firstChild);
     }
