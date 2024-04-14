@@ -178,6 +178,10 @@ a {
 	background: inherit;
 }
 
+ol li {
+	margin-bottom: 0.8em;
+}
+
 .tabled-list thead, .tabled-list-no-marker thead {
 	display: none;
 }

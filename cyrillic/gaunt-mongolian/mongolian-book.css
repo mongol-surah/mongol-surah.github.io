@@ -96,7 +96,7 @@ h3::before{
     height: 42px; 
     visibility: hidden; 
     pointer-events: none;
-	font-family: "DejaVu Sans";
+	font-family: Roboto, 'Source Han Sans', sans-serif;
 }
 
 h4::before{
@@ -120,8 +120,7 @@ h5::before{
 a:visited { color: #000080;}
 
 div.titlepage h3{
-    font-family: "DejaVu Sans", "Bitstream Vera Sans",
-		 Geneva, Verdana, sans-serif ;
+    font-family: Roboto, 'Source Han Sans', sans-serif;
     font-size: 2em;
 }
 

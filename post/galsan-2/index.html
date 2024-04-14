@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>蒙文诠释 作者简介 | </title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+	<link rel="stylesheet" href="/css/custom.css" />
+	<title>蒙文诠释 作者简介 </title>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CEJ4N0L9C7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-CEJ4N0L9C7');
+</script>
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">主页</a></li>
+      
+      <li><a href="/cyrillic">学新蒙文</a></li>
+      
+      <li><a href="/post/">文章</a></li>
+      
+      <li><a href="/links">其他资源</a></li>
+      
+      <li><a href="/about">关于</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<h1><span class="title">蒙文诠释 作者简介</span></h1>
+
+<div class="article-meta">
+	<h1 class="date">
+		
+
+		
+		2023/08/22</h1>
+</div>
+
+<main>
+	<h2 id="带注释竖蒙文">带注释竖蒙文</h2>
+<div class="the-amazing-toggle" style="display: flex;">
+    
+	
+    <input type="checkbox" id="toggly" checked>
+    <label for="toggly" onclick="toggleRuby()"><i></i></label>
+	<span>←注释开关</span>
+</div>
+
+<script>
+var lineHeight;
+function getRubyLineHeight() {
+  lineHeight = document.querySelector(".ruby-combo").style["line-height"];
+}
+
+window.onload = getRubyLineHeight;
+
+function toggleRuby() {
+ let displayProp = "block";
+ if(CSS.supports("display: ruby-text")) {
+	displayProp = "ruby-text";
+ }
+ else{
+	displayProp="block";
+   }
+  var rbWords = document.querySelectorAll(".ruby-combo");
+  rbWords;
+  for (let i =0; i< rbWords.length; i++) { 
+		ruby = rbWords[i];
+		rt = rbWords[i].querySelector("rt");
+	  if (rt.style.display === "none") {
+		rt.style.display = displayProp;
+		ruby.style["line-height"] = lineHeight;
+	  } 
+	  else {
+		rt.style.display = "none";
+		ruby.style["line-height"] = 1;
+	  }
+  }
+}
+</script>
+<div class='mongol-border'>
+<div class='mongol-box'>
+<div class='mongol-text'>
+<p><span class="ruby-box"><ruby class="ruby-combo"><rb>ᠵᠣᠬᠢᠶᠠᠭᠴᠢ ᠶᠢᠨ</rb><rt><span>зохиогч-ийн</span><span>著者[领]</span></rt></ruby></span> <span class="ruby-box"><ruby class="ruby-combo"><rb>ᠲᠣᠪᠴᠢ</rb><rt><span>товч</span><span>简</span></rt></ruby></span> <span class="ruby-box"><ruby class="ruby-combo"><rb>ᠮᠡᠳᠡᠭᠡ</rb><rt><span>信息</span></rt></ruby></span></p>
+<p>ᠲᠤᠰ ︽<span class="ruby-box"><ruby class="ruby-combo"><rb>ᠲᠠᠢᠯᠪᠤᠷᠢ</rb><rt><span>тайлбар</span><span>解释</span></rt></ruby></span> ᠪᠢᠴᠢᠭ︾ ᠤᠨ ᠵᠣᠬᠢᠶᠠᠭᠴᠢ ᠭᠠᠯᠰᠠᠩ ᠪᠣᠯ ᠲᠦᠮᠡᠳ  ᠦᠨ ᠬᠥᠮᠦᠨ ᠪᠥᠭᠡᠳ ᠬᠥᠬᠡᠬᠣᠲᠠ ᠶᠢᠨ ᠪᠠᠷᠠᠭᠤᠨ <span class="ruby-box"><ruby class="ruby-combo"><rb>ᠲᠣᠭᠣᠷᠢᠨ ᠤᠨ</rb><rt><span>тойрон-ы</span><span>附近[领]</span></rt></ruby></span> ᠤᠰᠤᠲᠤ ᠠᠶᠢᠯ ᠳᠤ ᠰᠠᠭᠤᠵᠤ ᠪᠠᠶᠢᠭᠰᠠᠨ ᠶᠤᠮ᠃</p>
+
+</div>
+</div>
+</div>
+<h2 id="中文翻译">中文翻译</h2>
+<h4 id="作者简介">作者简介</h4>
+<p>这本《解释书》的作者嘎拉桑是土默特人，在呼和浩特西部郊区生活。</p>
+
+</main>
+
+  <footer>
+  <p>
+制作：<a href="mailto:yabuhu@proton.me" target="_blank">yabuhu@proton.me</a>
+</p>
+
+<script src="//yihui.name/js/math-code.js"></script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3.2/es5/tex-mml-chtml.js">
+</script>
+<script async src="//yihui.name/js/center-img.js"></script>
+
+
+
+
+  
+  </footer>
+  </body>
+</html>

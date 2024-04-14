@@ -1,4 +1,5 @@
 @import url("lwarp_sagebrush.css") ;
+@import url("/css/fonts.css");
 
 div.sidetoccontainer__{
    position: fixed;
@@ -47,8 +48,7 @@ blockquote p{
 }
 
 nav {
-    font-family: "DejaVu Sans", "Bitstream Vera Sans",
-        Geneva, Verdana, sans-serif, "FangSong", ;
+    font-family: Roboto, 'Source Han Sans', sans-serif;
     margin-bottom: 4ex ;
     font-size: 1.5em;
 }
@@ -89,15 +89,15 @@ a.topnavcontents{
 
 div.book, h1, h2, h3, h4, h5, h6, span.paragraph, span.subparagraph
 {
-    font-family: "Linux Libertine O", "Hoefler Text", "Garamond",
-        "Bembo", "Janson", "TeX Gyre Pagella", "Palatino",
-        "Liberation Serif", "Nimbus Roman No 9 L",  "FreeSerif", Times,
-        "Times New Roman", "SimHei", serif;
+    font-family: Roboto, 'Source Han Sans', sans-serif;
     font-style: normal ;
     font-weight: bold ;
     text-align: left ;
 }
 
+body {
+    font-family: Roboto, 'Source Han Sans', sans-serif;
+} 
 /* trick to ensure link targets are not obscured by header */
 h3::before{
     display: block; 
@@ -106,7 +106,7 @@ h3::before{
     height: 42px; 
     visibility: hidden; 
     pointer-events: none;
-	font-family: "DejaVu Sans";
+	font-family: Roboto, 'Source Han Sans', sans-serif;
 }
 
 h4::before{
@@ -130,8 +130,7 @@ h5::before{
 a:visited { color: #000080;}
 
 div.titlepage h3{
-    font-family: "DejaVu Sans", "Bitstream Vera Sans",
-		 Geneva, Verdana, sans-serif ;
+    font-family: Roboto, 'Source Han Sans', sans-serif;
     font-size: 2em;
 }
 
