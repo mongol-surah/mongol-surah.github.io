@@ -9,15 +9,21 @@
 body {
 	font-family: var(--general-font);
 }
+
 nav {
 	margin-bottom: 2em;
 }
+
 hr {
 	border-style: dashed;
 	background-color: #888888;
 	height: 0.0000001ex;
-	opacity: 0.4; 
+	opacity: 0.4;
 	/* color: #304070; */
+}
+
+h1.date {
+	margin-bottom: 2em;
 }
 
 h2 {
@@ -35,65 +41,66 @@ h2 {
 
 
 h2~h3:not(:first-of-type) {
-    margin-top: 40px;
+	margin-top: 40px;
 }
 
 h3 {
-	display:inline-block;
+	display: inline-block;
 	font-weight: 600;
-	text-align:center;
+	text-align: center;
 	padding: 3px;
 	border-style: outset;
 	border-width: 3px;
-	border-color: rgb(238,238,238);
-	background-color:#c0c0f1;
+	border-color: rgb(238, 238, 238);
+	background-color: #c0c0f1;
 }
 
 ul {
 	padding-left: 0.4em;
 }
+
 ul li {
 	list-style-position: inside;
 }
 
-ul > li > ul {
+ul>li>ul {
 	padding-bottom: 1rem;
 }
 
 .mongol-text {
-  margin: 10px;
-  max-height: min(95ex,70vh);
-  writing-mode: vertical-lr;
-  text-orientation: sideways;
-  text-align: justify;
-  text-justify: inter-word;
-  line-height: 140%;
-  font-family: var(--mon-general-font);
-  font-size: 120%;
-  padding: 0px;
+	margin: 10px;
+	max-height: min(95ex, 70vh);
+	writing-mode: vertical-lr;
+	text-orientation: sideways;
+	text-align: justify;
+	text-justify: inter-word;
+	line-height: 140%;
+	font-family: var(--mon-general-font);
+	font-size: 120%;
+	padding: 0px;
 }
 
 .mongol-box {
-  box-sizing: content-box;
-  background-color: #E6F2FF;
-  margin: 0px;
-  overflow-x: scroll;
+	box-sizing: content-box;
+	background-color: #E6F2FF;
+	margin: 0px;
+	overflow-x: scroll;
 }
 
 .mongol-border {
-  padding: 0;
-  max-width: 100%;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-  border: 10px solid transparent;
-  border-image: url(/resources/uul3.svg) 25% round;
+	padding: 0;
+	max-width: 100%;
+	margin-bottom: 10px;
+	box-sizing: border-box;
+	border: 10px solid transparent;
+	border-image: url(/resources/uul3.svg) 25% round;
 }
 
 span.h-mongol-text {
 	font-family: 'Mongolian Title';
 	line-height: 200em;
 	writing-mode: lr;
-	
+
 }
 
 span.mongol-word {
@@ -108,36 +115,41 @@ span.mongol-word {
 }
 
 ruby {
-  white-space: normal;
-  ruby-position: over;
-  line-height: 2.5;
-  box-sizing: border-box;
+	white-space: normal;
+	ruby-position: over;
+	line-height: 2.5;
+	box-sizing: border-box;
 }
 
-ruby rt{
-  text-align: center;
-  margin-top: 0ex;
-  line-height: 1;
+ruby rt {
+	text-align: center;
+	margin-top: 0ex;
+	line-height: 1;
 }
+
 .ruby-box {
-	box-sizing:border-box;
-	margin:0;
-	padding:0; 
-	display:inline-block;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	display: inline-block;
 }
+
 .mongol-text ruby {
 	line-height: 2;
 }
+
 .mongol-text ruby>rb {
 	line-height: 1;
 }
+
 .mongol-text ruby>rt {
 	font-size: 45%;
 	font-family: var(--general-font);
 	text-orientation: mixed;
 	-webkit-transform: translateX(0.25em);
 }
-.mongol-text ruby>rt>span:nth-of-type(2){
+
+.mongol-text ruby>rt>span:nth-of-type(2) {
 	letter-spacing: -.2ex;
 }
 
@@ -152,9 +164,9 @@ html body {
 	background: #FAF7F4;
 }
 
-html > body > main > p {
+html>body>main>p {
 	text-align: justify;
-	text-justify:inter-word;
+	text-justify: inter-word;
 }
 
 a {
@@ -166,12 +178,12 @@ a {
 	background: #FAF7F4;
 	border-style: outset;
 	border-radius: 0.4em;
-	border-color: rgb(238,238,238);
+	border-color: rgb(238, 238, 238);
 }
 
-.title { 
-  font-size: 15pt; 
-  font-weight: normal;
+.title {
+	font-size: 15pt;
+	font-weight: normal;
 }
 
 .article-meta {
@@ -182,30 +194,35 @@ ol li {
 	margin-bottom: 0.8em;
 }
 
-.tabled-list thead, .tabled-list-no-marker thead {
+.tabled-list thead,
+.tabled-list-no-marker thead {
 	display: none;
 }
-.tabled-list td, .tabled-list-no-marker td{
+
+.tabled-list td,
+.tabled-list-no-marker td {
 	padding-top: 0;
 	padding-bottom: 0;
+	vertical-align: top;
 }
-.tabled-list tr, .tabled-list-no-marker tr{
+
+.tabled-list tr,
+.tabled-list-no-marker tr {
 	background: none;
 }
+
 .tabled-list tr td:first-child {
 	display: list-item;
 	list-style-position: inside;
 }
+
 .tabled-list-no-marker tr td:first-of-type {
-	padding-left:0;
+	padding-left: 0;
 }
 
-.tabled-list-no-marker tr th:nth-of-type(odd) {
-	
-}
-
-.tabled-list, .tabled-list-no-marker {
-	border: none ;
+.tabled-list,
+.tabled-list-no-marker {
+	border: none;
 	margin-right: auto;
 	margin-left: 0px;
 	margin-top: 0.3em;
@@ -219,23 +236,15 @@ ol li {
 .footnotes {
 	margin-top: 20ex;
 }
-footer {
-    font-size: .85em ;
-    line-height: 1.2 ;
-    margin-top: 100px ;
-    border-top: 1px solid silver ;
-    /* padding: 2ex 1em 2ex 1em ; */
-    clear: both ;
-    text-align: center ;
-}
 
 
 .vocabulary-column {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr); /* Creates two columns */
+	grid-template-columns: repeat(2, 1fr);
+	/* Creates two columns */
 	column-gap: 3ex;
-  }
-  
+}
+
 .vocabulary-item {
 	display: flex;
 	flex-direction: row;
@@ -258,4 +267,78 @@ footer {
 	color: #535353;
 	text-align: left;
 	font-style: normal;
+}
+
+/* css for proverbs */
+.proverb {
+	margin-bottom: 10px;
+}
+
+.proverb-header {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 5px;
+}
+
+.proverb-number {
+	font-weight: bold;
+}
+
+.proverb-usage {
+	font-style: normal;
+	color: #666;
+}
+
+.proverb-columns {
+	display: flex;
+	justify-content: space-between;
+}
+
+.proverb-column {
+	width: 48%;
+	/* Adjust as needed for spacing */
+}
+
+.proverb-text {
+	font-size: medium;
+	font-weight: normal;
+	margin-bottom: 5px;
+	/* Space between proverb and explanation */
+}
+
+.proverb-explanation {
+	font-size: 14px;
+	font-style: normal;
+	color: #555;
+}
+
+.proverb:first-child:before {
+	content: "";
+	display: block;
+	border: none;
+	margin: 10px 0;
+	border-top: 0.9px solid #000;
+  }
+
+.proverb-mongolian em {
+	/* this is to reproduce the substitution mark (underline) in the book */
+	font-style: normal;
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+hr.proverbs-seperation {
+	border: none;
+	border-top: 1px solid #000;
+	margin: 10px 0;
+}
+
+/* css for footer */
+footer {
+	font-size: .85em;
+	line-height: 1.2;
+	margin-top: 100px;
+	border-top: 1px solid silver;
+	/* padding: 2ex 1em 2ex 1em ; */
+	clear: both;
+	text-align: center;
 }
